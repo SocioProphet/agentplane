@@ -1,0 +1,183 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# qemu-local backend (v0): contract-first.
+# Today: validate bundle, run smoke, emit artifacts, manage pointers.
+# Next: build+boot NixOS VM and execute smoke inside guest (same interface).
+
+usage() {
+  cat <<USAGE
+Usage:
+  runners/qemu-local.sh run <bundle-dir> [--profile staging|prod]
+  runners/qemu-local.sh smoke <bundle-dir>
+  runners/qemu-local.sh promote <bundle-dir>
+  runners/qemu-local.sh rollback
+  runners/qemu-local.sh status
+  runners/qemu-local.sh stop
+
+Notes:
+  - <bundle-dir> is a directory containing bundle.json
+  - v0 does not boot a VM yet; it is contract+artifacts+pointers.
+USAGE
+}
+
+AP_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+STATE_DIR="${AP_ROOT}/state"
+POINTERS_DIR="${STATE_DIR}/pointers"
+
+cmd="${1:-}"
+shift || true
+
+bundle_dir=""
+profile="staging"
+
+if [[ "$cmd" == "run" || "$cmd" == "smoke" || "$cmd" == "promote" ]]; then
+  bundle_dir="${1:-}"
+  shift || true
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --profile) profile="${2:-}"; shift 2;;
+      *) echo "[runner] unknown arg: $1" >&2; exit 2;;
+    esac
+  done
+  if [[ -z "$bundle_dir" || ! -d "$bundle_dir" ]]; then
+    echo "[runner] bundle-dir missing or not a directory" >&2
+    usage; exit 2
+  fi
+fi
+
+bundle_json=""
+if [[ -n "$bundle_dir" ]]; then
+  bundle_json="${bundle_dir%/}/bundle.json"
+  [[ -f "$bundle_json" ]] || { echo "[runner] missing $bundle_json" >&2; exit 2; }
+fi
+
+read_json_field() {
+  # minimal JSON reader: python stdlib only
+  local file="$1" field="$2"
+  python3 - <<PY
+import json
+b=json.load(open("$file","r",encoding="utf-8"))
+cur=b
+for k in "$field".split("."):
+    cur=cur[k]
+print(cur)
+PY
+}
+
+ensure_pointers() {
+  mkdir -p "$POINTERS_DIR"
+  : > "${POINTERS_DIR}/current-staging" 2>/dev/null || true
+  : > "${POINTERS_DIR}/current-prod" 2>/dev/null || true
+  : > "${POINTERS_DIR}/previous-good" 2>/dev/null || true
+}
+
+emit_run_artifact() {
+  local out_dir="$1" bundle_name="$2" bundle_ver="$3" lane="$4"
+  mkdir -p "$out_dir"
+  cat > "${out_dir}/run-artifact.json" <<JSON
+{
+  "kind": "RunArtifact",
+  "bundle": "${bundle_name}@${bundle_ver}",
+  "lane": "${lane}",
+  "backend": "qemu-local",
+  "startedAt": "$(date -Iseconds)",
+  "endedAt": "$(date -Iseconds)",
+  "result": "pass",
+  "notes": "v0 runner: smoke executed on host. Next: smoke executed inside guest VM."
+}
+JSON
+}
+
+emit_placement_receipt() {
+  local out_dir="$1" bundle_name="$2" bundle_ver="$3" lane="$4"
+  mkdir -p "$out_dir"
+  cat > "${out_dir}/placement-receipt.json" <<JSON
+{
+  "kind": "PlacementReceipt",
+  "bundle": "${bundle_name}@${bundle_ver}",
+  "decision": {
+    "chosenSite": "local-host",
+    "backend": "qemu-local",
+    "constraints": { "lane": "${lane}" },
+    "rejectedSites": []
+  },
+  "signedBy": "UNSET",
+  "createdAt": "$(date -Iseconds)"
+}
+JSON
+}
+
+case "$cmd" in
+  run)
+    ensure_pointers
+    echo "[runner] validate bundle..."
+    "${AP_ROOT}/scripts/validate_bundle.py" "$bundle_json" >/dev/null
+
+    name="$(read_json_field "$bundle_json" "metadata.name")"
+    ver="$(read_json_field "$bundle_json" "metadata.version")"
+    out_dir="$(read_json_field "$bundle_json" "spec.artifacts.outDir")"
+    smoke_script="$(read_json_field "$bundle_json" "spec.smoke.script")"
+
+    echo "[runner] smoke (profile=${profile})..."
+    # smoke script accepts OUT_DIR as first arg
+    "${AP_ROOT}/${smoke_script}" "${AP_ROOT}/${out_dir}" >/dev/null
+
+    echo "[runner] emit artifacts..."
+    emit_placement_receipt "${AP_ROOT}/${out_dir}" "$name" "$ver" "$profile"
+    emit_run_artifact "${AP_ROOT}/${out_dir}" "$name" "$ver" "$profile"
+
+    echo "[runner] update current-${profile} pointer..."
+    printf '%s\n' "${bundle_dir%/}" > "${POINTERS_DIR}/current-${profile}"
+
+    echo "[runner] OK: ${name}@${ver} (${profile})"
+    ;;
+
+  smoke)
+    echo "[runner] validate bundle..."
+    "${AP_ROOT}/scripts/validate_bundle.py" "$bundle_json" >/dev/null
+    out_dir="$(read_json_field "$bundle_json" "spec.artifacts.outDir")"
+    smoke_script="$(read_json_field "$bundle_json" "spec.smoke.script")"
+    "${AP_ROOT}/${smoke_script}" "${AP_ROOT}/${out_dir}"
+    ;;
+
+  promote)
+    ensure_pointers
+    "${AP_ROOT}/scripts/validate_bundle.py" "$bundle_json" >/dev/null
+    echo "[runner] promote: staging -> prod pointer swap"
+    # move prod to previous-good if set
+    if [[ -s "${POINTERS_DIR}/current-prod" ]]; then
+      cp -f "${POINTERS_DIR}/current-prod" "${POINTERS_DIR}/previous-good"
+    fi
+    printf '%s\n' "${bundle_dir%/}" > "${POINTERS_DIR}/current-prod"
+    echo "[runner] OK: current-prod -> ${bundle_dir%/}"
+    ;;
+
+  rollback)
+    ensure_pointers
+    if [[ ! -s "${POINTERS_DIR}/previous-good" ]]; then
+      echo "[runner] no previous-good pointer set" >&2
+      exit 2
+    fi
+    echo "[runner] rollback: current-prod -> previous-good"
+    cp -f "${POINTERS_DIR}/current-prod" "${POINTERS_DIR}/current-staging" 2>/dev/null || true
+    cp -f "${POINTERS_DIR}/previous-good" "${POINTERS_DIR}/current-prod"
+    echo "[runner] OK: current-prod rolled back"
+    ;;
+
+  status)
+    ensure_pointers
+    echo "[runner] pointers:"
+    for f in current-staging current-prod previous-good; do
+      printf "  %-14s %s\n" "$f:" "$(cat "${POINTERS_DIR}/${f}" 2>/dev/null || true)"
+    done
+    ;;
+
+  stop)
+    # v0 no-op; future: kill VM pidfiles
+    echo "[runner] stop: v0 no-op (no VM yet)"
+    ;;
+
+  *)
+    usage; exit 2;;
+esac
