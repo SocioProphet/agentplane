@@ -117,13 +117,27 @@ case "$cmd" in
     out_dir="$(read_json_field "$bundle_json" "spec.artifacts.outDir")"
     smoke_script="$(read_json_field "$bundle_json" "spec.smoke.script")"
 
-    echo "[runner] smoke (profile=${profile})..."
-    # smoke script accepts OUT_DIR as first arg
-    "${AP_ROOT}/${smoke_script}" "${AP_ROOT}/${out_dir}" >/dev/null
+    echo "[runner] build VM artifact (flake package vm-example-agent)..."
+    # Build VM artifact. On Linux, add --extra-experimental-features if needed.
+    nix build ".#packages.$(nix eval --raw --impure --expr builtins.currentSystem).vm-example-agent" --no-link
 
-    echo "[runner] emit artifacts..."
+    # Find the VM run script from the build output
+    VM_OUT="$(nix path-info ".#packages.$(nix eval --raw --impure --expr builtins.currentSystem).vm-example-agent")"
+    RUN_SCRIPT="$(ls -1 "${VM_OUT}"/bin/run-*-vm 2>/dev/null | head -n1 || true)"
+    if [[ -z "${RUN_SCRIPT}" ]]; then
+      echo "[runner] ERROR: could not find run-*-vm script in ${VM_OUT}/bin" >&2
+      exit 2
+    fi
+
+    echo "[runner] run VM (guest executes smoke and powers off)..."
+    mkdir -p "${AP_ROOT}/${out_dir}"
+    # Mount artifacts into guest as /mnt/artifacts via 9p
+    export QEMU_OPTS="${QEMU_OPTS:-} -virtfs local,path=${AP_ROOT}/${out_dir},mount_tag=artifacts,security_model=none,id=artifacts"
+    "${RUN_SCRIPT}" >/dev/null
+
+    echo "[runner] emit placement receipt (host-side scheduling receipt)..."
     emit_placement_receipt "${AP_ROOT}/${out_dir}" "$name" "$ver" "$profile"
-    emit_run_artifact "${AP_ROOT}/${out_dir}" "$name" "$ver" "$profile"
+    echo "[runner] NOTE: run-artifact.json should now be guest-authored in ${out_dir}"
 
     echo "[runner] update current-${profile} pointer..."
     printf '%s\n' "${bundle_dir%/}" > "${POINTERS_DIR}/current-${profile}"
