@@ -128,6 +128,17 @@ case "$cmd" in
     smoke_script="$(read_json_field "$bundle_json" "spec.smoke.script")"
 
     echo "[runner] build VM artifact (flake package vm-example-agent)..."
+    HOST_SYS="$(uname -s | tr '[:upper:]' '[:lower:]')"
+    if [[ "${HOST_SYS}" == "darwin" && "${TARGET_SYSTEM}" == *"-linux" ]]; then
+      # On macOS we need a remote Linux builder; building Linux closures locally is not available.
+      BUILDERS="$(nix config show 2>/dev/null | awk -F" = " '/^builders =/ {print $2}' | head -n1 | tr -d ' ')"
+      if [[ -z "${BUILDERS}" ]]; then
+        echo "[runner] ERROR: target system ${TARGET_SYSTEM} requires a remote Linux builder, but nix.builders is empty." >&2
+        echo "[runner] Remediation: set builders = ssh-ng://user@<linux-host> ${TARGET_SYSTEM} ... in /etc/nix/nix.conf" >&2
+        echo "[runner] This is expected on hotspot/NAT networks with no reachable Linux host." >&2
+        exit 2
+      fi
+    fi
     # Build VM artifact. On Linux, add --extra-experimental-features if needed.
     nix build ".#packages.${TARGET_SYSTEM}.vm-example-agent" --no-link
 
