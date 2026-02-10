@@ -31,12 +31,15 @@ shift || true
 bundle_dir=""
 profile="staging"
 
+TARGET_SYSTEM="aarch64-linux"
+
 if [[ "$cmd" == "run" || "$cmd" == "smoke" || "$cmd" == "promote" ]]; then
   bundle_dir="${1:-}"
   shift || true
   while [[ $# -gt 0 ]]; do
     case "$1" in
       --profile) profile="${2:-}"; shift 2;;
+      --system) TARGET_SYSTEM="${2:-}"; shift 2;;
       *) echo "[runner] unknown arg: $1" >&2; exit 2;;
     esac
   done
@@ -126,10 +129,10 @@ case "$cmd" in
 
     echo "[runner] build VM artifact (flake package vm-example-agent)..."
     # Build VM artifact. On Linux, add --extra-experimental-features if needed.
-    nix build ".#packages.$(nix eval --raw --impure --expr builtins.currentSystem).vm-example-agent" --no-link
+    nix build ".#packages.${TARGET_SYSTEM}.vm-example-agent" --no-link
 
     # Find the VM run script from the build output
-    VM_OUT="$(nix path-info ".#packages.$(nix eval --raw --impure --expr builtins.currentSystem).vm-example-agent")"
+    VM_OUT="$(nix path-info ".#packages.${TARGET_SYSTEM}.vm-example-agent")"
     RUN_SCRIPT="$(ls -1 "${VM_OUT}"/bin/run-*-vm 2>/dev/null | head -n1 || true)"
     if [[ -z "${RUN_SCRIPT}" ]]; then
       echo "[runner] ERROR: could not find run-*-vm script in ${VM_OUT}/bin" >&2
