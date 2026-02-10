@@ -67,9 +67,7 @@ PY
 
 ensure_pointers() {
   mkdir -p "$POINTERS_DIR"
-  : > "${POINTERS_DIR}/current-staging" 2>/dev/null || true
-  : > "${POINTERS_DIR}/current-prod" 2>/dev/null || true
-  : > "${POINTERS_DIR}/previous-good" 2>/dev/null || true
+  touch "${POINTERS_DIR}/current-staging" "${POINTERS_DIR}/current-prod" "${POINTERS_DIR}/previous-good"
 }
 
 emit_run_artifact() {

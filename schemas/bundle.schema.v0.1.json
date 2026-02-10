@@ -1,0 +1,103 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Agentplane Bundle Schema v0.1",
+  "type": "object",
+  "required": ["apiVersion", "kind", "metadata", "spec"],
+  "properties": {
+    "apiVersion": { "type": "string", "enum": ["agentplane.socioprophet.org/v0.1"] },
+    "kind": { "type": "string", "enum": ["Bundle"] },
+    "metadata": {
+      "type": "object",
+      "required": ["name", "version", "createdAt"],
+      "properties": {
+        "name": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]{1,62}$" },
+        "version": { "type": "string" },
+        "createdAt": { "type": "string" },
+        "source": {
+          "type": "object",
+          "properties": {
+            "git": { "type": "object", "properties": { "rev": { "type": "string" }, "dirty": { "type": "boolean" } } }
+          }
+        },
+        "licensePolicy": {
+          "type": "object",
+          "description": "Our internal compliance gate: declare that bundle contents are shippable under our rules.",
+          "properties": {
+            "allowAGPL": { "type": "boolean", "enum": [false] },
+            "notes": { "type": "string" }
+          }
+        }
+      }
+    },
+    "spec": {
+      "type": "object",
+      "required": ["vm", "policy", "secrets", "artifacts", "smoke"],
+      "properties": {
+        "vm": {
+          "type": "object",
+          "required": ["modulePath", "backendIntent"],
+          "properties": {
+            "modulePath": { "type": "string", "description": "Path to NixOS module entry (e.g., vm.nix)" },
+            "backendIntent": { "type": "string", "enum": ["qemu", "microvm", "fleet"] },
+            "resources": {
+              "type": "object",
+              "properties": { "vcpu": { "type": "integer" }, "memMiB": { "type": "integer" }, "diskGiB": { "type": "integer" } }
+            },
+            "mounts": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["type", "source", "target", "ro"],
+                "properties": {
+                  "type": { "type": "string", "enum": ["virtiofs", "9p", "none"] },
+                  "source": { "type": "string" },
+                  "target": { "type": "string" },
+                  "ro": { "type": "boolean" }
+                }
+              }
+            },
+            "network": {
+              "type": "object",
+              "properties": {
+                "mode": { "type": "string", "enum": ["none", "nat", "bridge", "slirp"] },
+                "egressAllowlist": { "type": "array", "items": { "type": "string" } }
+              }
+            }
+          }
+        },
+        "policy": {
+          "type": "object",
+          "description": "TrustFirst Policy Pack pointer(s) and hashes; contents live elsewhere.",
+          "properties": {
+            "policyPackRef": { "type": "string" },
+            "policyPackHash": { "type": "string" },
+            "lane": { "type": "string", "enum": ["staging", "prod"] },
+            "humanGateRequired": { "type": "boolean" }
+          }
+        },
+        "secrets": {
+          "type": "object",
+          "description": "Secrets are refs/paths only — never inline values.",
+          "properties": {
+            "required": { "type": "array", "items": { "type": "string" } },
+            "secretRefRoot": { "type": "string" }
+          }
+        },
+        "artifacts": {
+          "type": "object",
+          "required": ["outDir"],
+          "properties": {
+            "outDir": { "type": "string", "description": "Where proof artifacts are written (run/policy/promotion/replay/receipt)" }
+          }
+        },
+        "smoke": {
+          "type": "object",
+          "required": ["script"],
+          "properties": {
+            "script": { "type": "string" }
+          }
+        }
+      }
+    }
+  }
+}
