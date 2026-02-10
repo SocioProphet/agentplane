@@ -108,6 +108,13 @@ JSON
 
 case "$cmd" in
   run)
+    # Host prerequisites (fail fast, product-grade)
+    command -v python3 >/dev/null || { echo "[runner] ERROR: python3 is required" >&2; exit 2; }
+    command -v nix >/dev/null || {
+      echo "[runner] ERROR: nix is required for VM builds (nix command not found)." >&2
+      echo "[runner] Hint: install Nix on this host, or run this backend on a Linux host with Nix." >&2
+      exit 2
+    }
     ensure_pointers
     echo "[runner] validate bundle..."
     "${AP_ROOT}/scripts/validate_bundle.py" "$bundle_json" >/dev/null
