@@ -9,6 +9,7 @@ SYSTEM="${3:-aarch64-linux}"
 rm -rf artifacts/example-agent
 mkdir -p artifacts/example-agent
 
+./scripts/hygiene.sh
 ./scripts/doctor.sh "${SYSTEM}"
 ./runners/qemu-local.sh run "${BUNDLE_DIR}" --profile "${PROFILE}" --system "${SYSTEM}" --watch
 
