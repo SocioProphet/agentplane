@@ -1,0 +1,29 @@
+# Local archives / extracted repos (do not commit)
+_archives/
+spine/
+components/
+
+# OS/editor noise
+.DS_Store
+Thumbs.db
+__MACOSX/
+
+# Python noise
+.venv/
+venv/
+env/
+__pycache__/
+*.pyc
+*.pyo
+
+# Node
+node_modules/
+
+# Rust/Go build artifacts
+target/
+dist/
+build/
+
+# IDE
+.idea/
+.vscode/
