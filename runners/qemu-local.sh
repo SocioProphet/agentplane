@@ -184,6 +184,27 @@ case "$cmd" in
     ver="$(read_json_field "$bundle_json" "metadata.version")"
     out_dir="$(read_json_field "$bundle_json" "spec.artifacts.outDir")"
     backend_intent="$(read_json_field "$bundle_json" "spec.vm.backendIntent")"
+    # Caps guard: prevent slow/hanging nested VM backends when executor has no KVM.
+    # If backendIntent requests VM, but executor caps.kvm is false, force lima-process.
+    if [[ "${backend_intent}" == "qemu" || "${backend_intent}" == "microvm" ]]; then
+      # Try read caps.kvm from fleet inventory for default executor (best-effort; empty means unknown)
+      KVM_CAP="$(python3 - <<'PYI' 2>/dev/null || true
+import json
+from pathlib import Path
+inv=Path("fleet/inventory.json")
+if inv.exists():
+    d=json.load(inv.open())
+    name=d.get("defaultExecutor")
+    for ex in d.get("executors",[]):
+        if ex.get("name")==name:
+            print(ex.get("caps",{}).get("kvm",""))
+PYI
+)"
+      if [[ "${KVM_CAP}" == "False" || "${KVM_CAP}" == "false" ]]; then
+        backend_intent="lima-process"
+      fi
+    fi
+
     max_run_seconds="$(read_json_field "$bundle_json" "spec.policy.maxRunSeconds")"
     fail_on_timeout="$(read_json_field "$bundle_json" "spec.policy.failOnTimeout")"
     executor_ref="$(read_json_field_optional "$bundle_json" "spec.executor.ref")"
