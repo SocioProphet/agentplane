@@ -36,8 +36,10 @@ def main() -> int:
     # Our hard constraint: never allow AGPL in shipped content.
     if lp.get("allowAGPL", False) is not False:
         die("metadata.licensePolicy.allowAGPL must be false", 2)
-
+    # Spec checks (v0.1)
     for k in ("vm", "policy", "secrets", "artifacts", "smoke"):
+        if k not in spec:
+            die(f"spec.{k} is required", 2)
 
     pol = spec.get("policy") or {}
     mrs = pol.get("maxRunSeconds")
@@ -45,8 +47,7 @@ def main() -> int:
         die("spec.policy.maxRunSeconds is required", 2)
     if not isinstance(mrs, int) or mrs < 5 or mrs > 3600:
         die("spec.policy.maxRunSeconds must be an int in [5, 3600]", 2)
-        if k not in spec:
-            die(f"spec.{k} is required", 2)
+
 
     vm = spec["vm"]
     backend_intent = vm.get("backendIntent")
