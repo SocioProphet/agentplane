@@ -186,8 +186,8 @@ case "$cmd" in
 
       # Build+run inside remote Linux
       if [[ "${WATCH}" == "true" ]]; then
-        echo "[watch] streaming remote guest-serial.log (last 1 line every 2s)..."
-        ( ssh "${REMOTE}" "tail -n +1 -F ${REMOTE_ROOT}/artifacts/guest-serial.log 2>/dev/null || true" ) &
+        echo "[watch] streaming remote guest-serial.log (tail -F)..."
+        ssh "${REMOTE}" "tail -n +1 -F ${REMOTE_ROOT}/artifacts/guest-serial.log 2>/dev/null || true" &
         WATCH_PID=$!
         trap "kill ${WATCH_PID} >/dev/null 2>&1 || true" EXIT
       fi
