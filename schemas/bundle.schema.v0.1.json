@@ -78,6 +78,14 @@
           ],
           "type": "object"
         },
+        "executor": {
+          "properties": {
+            "ref": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
         "policy": {
           "description": "TrustFirst Policy Pack pointer(s) and hashes; contents live elsewhere.",
           "properties": {
