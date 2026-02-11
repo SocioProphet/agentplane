@@ -299,6 +299,29 @@ JSON
       echo "[runner] emit placement receipt (host-side scheduling receipt)..."
             echo "${PLACEMENT_JSON}" > "${AP_ROOT}/${out_dir}/placement-decision.json"
       emit_placement_receipt "${AP_ROOT}/${out_dir}" "$name" "$ver" "$profile" "lima-process" "${REMOTE}"
+      # Embed PlacementDecision into PlacementReceipt (evidence coherence)
+      if [[ -f "${AP_ROOT}/${out_dir}/placement-decision.json" && -f "${AP_ROOT}/${out_dir}/placement-receipt.json" ]]; then
+        python3 - <<'PYI' "${AP_ROOT}/${out_dir}/placement-receipt.json" "${AP_ROOT}/${out_dir}/placement-decision.json"
+import json,sys
+receipt=json.load(open(sys.argv[1],"r",encoding="utf-8"))
+decision=json.load(open(sys.argv[2],"r",encoding="utf-8"))
+receipt.setdefault("decision", {})["scheduler"] = decision
+open(sys.argv[1],"w",encoding="utf-8").write(json.dumps(receipt, indent=2, sort_keys=True)+"\n")
+PYI
+      fi
+
+      # Drift guard: scheduler sshRef must match executor used
+      SCH_REF="$(python3 - <<'PYI' "${AP_ROOT}/${out_dir}/placement-receipt.json" 2>/dev/null || true
+import json,sys
+r=json.load(open(sys.argv[1],"r",encoding="utf-8"))
+print(r.get("decision",{}).get("scheduler",{}).get("sshRef",""))
+PYI
+)"
+      if [[ -n "${SCH_REF}" && "${SCH_REF}" != "${REMOTE}" ]]; then
+        echo "[runner] ERROR: scheduler sshRef mismatch: receipt=${SCH_REF} remote=${REMOTE}" >&2
+        exit 2
+      fi
+
       # Drift guard: placement receipt backend must match run-artifact backend
       if [[ -f "${AP_ROOT}/${out_dir}/run-artifact.json" && -f "${AP_ROOT}/${out_dir}/placement-receipt.json" ]]; then
         RUN_BACKEND="$(python3 -c 'import json,sys;print(json.load(open(sys.argv[1]))["backend"])' 2>/dev/null "${AP_ROOT}/${out_dir}/run-artifact.json" || true)"
