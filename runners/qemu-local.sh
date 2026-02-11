@@ -151,7 +151,7 @@ case "$cmd" in
       fi
     fi
     # Build VM artifact. On Linux, add --extra-experimental-features if needed.
-    nix build ".#packages.${TARGET_SYSTEM}.vm-example-agent" --no-link
+    NIX_PROGRESS_STYLE=none TERM=dumb nix build --log-format raw --quiet ".#packages.${TARGET_SYSTEM}.vm-example-agent" --no-link
 
     # Find the VM run script from the build output
     VM_OUT="$(nix path-info ".#packages.${TARGET_SYSTEM}.vm-example-agent")"
@@ -181,7 +181,7 @@ case "$cmd" in
       ssh "${REMOTE}" "set -euo pipefail; \
         . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh; \
         cd ${REMOTE_ROOT}/repo; \
-        nix build .#packages.${TARGET_SYSTEM}.vm-example-agent --no-link; \
+        NIX_PROGRESS_STYLE=none TERM=dumb nix build --log-format raw --quiet .#packages.${TARGET_SYSTEM}.vm-example-agent --no-link; \
         VM_OUT=\"$(nix path-info .#packages.${TARGET_SYSTEM}.vm-example-agent)\"; \
         RUN_SCRIPT=\"$(ls -1 ${VM_OUT}/bin/run-*-vm | head -n1)\"; \
         mkdir -p ${REMOTE_ROOT}/artifacts; \
