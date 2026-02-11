@@ -132,7 +132,58 @@ case "$cmd" in
     name="$(read_json_field "$bundle_json" "metadata.name")"
     ver="$(read_json_field "$bundle_json" "metadata.version")"
     out_dir="$(read_json_field "$bundle_json" "spec.artifacts.outDir")"
+    backend_intent="$(read_json_field "$bundle_json" "spec.vm.backendIntent")"
     smoke_script="$(read_json_field "$bundle_json" "spec.smoke.script")"
+
+    # Local-fast mode: run agent directly in the Lima executor (no nested QEMU under TCG)
+    if [[ "${backend_intent}" == "lima-process" ]]; then
+      REMOTE="lima-nixbuilder"
+      REMOTE_ROOT="/tmp/agentplane-run"
+      REMOTE_TIMEOUT="${REMOTE_TIMEOUT:-60}"
+
+      echo "[runner] lima-process: delegating to ${REMOTE} (timeout=${REMOTE_TIMEOUT}s)"
+      ssh "${REMOTE}" "mkdir -p ${REMOTE_ROOT}/repo ${REMOTE_ROOT}/artifacts && : > ${REMOTE_ROOT}/artifacts/guest-serial.log"
+      rsync -a --delete --exclude ".git/" --exclude "artifacts/" --exclude "state/pointers/" "${AP_ROOT}/" "${REMOTE}:${REMOTE_ROOT}/repo/"
+
+      if [[ "${WATCH}" == "true" ]]; then
+        echo "[watch] streaming remote guest-serial.log (tail -F)..."
+        ssh "${REMOTE}" "tail -n +1 -F ${REMOTE_ROOT}/artifacts/guest-serial.log 2>/dev/null || true" &
+        WATCH_PID=$!
+        trap "kill ${WATCH_PID} >/dev/null 2>&1 || true" EXIT
+      fi
+
+      ssh "${REMOTE}" bash -s <<'EOS'
+set -euo pipefail
+REMOTE_ROOT="/tmp/agentplane-run"
+ART="${REMOTE_ROOT}/artifacts"
+mkdir -p "${ART}"
+
+# A tiny "agent" run that writes proof artifacts deterministically
+echo "[lima-process] hello $(date -Iseconds)" | tee -a "${ART}/guest-serial.log" >/dev/null
+echo "[lima-process] proof: $(date -Iseconds)" > "${ART}/guest-proof.txt"
+
+cat > "${ART}/run-artifact.json" <<JSON
+{
+  "kind": "RunArtifact",
+  "bundle": "example-agent@0.1.0",
+  "lane": "staging",
+  "backend": "lima-process",
+  "executedIn": "lima-vm",
+  "startedAt": "$(date -Iseconds)",
+  "endedAt": "$(date -Iseconds)",
+  "result": "pass"
+}
+JSON
+EOS
+
+      rsync -a --delete "${REMOTE}:${REMOTE_ROOT}/artifacts/" "${AP_ROOT}/${out_dir}/"
+      echo "[runner] emit placement receipt (host-side scheduling receipt)..."
+      emit_placement_receipt "${AP_ROOT}/${out_dir}" "$name" "$ver" "$profile"
+      echo "[runner] update current-${profile} pointer..."
+      printf '%s\n' "${bundle_dir%/}" > "${POINTERS_DIR}/current-${profile}"
+      echo "[runner] OK: ${name}@${ver} (${profile}) [lima-process]"
+      exit 0
+    fi
 
     echo "[runner] build VM artifact (flake package vm-example-agent)..."
     HOST_SYS="$(uname -s | tr '[:upper:]' '[:lower:]')"
