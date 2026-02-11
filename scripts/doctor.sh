@@ -7,7 +7,18 @@ TARGET_SYSTEM="${1:-aarch64-linux}"
 
 command -v nix >/dev/null || { echo "[doctor] FAIL: nix not in PATH"; exit 2; }
 
-BUILDERS="$(nix config show 2>/dev/null | awk -F" = " '/^builders =/ {print $2}' | head -n1)"
+BUILDERS_RAW="$(nix config show 2>/dev/null | awk -F\" = \" '/^builders =/ {print $2}' | head -n1)"
+BUILDERS="${BUILDERS_RAW}"
+
+# If builders is a @file reference (common on macOS Determinate installs), read the file.
+if [[ "${BUILDERS_RAW}" == @* ]]; then
+  MACHINES_FILE="${BUILDERS_RAW#@}"
+  if [[ -f "${MACHINES_FILE}" ]]; then
+    BUILDERS="$(grep -vE '^\s*#|^\s*$' "${MACHINES_FILE}" | tr '\n' ' ')"
+  else
+    BUILDERS=""
+  fi
+fi
 
 HOST_SYS="$(uname -s | tr '[:upper:]' '[:lower:]')"
 if [[ "${HOST_SYS}" == "darwin" && "${TARGET_SYSTEM}" == *"-linux" ]]; then
