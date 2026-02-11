@@ -194,8 +194,8 @@ JSON
       emit_placement_receipt "${AP_ROOT}/${out_dir}" "$name" "$ver" "$profile" "lima-process" "${REMOTE}"
       # Drift guard: placement receipt backend must match run-artifact backend
       if [[ -f "${AP_ROOT}/${out_dir}/run-artifact.json" && -f "${AP_ROOT}/${out_dir}/placement-receipt.json" ]]; then
-        RUN_BACKEND="$(python3 -c 'import json;print(json.load(open("artifacts/example-agent/run-artifact.json"))["backend"])' 2>/dev/null || true)"
-        REC_BACKEND="$(python3 -c 'import json;print(json.load(open("artifacts/example-agent/placement-receipt.json"))["decision"]["backend"])' 2>/dev/null || true)"
+        RUN_BACKEND="$(python3 -c 'import json,sys;print(json.load(open(sys.argv[1]))["backend"])' 2>/dev/null "${AP_ROOT}/${out_dir}/run-artifact.json" || true)"
+        REC_BACKEND="$(python3 -c 'import json,sys;print(json.load(open(sys.argv[1]))["decision"]["backend"])' 2>/dev/null "${AP_ROOT}/${out_dir}/placement-receipt.json" || true)"
         if [[ -n "${RUN_BACKEND}" && -n "${REC_BACKEND}" && "${RUN_BACKEND}" != "${REC_BACKEND}" ]]; then
           echo "[runner] ERROR: backend mismatch: run-artifact=${RUN_BACKEND} placement-receipt=${REC_BACKEND}" >&2
           exit 2
