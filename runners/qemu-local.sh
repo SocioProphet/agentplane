@@ -106,7 +106,7 @@ emit_placement_receipt() {
   "bundle": "${bundle_name}@${bundle_ver}",
   "decision": {
     "chosenSite": "${site}",
-    "backend": "qemu-local",
+    "backend": "${backend}",
     "constraints": { "lane": "${lane}" },
     "rejectedSites": []
   },
@@ -292,7 +292,7 @@ EOS
       "${RUN_SCRIPT}" >/dev/null
       echo "[runner] emit placement receipt (host-side scheduling receipt)..."
     fi
-    emit_placement_receipt "${AP_ROOT}/${out_dir}" "$name" "$ver" "$profile"
+    emit_placement_receipt "${AP_ROOT}/${out_dir}" "$name" "$ver" "$profile" "lima-process" "${REMOTE}"
     echo "[runner] NOTE: run-artifact.json should now be guest-authored in ${out_dir}"
 
     echo "[runner] update current-${profile} pointer..."
