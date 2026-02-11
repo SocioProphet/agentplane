@@ -177,6 +177,19 @@ JSON
 EOS
 
       rsync -a --delete "${REMOTE}:${REMOTE_ROOT}/artifacts/" "${AP_ROOT}/${out_dir}/"
+      # Replay artifact (fleet-shaped): how to reproduce this run
+      cat > "${AP_ROOT}/${out_dir}/replay-artifact.json" <<JSON
+{
+  "kind": "ReplayArtifact",
+  "bundleDir": "${bundle_dir%/}",
+  "backend": "lima-process",
+  "executor": "${REMOTE}",
+  "executorRoot": "${REMOTE_ROOT}",
+  "invocation": "./runners/qemu-local.sh run ${bundle_dir%/} --profile ${profile} --system ${TARGET_SYSTEM} --watch",
+  "capturedAt": "$(date -Iseconds)"
+}
+JSON
+
       echo "[runner] emit placement receipt (host-side scheduling receipt)..."
       emit_placement_receipt "${AP_ROOT}/${out_dir}" "$name" "$ver" "$profile"
       echo "[runner] update current-${profile} pointer..."
