@@ -1,0 +1,439 @@
+version: '0.1'
+generated_at: '2026-02-11T20:24:59.554912+00:00'
+policy:
+  preferred_licenses:
+  - MIT
+  - Apache-2.0
+  permissive_allowed:
+  - BSD-3-Clause
+  - CC0-1.0
+  boxed_required:
+  - GPL-3.0
+  - AGPL-3.0
+  - CAL-1.0
+  - BUSL-1.1
+  - Proprietary
+  - VERIFY_PER_REPO
+  - NO_LICENSE_IN_ARCHIVE
+  - AMBIGUOUS
+  block_if_missing_license: true
+tools:
+- id: sourceos
+  name: SourceOS
+  kind: repo
+  layer: L0-os-sandbox
+  lane: spine-core
+  license: MIT
+  source: Archive.zip:SourceOS-main
+  interfaces:
+  - (none)
+  replacement: none
+  notes: OS substrate; must operate without socios.
+- id: sociosphere
+  name: sociosphere
+  kind: repo
+  layer: L3-orchestration
+  lane: spine-core
+  license: NO_LICENSE_IN_ARCHIVE
+  source: Archive.zip:sociosphere-main
+  interfaces:
+  - OrchestratorAPI
+  replacement: none
+  notes: Workspace/orchestrator. Add LICENSE before distribution.
+- id: tritrpc
+  name: TriTRPC
+  kind: repo
+  layer: L3-protocol
+  lane: spine-core
+  license: MIT
+  source: Archive.zip:TriTRPC-main
+  interfaces:
+  - (protocol)
+  replacement: none
+  notes: Deterministic RPC protocol + fixtures.
+- id: standards-storage
+  name: socioprophet-standards-storage
+  kind: repo
+  layer: L0-standards
+  lane: spine-core
+  license: MIT
+  source: Archive.zip:socioprophet-standards-storage
+  interfaces:
+  - (standards)
+  replacement: none
+  notes: Canonical platform standards.
+- id: standards-knowledge
+  name: socioprophet-standards-knowledge
+  kind: repo
+  layer: L0-standards
+  lane: spine-core
+  license: MIT
+  source: Archive.zip:socioprophet-standards-knowledge
+  interfaces:
+  - (standards)
+  replacement: none
+  notes: Canonical knowledge context standards.
+- id: agentplane
+  name: agentplane
+  kind: repo
+  layer: L2-execution
+  lane: spine-core
+  license: MIT
+  source: Archive.zip:agentplane
+  interfaces:
+  - ExecutorAPI
+  replacement: none
+  notes: Execution/control plane; evidence bundles; sandbox-friendly.
+- id: tritfabric
+  name: tritfabric
+  kind: repo
+  layer: L2-runtime
+  lane: spine-core
+  license: MIT
+  source: Archive.zip:tritfabric_repo_fresh
+  interfaces:
+  - (runtime)
+  replacement: none
+  notes: Opt-in runtime service; default-deny; local-first mode.
+- id: socios
+  name: socios
+  kind: repo
+  layer: L3-community-automation
+  lane: boxed
+  license: GPL-3.0
+  source: Archive.zip:socios-main
+  interfaces:
+  - (automation)
+  replacement: optional
+  notes: Opt-in community automation. OFF by default. Keep separate service; avoid
+    linking into base OS distribution.
+- id: global-devsecops-intelligence
+  name: global-devsecops-intelligence
+  kind: repo
+  layer: L0-specs
+  lane: blocked
+  license: NO_LICENSE_IN_ARCHIVE
+  source: Archive.zip:global-devsecops-intelligence
+  interfaces:
+  - (specs)
+  replacement: none
+  notes: Spec bundle. Add LICENSE before using beyond internal reference.
+- id: aiwg
+  name: AIWG
+  kind: repo
+  layer: L3-process-spine
+  lane: core
+  license: MIT
+  source: aiwg-main.zip
+  interfaces:
+  - Process Spine
+  replacement: none
+  notes: 'Workflow spine: artifacts, stage gates, ensemble patterns.'
+- id: vercel-ai-sdk
+  name: Vercel AI SDK (ai)
+  kind: repo
+  layer: L6-app-framework
+  lane: support
+  license: Apache-2.0
+  source: ai-main.zip
+  interfaces:
+  - (app sdk)
+  replacement: none
+  notes: App-layer agent SDK (TypeScript).
+- id: browser-use
+  name: browser-use
+  kind: repo
+  layer: L4-browser-ops
+  lane: support
+  license: MIT
+  source: browser-use-main.zip
+  interfaces:
+  - BrowserOpsAPI
+  replacement: none
+  notes: Alternate BrowserOps driver.
+- id: agent-s
+  name: Agent-S
+  kind: repo
+  layer: L4-desktop-ops
+  lane: restricted
+  license: Apache-2.0
+  source: Agent-S-main.zip
+  interfaces:
+  - DesktopOpsAPI
+  replacement: none
+  notes: Desktop/GUI automation. Sandbox+opt-in only.
+- id: inbox-zero
+  name: Inbox Zero
+  kind: repo
+  layer: L7-vertical
+  lane: boxed
+  license: GPL-3.0
+  source: inbox-zero-main.zip
+  interfaces:
+  - MailOpsAPI
+  replacement: planned
+  notes: Email automation app. Keep as separate service; do not link into OS base.
+- id: fortemi
+  name: Fortemi
+  kind: repo
+  layer: L5-knowledge
+  lane: quarantine
+  license: BUSL-1.1
+  source: fortemi-main.zip
+  interfaces:
+  - KnowledgeBaseAPI
+  replacement: replace-first
+  notes: Source-available; evaluation only. Build permissive KB-Core replacement early.
+- id: skill-seekers
+  name: Skill Seekers
+  kind: repo
+  layer: L5-ingestion
+  lane: support
+  license: MIT
+  source: Skill_Seekers-development.zip
+  interfaces:
+  - Extractor
+  replacement: none
+  notes: RAG preprocessing / ingestion helpers.
+- id: seomachine
+  name: seomachine
+  kind: repo
+  layer: L7-vertical
+  lane: support
+  license: MIT
+  source: seomachine-main.zip
+  interfaces:
+  - (rig)
+  replacement: none
+  notes: SEO rig (Claude Code workspace).
+- id: agent-inbox
+  name: agent-inbox
+  kind: repo
+  layer: L7-vertical
+  lane: support
+  license: MIT
+  source: agent-inbox-main.zip
+  interfaces:
+  - (rig)
+  replacement: none
+  notes: Inbox rig / patterns.
+- id: anus
+  name: ANUS
+  kind: repo
+  layer: L7-vertical
+  lane: support
+  license: Apache-2.0
+  source: ANUS-main.zip
+  interfaces:
+  - (example)
+  replacement: none
+  notes: Agentic CLI example; useful as sandbox.
+- id: argos
+  name: argos
+  kind: repo
+  layer: L0-patterns
+  lane: support
+  license: CC0-1.0
+  source: argos-main.zip
+  interfaces:
+  - (patterns)
+  replacement: none
+  notes: Authz patterns reference.
+- id: bmad-builder
+  name: bmad-builder
+  kind: repo
+  layer: L3-process-playbooks
+  lane: support
+  license: MIT
+  source: bmad-builder-main.zip
+  interfaces:
+  - (playbooks)
+  replacement: none
+  notes: Process/playbook builder.
+- id: ace-framework
+  name: ACE Framework
+  kind: repo
+  layer: L3-process-playbooks
+  lane: support
+  license: MIT
+  source: ACE_Framework-main.zip
+  interfaces:
+  - (playbooks)
+  replacement: none
+  notes: Principles/process pack.
+- id: full-small-app-workflow
+  name: Full Small App Workflow
+  kind: repo
+  layer: L3-process-playbooks
+  lane: support
+  license: MIT
+  source: Full-Small-App-Workflow-main.zip
+  interfaces:
+  - (playbooks)
+  replacement: none
+  notes: Workflow template.
+- id: rappy-lobster
+  name: rappy-lobster
+  kind: repo
+  layer: L7-vertical
+  lane: blocked
+  license: AMBIGUOUS (MIT-like LICENSE text; package.json=UNLICENSED)
+  source: rappy-lobster-main.zip
+  interfaces:
+  - (unknown)
+  replacement: none
+  notes: Do not ship/use until license contradiction resolved.
+- id: gastown
+  name: Gastown
+  kind: external
+  layer: L3-orchestration
+  lane: core
+  license: MIT
+  source: external
+  interfaces:
+  - OrchestratorAPI
+  replacement: none
+  notes: Multi-agent workspace orchestrator.
+- id: opencode
+  name: OpenCode
+  kind: external
+  layer: L2-executor
+  lane: core
+  license: MIT
+  source: external
+  interfaces:
+  - ExecutorAPI
+  replacement: none
+  notes: Terminal executor.
+- id: goose
+  name: Goose
+  kind: external
+  layer: L2-executor
+  lane: core
+  license: Apache-2.0
+  source: external
+  interfaces:
+  - ExecutorAPI
+  replacement: none
+  notes: Alternate executor.
+- id: aider
+  name: Aider
+  kind: external
+  layer: L2-executor
+  lane: support
+  license: Apache-2.0
+  source: external
+  interfaces:
+  - ExecutorAPI
+  replacement: none
+  notes: Patch-centric executor.
+- id: continue
+  name: Continue
+  kind: external
+  layer: L2-executor
+  lane: support
+  license: Apache-2.0
+  source: external
+  interfaces:
+  - ExecutorAPI
+  replacement: none
+  notes: IDE executor/review.
+- id: stagehand
+  name: Stagehand
+  kind: external
+  layer: L4-browser-ops
+  lane: core
+  license: MIT
+  source: external
+  interfaces:
+  - BrowserOpsAPI
+  replacement: none
+  notes: Primary browser automation driver.
+- id: tabby
+  name: TabbyML Tabby
+  kind: external
+  layer: L1-devx
+  lane: support
+  license: Apache-2.0 (ee/ separate)
+  source: external
+  interfaces:
+  - (assist)
+  replacement: none
+  notes: Self-hosted coding assistant. Keep EE boundary strict.
+- id: mem0
+  name: Mem0
+  kind: external
+  layer: L5-memory
+  lane: core
+  license: Apache-2.0
+  source: external
+  interfaces:
+  - MemoryAPI
+  replacement: none
+  notes: Primary memory service.
+- id: ad4m
+  name: AD4M
+  kind: external
+  layer: L5-meaning-graph
+  lane: boxed
+  license: CAL-1.0 (upstream)
+  source: external
+  interfaces:
+  - MeaningGraphAPI
+  replacement: planned
+  notes: Use behind MeaningGraphAPI; build MG-Core replacement for portability.
+- id: ontogpt
+  name: OntoGPT
+  kind: external
+  layer: L5-extraction
+  lane: support
+  license: BSD-3-Clause
+  source: external
+  interfaces:
+  - Extractor
+  replacement: none
+  notes: Ontology-grounded extraction.
+- id: vlmrun
+  name: VLM Run
+  kind: external
+  layer: L5-extraction
+  lane: support
+  license: Apache-2.0
+  source: external
+  interfaces:
+  - Extractor
+  replacement: none
+  notes: Schema hub + runners.
+- id: subconscious
+  name: Subconscious Systems
+  kind: external
+  layer: L8-experimental
+  lane: boxed
+  license: VERIFY_PER_REPO
+  source: external
+  interfaces:
+  - (optional)
+  replacement: none
+  notes: Optional external engine. Keep API-only until licensing clarified.
+- id: zed
+  name: Zed
+  kind: external
+  layer: L1-devx
+  lane: boxed
+  license: GPL/AGPL (verify)
+  source: external
+  interfaces:
+  - (tool)
+  replacement: none
+  notes: Developer editor. Do not embed into OS distro without compliance plan.
+- id: warp
+  name: Warp
+  kind: external
+  layer: L1-devx
+  lane: boxed
+  license: Proprietary
+  source: external
+  interfaces:
+  - (tool)
+  replacement: none
+  notes: Optional terminal UX only.
