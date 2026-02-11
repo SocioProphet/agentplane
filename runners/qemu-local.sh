@@ -185,7 +185,7 @@ case "$cmd" in
         VM_OUT=\"$(nix path-info .#packages.${TARGET_SYSTEM}.vm-example-agent)\"; \
         RUN_SCRIPT=\"$(ls -1 ${VM_OUT}/bin/run-*-vm | head -n1)\"; \
         mkdir -p ${REMOTE_ROOT}/artifacts; \
-        export QEMU_OPTS=\"${QEMU_OPTS:-} -virtfs local,path=${REMOTE_ROOT}/artifacts,mount_tag=artifacts,security_model=none,id=artifacts\"; \
+        export QEMU_OPTS=\"${QEMU_OPTS:-} -virtfs local,path=${REMOTE_ROOT}/artifacts,mount_tag=artifacts,security_model=none,id=artifacts\"; \ -nographic -serial mon:stdio
         ${RUN_SCRIPT} >/dev/null"
 
       # Sync artifacts back
