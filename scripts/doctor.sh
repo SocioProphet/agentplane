@@ -7,7 +7,7 @@ TARGET_SYSTEM="${1:-aarch64-linux}"
 
 command -v nix >/dev/null || { echo "[doctor] FAIL: nix not in PATH"; exit 2; }
 
-BUILDERS_RAW="$(nix config show 2>/dev/null | awk -F\" = \" '/^builders =/ {print $2}' | head -n1)"
+BUILDERS_RAW="$(nix config show 2>/dev/null | grep -E '^builders =' | head -n1 | sed -E 's/^builders = ?//')"
 BUILDERS="${BUILDERS_RAW}"
 
 # If builders is a @file reference (common on macOS Determinate installs), read the file.
