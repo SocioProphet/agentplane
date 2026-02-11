@@ -63,6 +63,23 @@ if [[ -n "$bundle_dir" ]]; then
 fi
 
 
+
+read_default_executor_from_inventory() {
+  local inv="${AP_ROOT}/fleet/inventory.json"
+  [[ -f "${inv}" ]] || return 1
+  python3 - <<'PYI' "${inv}"
+import json,sys
+inv=json.load(open(sys.argv[1]))
+name=inv.get("defaultExecutor")
+if not name: raise SystemExit(1)
+for ex in inv.get("executors",[]):
+    if ex.get("name")==name:
+        print(ex.get("sshRef") or ex.get("name"))
+        raise SystemExit(0)
+raise SystemExit(1)
+PYI
+}
+
 read_first_executor_from_machines() {
   # Determinate macOS often uses builders = @/etc/nix/machines
   local machines_file="/etc/nix/machines"
@@ -158,6 +175,9 @@ case "$cmd" in
     # Local-fast mode: run agent directly in the Lima executor (no nested QEMU under TCG)
     if [[ "${backend_intent}" == "lima-process" ]]; then
       REMOTE="${executor_ref:-}"
+      if [[ -z "${REMOTE}" ]]; then
+        REMOTE="$(read_default_executor_from_inventory || true)"
+      fi
       if [[ -z "${REMOTE}" ]]; then
         REMOTE="$(read_first_executor_from_machines || true)"
       fi
