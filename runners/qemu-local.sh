@@ -186,7 +186,7 @@ case "$cmd" in
         RUN_SCRIPT=\"$(ls -1 ${VM_OUT}/bin/run-*-vm | head -n1)\"; \
         mkdir -p ${REMOTE_ROOT}/artifacts; \
         export QEMU_OPTS=\"${QEMU_OPTS:-} -virtfs local,path=${REMOTE_ROOT}/artifacts,mount_tag=artifacts,security_model=none,id=artifacts -nographic -serial mon:stdio\"; \
-        ${RUN_SCRIPT} >/dev/null"
+        timeout 900 ${RUN_SCRIPT} > ${REMOTE_ROOT}/artifacts/guest-serial.log 2>&1"
 
       # Sync artifacts back
       rsync -a --delete "${REMOTE}:${REMOTE_ROOT}/artifacts/" "${AP_ROOT}/${out_dir}/"
