@@ -42,6 +42,10 @@ def main() -> int:
             die(f"spec.{k} is required", 2)
 
     vm = spec["vm"]
+    backend_intent = vm.get("backendIntent")
+    allowed = {"qemu","microvm","lima-process","fleet"}
+    if backend_intent not in allowed:
+        die(f"spec.vm.backendIntent must be one of {sorted(allowed)}", 2)
     if "modulePath" not in vm or "backendIntent" not in vm:
         die("spec.vm.modulePath and spec.vm.backendIntent are required", 2)
 
