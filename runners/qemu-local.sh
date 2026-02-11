@@ -62,6 +62,23 @@ if [[ -n "$bundle_dir" ]]; then
   [[ -f "$bundle_json" ]] || { echo "[runner] missing $bundle_json" >&2; exit 2; }
 fi
 
+
+read_first_executor_from_machines() {
+  # Determinate macOS often uses builders = @/etc/nix/machines
+  local machines_file="/etc/nix/machines"
+  [[ -f "${machines_file}" ]] || return 1
+  # first non-empty, non-comment line
+  local line
+  line="$(grep -vE '^\s*#|^\s*$' "${machines_file}" | head -n 1 || true)"
+  [[ -n "${line}" ]] || return 1
+  # field1 is like ssh-ng://lima-nixbuilder or ssh-ng://user@host
+  local uri
+  uri="$(echo "${line}" | awk '{print $1}')"
+  uri="${uri#ssh-ng://}"
+  echo "${uri}"
+  return 0
+}
+
 read_json_field() {
   # minimal JSON reader: python stdlib only
   local file="$1" field="$2"
@@ -139,7 +156,11 @@ case "$cmd" in
 
     # Local-fast mode: run agent directly in the Lima executor (no nested QEMU under TCG)
     if [[ "${backend_intent}" == "lima-process" ]]; then
-      REMOTE="${executor_ref:-lima-nixbuilder}"
+      REMOTE="${executor_ref:-}"
+      if [[ -z "${REMOTE}" ]]; then
+        REMOTE="$(read_first_executor_from_machines || true)"
+      fi
+      REMOTE="${REMOTE:-lima-nixbuilder}"
       REMOTE_ROOT="/tmp/agentplane-run"
       REMOTE_TIMEOUT="${max_run_seconds}"
 
