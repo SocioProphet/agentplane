@@ -7,3 +7,7 @@ state/pointers/*
 
 # OS/editor noise
 .DS_Store
+
+# Python caches
+__pycache__/
+*.pyc
