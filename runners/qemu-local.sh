@@ -151,6 +151,7 @@ case "$cmd" in
     out_dir="$(read_json_field "$bundle_json" "spec.artifacts.outDir")"
     backend_intent="$(read_json_field "$bundle_json" "spec.vm.backendIntent")"
     max_run_seconds="$(read_json_field "$bundle_json" "spec.policy.maxRunSeconds")"
+    fail_on_timeout="$(read_json_field "$bundle_json" "spec.policy.failOnTimeout")"
     executor_ref="$(read_json_field "$bundle_json" "spec.executor.ref")"
     smoke_script="$(read_json_field "$bundle_json" "spec.smoke.script")"
 
@@ -175,7 +176,8 @@ case "$cmd" in
         trap "kill ${WATCH_PID} >/dev/null 2>&1 || true" EXIT
       fi
 
-      ssh "${REMOTE}" bash -s <<'EOS'
+      set +e
+      timeout "${REMOTE_TIMEOUT}" ssh "${REMOTE}" bash -s <<'EOS'
 set -euo pipefail
 REMOTE_ROOT="/tmp/agentplane-run"
 ART="${REMOTE_ROOT}/artifacts"
@@ -198,6 +200,27 @@ cat > "${ART}/run-artifact.json" <<JSON
 }
 JSON
 EOS
+
+      RC=$?
+      set -e
+      echo "${RC}" > "${AP_ROOT}/${out_dir}/runner-exitcode.txt"
+      if [[ "${RC}" == "124" ]]; then
+        cat > "${AP_ROOT}/${out_dir}/timeout-artifact.json" <<JSON
+{
+  "kind": "TimeoutArtifact",
+  "bundle": "${name}@${ver}",
+  "backend": "lima-process",
+  "executor": "${REMOTE}",
+  "maxRunSeconds": ${REMOTE_TIMEOUT},
+  "capturedAt": "$(date -Iseconds)"
+}
+JSON
+        if [[ "${fail_on_timeout}" == "True" || "${fail_on_timeout}" == "true" ]]; then
+          echo "[runner] ERROR: timed out after ${REMOTE_TIMEOUT}s (TimeoutArtifact written)" >&2
+          rsync -a --delete "${REMOTE}:${REMOTE_ROOT}/artifacts/" "${AP_ROOT}/${out_dir}/" || true
+          exit 2
+        fi
+      fi
 
       rsync -a --delete "${REMOTE}:${REMOTE_ROOT}/artifacts/" "${AP_ROOT}/${out_dir}/"
       # Replay artifact (fleet-shaped): how to reproduce this run
