@@ -191,15 +191,24 @@ case "$cmd" in
         WATCH_PID=$!
         trap "kill ${WATCH_PID} >/dev/null 2>&1 || true" EXIT
       fi
-      ssh "${REMOTE}" "set -euo pipefail; \
-        . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh; \
-        cd ${REMOTE_ROOT}/repo; \
-        NIX_PROGRESS_STYLE=none TERM=dumb nix build --log-format raw --quiet .#packages.${TARGET_SYSTEM}.vm-example-agent --no-link; \
-        VM_OUT=\"$(nix path-info .#packages.${TARGET_SYSTEM}.vm-example-agent)\"; \
-        RUN_SCRIPT=\"$(ls -1 ${VM_OUT}/bin/run-*-vm | head -n1)\"; \
-        mkdir -p ${REMOTE_ROOT}/artifacts; \
-        export QEMU_OPTS=\"${QEMU_OPTS:-} -virtfs local,path=${REMOTE_ROOT}/artifacts,mount_tag=artifacts,security_model=none,id=artifacts -nographic -serial mon:stdio\"; \
-        timeout ${REMOTE_TIMEOUT} ${RUN_SCRIPT} >> ${REMOTE_ROOT}/artifacts/guest-serial.log 2>&1
+      ssh "${REMOTE}" "mkdir -p ${REMOTE_ROOT}/repo ${REMOTE_ROOT}/artifacts && : > ${REMOTE_ROOT}/artifacts/guest-serial.log"
+ssh "${REMOTE}" REMOTE_ROOT="${REMOTE_ROOT}" TARGET_SYSTEM="${TARGET_SYSTEM}" REMOTE_TIMEOUT="${REMOTE_TIMEOUT}" QEMU_OPTS="${QEMU_OPTS:-}" bash -s <<'EOS'
+set -euo pipefail
+. /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
+
+cd "${REMOTE_ROOT}/repo"
+NIX_PROGRESS_STYLE=none TERM=dumb nix build --log-format raw --quiet ".#packages.${TARGET_SYSTEM}.vm-example-agent" --no-link
+
+VM_OUT="$(nix path-info ".#packages.${TARGET_SYSTEM}.vm-example-agent")"
+RUN_SCRIPT="$(ls -1 "${VM_OUT}"/bin/run-*-vm | head -n1)"
+
+mkdir -p "${REMOTE_ROOT}/artifacts"
+export QEMU_OPTS="${QEMU_OPTS:-} -virtfs local,path=${REMOTE_ROOT}/artifacts,mount_tag=artifacts,security_model=none,id=artifacts -nographic -serial mon:stdio"
+
+timeout "${REMOTE_TIMEOUT}" "${RUN_SCRIPT}" >> "${REMOTE_ROOT}/artifacts/guest-serial.log" 2>&1
+echo "$?" > "${REMOTE_ROOT}/artifacts/runner-exitcode.txt"
+EOS
+
 
       # Sync artifacts back
       rsync -a --delete "${REMOTE}:${REMOTE_ROOT}/artifacts/" "${AP_ROOT}/${out_dir}/"
