@@ -25,6 +25,11 @@ AP_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 STATE_DIR="${AP_ROOT}/state"
 POINTERS_DIR="${STATE_DIR}/pointers"
 
+# Safe defaults for set -u (do not assume remote vars exist outside the remote branch)
+REMOTE="${REMOTE:-}"
+REMOTE_ROOT="${REMOTE_ROOT:-}"
+REMOTE_TIMEOUT="${REMOTE_TIMEOUT:-900}"  # seconds; hard deadline for VM run
+
 cmd="${1:-}"
 shift || true
 
@@ -156,7 +161,7 @@ case "$cmd" in
     # Find the VM run script from the build output
     VM_OUT="$(nix path-info ".#packages.${TARGET_SYSTEM}.vm-example-agent")"
     RUN_SCRIPT="$(ls -1 "${VM_OUT}"/bin/run-*-vm 2>/dev/null | head -n1 || true)"
-    if [[ -z "timeout 900 timeout 900 ${RUN_SCRIPT} > ${REMOTE_ROOT}/artifacts/guest-serial.log 2>&1 > ${REMOTE_ROOT}/artifacts/guest-serial.log 2>&1" ]]; then
+    if [[ -z "timeout 900 timeout ${REMOTE_TIMEOUT} ${RUN_SCRIPT} > ${REMOTE_ROOT}/artifacts/guest-serial.log 2>&1; echo $? > ${REMOTE_ROOT}/artifacts/runner-exitcode.txt > ${REMOTE_ROOT}/artifacts/guest-serial.log 2>&1" ]]; then
       echo "[runner] ERROR: could not find run-*-vm script in ${VM_OUT}/bin" >&2
       exit 2
     fi
@@ -190,6 +195,14 @@ case "$cmd" in
 
       # Sync artifacts back
       rsync -a --delete "${REMOTE}:${REMOTE_ROOT}/artifacts/" "${AP_ROOT}/${out_dir}/"
+      # If timeout fired, mark run as failed (timeout exit code is 124)
+      if [[ -f "${AP_ROOT}/${out_dir}/runner-exitcode.txt" ]]; then
+        RC="$(cat "${AP_ROOT}/${out_dir}/runner-exitcode.txt" | tr -d '\n\r')"
+        if [[ "${RC}" == "124" ]]; then
+          echo "[runner] ERROR: VM run timed out after ${REMOTE_TIMEOUT}s (see guest-serial.log)" >&2
+          exit 2
+        fi
+      fi
 
       echo "[runner] emit placement receipt (host-side scheduling receipt)..."
     else
