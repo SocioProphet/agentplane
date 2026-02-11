@@ -167,7 +167,9 @@ case "$cmd" in
     # If we are on macOS and the target is Linux, we must run the VM on Linux too.
     if [[ "${HOST_SYS}" == "darwin" && "${TARGET_SYSTEM}" == *"-linux" ]]; then
       REMOTE="lima-nixbuilder"
-      REMOTE_ROOT="~/agentplane-run"
+      REMOTE_HOME="$(ssh "${REMOTE}" "printf %s \"$HOME\"")"
+      REMOTE_ROOT="${REMOTE_HOME}/agentplane-run"
+      ssh "${REMOTE}" "mkdir -p ${REMOTE_ROOT}/repo ${REMOTE_ROOT}/artifacts"
       echo "[runner] darwin->linux: delegating build+run to ${REMOTE} (rsync repo + artifacts, run QEMU there, sync artifacts back)"
 
       # Sync repo (excluding runtime artifacts) to remote
