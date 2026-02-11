@@ -21,8 +21,10 @@
       "outDir": "./artifacts/example-agent"
     },
     "policy": {
+      "failOnTimeout": true,
       "humanGateRequired": false,
       "lane": "staging",
+      "maxRunSeconds": 20,
       "policyPackHash": "UNSET",
       "policyPackRef": "policy-packs/dev/default"
     },

@@ -38,6 +38,13 @@ def main() -> int:
         die("metadata.licensePolicy.allowAGPL must be false", 2)
 
     for k in ("vm", "policy", "secrets", "artifacts", "smoke"):
+
+    pol = spec.get("policy") or {}
+    mrs = pol.get("maxRunSeconds")
+    if mrs is None:
+        die("spec.policy.maxRunSeconds is required", 2)
+    if not isinstance(mrs, int) or mrs < 5 or mrs > 3600:
+        die("spec.policy.maxRunSeconds must be an int in [5, 3600]", 2)
         if k not in spec:
             die(f"spec.{k} is required", 2)
 

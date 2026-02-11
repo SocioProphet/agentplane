@@ -81,6 +81,9 @@
         "policy": {
           "description": "TrustFirst Policy Pack pointer(s) and hashes; contents live elsewhere.",
           "properties": {
+            "failOnTimeout": {
+              "type": "boolean"
+            },
             "humanGateRequired": {
               "type": "boolean"
             },
@@ -90,6 +93,11 @@
                 "prod"
               ],
               "type": "string"
+            },
+            "maxRunSeconds": {
+              "maximum": 3600,
+              "minimum": 5,
+              "type": "integer"
             },
             "policyPackHash": {
               "type": "string"
@@ -216,8 +224,8 @@
       },
       "required": [
         "vm",
-        "policy",
         "secrets",
+        "policy",
         "artifacts",
         "smoke"
       ],
