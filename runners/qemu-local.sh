@@ -175,7 +175,7 @@ case "$cmd" in
     if [[ "${HOST_SYS}" == "darwin" && "${TARGET_SYSTEM}" == *"-linux" ]]; then
       REMOTE="lima-nixbuilder"
       REMOTE_ROOT="/tmp/agentplane-run"
-      ssh "${REMOTE}" "mkdir -p ${REMOTE_ROOT}/repo ${REMOTE_ROOT}/artifacts"
+      ssh "${REMOTE}" "mkdir -p ${REMOTE_ROOT}/repo ${REMOTE_ROOT}/artifacts && : > ${REMOTE_ROOT}/artifacts/guest-serial.log"
       echo "[runner] darwin->linux: delegating build+run to ${REMOTE} (rsync repo + artifacts, run QEMU there, sync artifacts back)"
 
       # Sync repo (excluding runtime artifacts) to remote
@@ -187,7 +187,7 @@ case "$cmd" in
       # Build+run inside remote Linux
       if [[ "${WATCH}" == "true" ]]; then
         echo "[watch] streaming remote guest-serial.log (last 1 line every 2s)..."
-        ( while true; do ssh "${REMOTE}" "tail -n 1 ${REMOTE_ROOT}/artifacts/guest-serial.log 2>/dev/null || true"; sleep 2; done ) &
+        ( ssh "${REMOTE}" "tail -n +1 -F ${REMOTE_ROOT}/artifacts/guest-serial.log 2>/dev/null || true" ) &
         WATCH_PID=$!
         trap "kill ${WATCH_PID} >/dev/null 2>&1 || true" EXIT
       fi
@@ -199,7 +199,7 @@ case "$cmd" in
         RUN_SCRIPT=\"$(ls -1 ${VM_OUT}/bin/run-*-vm | head -n1)\"; \
         mkdir -p ${REMOTE_ROOT}/artifacts; \
         export QEMU_OPTS=\"${QEMU_OPTS:-} -virtfs local,path=${REMOTE_ROOT}/artifacts,mount_tag=artifacts,security_model=none,id=artifacts -nographic -serial mon:stdio\"; \
-        timeout 900 ${RUN_SCRIPT} > ${REMOTE_ROOT}/artifacts/guest-serial.log 2>&1"
+        timeout ${REMOTE_TIMEOUT} ${RUN_SCRIPT} >> ${REMOTE_ROOT}/artifacts/guest-serial.log 2>&1
 
       # Sync artifacts back
       rsync -a --delete "${REMOTE}:${REMOTE_ROOT}/artifacts/" "${AP_ROOT}/${out_dir}/"
