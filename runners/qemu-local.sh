@@ -1,3 +1,4 @@
+
 #!/usr/bin/env bash
 set -euo pipefail
 
@@ -109,6 +110,22 @@ print(cur)
 PY
 }
 
+read_json_field_optional() {
+  # Returns empty string if the path is missing (no traceback).
+  local file="$1" field="$2"
+  python3 - <<PY
+import json
+b=json.load(open("$file","r",encoding="utf-8"))
+cur=b
+try:
+    for k in "$field".split("."):
+        cur=cur[k]
+    print(cur)
+except Exception:
+    print("")
+PY
+}
+
 ensure_pointers() {
   mkdir -p "$POINTERS_DIR"
   touch "${POINTERS_DIR}/current-staging" "${POINTERS_DIR}/current-prod" "${POINTERS_DIR}/previous-good"
@@ -169,7 +186,7 @@ case "$cmd" in
     backend_intent="$(read_json_field "$bundle_json" "spec.vm.backendIntent")"
     max_run_seconds="$(read_json_field "$bundle_json" "spec.policy.maxRunSeconds")"
     fail_on_timeout="$(read_json_field "$bundle_json" "spec.policy.failOnTimeout")"
-    executor_ref="$(read_json_field "$bundle_json" "spec.executor.ref")"
+    executor_ref="$(read_json_field_optional "$bundle_json" "spec.executor.ref")"
     smoke_script="$(read_json_field "$bundle_json" "spec.smoke.script")"
 
     # Local-fast mode: run agent directly in the Lima executor (no nested QEMU under TCG)
