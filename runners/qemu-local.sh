@@ -37,6 +37,7 @@ bundle_dir=""
 profile="staging"
 
 TARGET_SYSTEM="aarch64-linux"
+WATCH="false"
 
 if [[ "$cmd" == "run" || "$cmd" == "smoke" || "$cmd" == "promote" ]]; then
   bundle_dir="${1:-}"
@@ -45,6 +46,7 @@ if [[ "$cmd" == "run" || "$cmd" == "smoke" || "$cmd" == "promote" ]]; then
     case "$1" in
       --profile) profile="${2:-}"; shift 2;;
       --system) TARGET_SYSTEM="${2:-}"; shift 2;;
+      --watch) WATCH="true"; shift 1;;
       *) echo "[runner] unknown arg: $1" >&2; exit 2;;
     esac
   done
@@ -183,6 +185,12 @@ case "$cmd" in
       rsync -a "${AP_ROOT}/${out_dir}/" "${REMOTE}:${REMOTE_ROOT}/artifacts/" || true
 
       # Build+run inside remote Linux
+      if [[ "${WATCH}" == "true" ]]; then
+        echo "[watch] streaming remote guest-serial.log (last 1 line every 2s)..."
+        ( while true; do ssh "${REMOTE}" "tail -n 1 ${REMOTE_ROOT}/artifacts/guest-serial.log 2>/dev/null || true"; sleep 2; done ) &
+        WATCH_PID=$!
+        trap "kill ${WATCH_PID} >/dev/null 2>&1 || true" EXIT
+      fi
       ssh "${REMOTE}" "set -euo pipefail; \
         . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh; \
         cd ${REMOTE_ROOT}/repo; \
