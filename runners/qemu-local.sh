@@ -163,11 +163,40 @@ case "$cmd" in
 
     echo "[runner] run VM (guest executes smoke and powers off)..."
     mkdir -p "${AP_ROOT}/${out_dir}"
-    # Mount artifacts into guest as /mnt/artifacts via 9p
-    export QEMU_OPTS="${QEMU_OPTS:-} -virtfs local,path=${AP_ROOT}/${out_dir},mount_tag=artifacts,security_model=none,id=artifacts"
-    "${RUN_SCRIPT}" >/dev/null
 
-    echo "[runner] emit placement receipt (host-side scheduling receipt)..."
+    # If we are on macOS and the target is Linux, we must run the VM on Linux too.
+    if [[ "${HOST_SYS}" == "darwin" && "${TARGET_SYSTEM}" == *"-linux" ]]; then
+      REMOTE="lima-nixbuilder"
+      REMOTE_ROOT="~/agentplane-run"
+      echo "[runner] darwin->linux: delegating build+run to ${REMOTE} (rsync repo + artifacts, run QEMU there, sync artifacts back)"
+
+      # Sync repo (excluding runtime artifacts) to remote
+      rsync -a --delete --exclude ".git/" --exclude "artifacts/" --exclude "state/pointers/" "${AP_ROOT}/" "${REMOTE}:${REMOTE_ROOT}/repo/"
+
+      # Sync artifacts dir to remote (so QEMU can mount it)
+      rsync -a "${AP_ROOT}/${out_dir}/" "${REMOTE}:${REMOTE_ROOT}/artifacts/" || true
+
+      # Build+run inside remote Linux
+      ssh "${REMOTE}" "set -euo pipefail; \
+        . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh; \
+        cd ${REMOTE_ROOT}/repo; \
+        nix build .#packages.${TARGET_SYSTEM}.vm-example-agent --no-link; \
+        VM_OUT=\"$(nix path-info .#packages.${TARGET_SYSTEM}.vm-example-agent)\"; \
+        RUN_SCRIPT=\"$(ls -1 ${VM_OUT}/bin/run-*-vm | head -n1)\"; \
+        mkdir -p ${REMOTE_ROOT}/artifacts; \
+        export QEMU_OPTS=\"${QEMU_OPTS:-} -virtfs local,path=${REMOTE_ROOT}/artifacts,mount_tag=artifacts,security_model=none,id=artifacts\"; \
+        ${RUN_SCRIPT} >/dev/null"
+
+      # Sync artifacts back
+      rsync -a "${REMOTE}:${REMOTE_ROOT}/artifacts/" "${AP_ROOT}/${out_dir}/"
+
+      echo "[runner] emit placement receipt (host-side scheduling receipt)..."
+    else
+      # Local Linux host path
+      export QEMU_OPTS="${QEMU_OPTS:-} -virtfs local,path=${AP_ROOT}/${out_dir},mount_tag=artifacts,security_model=none,id=artifacts"
+      "${RUN_SCRIPT}" >/dev/null
+      echo "[runner] emit placement receipt (host-side scheduling receipt)..."
+    fi
     emit_placement_receipt "${AP_ROOT}/${out_dir}" "$name" "$ver" "$profile"
     echo "[runner] NOTE: run-artifact.json should now be guest-authored in ${out_dir}"
 
