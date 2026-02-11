@@ -20,9 +20,7 @@
     "artifacts": {
       "outDir": "./artifacts/example-agent"
     },
-    "executor": {
-      "ref": "lima-nixbuilder"
-    },
+    "executor": {},
     "policy": {
       "failOnTimeout": true,
       "humanGateRequired": false,
