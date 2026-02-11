@@ -2,33 +2,62 @@
   "apiVersion": "agentplane.socioprophet.org/v0.1",
   "kind": "Bundle",
   "metadata": {
-    "name": "example-agent",
-    "version": "0.1.0",
     "createdAt": "2026-02-10T00:00:00-05:00",
-    "source": { "git": { "rev": "UNSET", "dirty": true } },
-    "licensePolicy": { "allowAGPL": false, "notes": "Bundle contents must remain shippable under permissive-friendly policy." }
+    "licensePolicy": {
+      "allowAGPL": false,
+      "notes": "Bundle contents must remain shippable under permissive-friendly policy."
+    },
+    "name": "example-agent",
+    "source": {
+      "git": {
+        "dirty": true,
+        "rev": "UNSET"
+      }
+    },
+    "version": "0.1.0"
   },
   "spec": {
-    "vm": {
-      "modulePath": "bundles/example-agent/vm.nix",
-      "backendIntent": "qemu",
-      "resources": { "vcpu": 2, "memMiB": 2048, "diskGiB": 8 },
-      "mounts": [
-        { "type": "9p", "source": "./artifacts/example-agent", "target": "/mnt/artifacts", "ro": false }
-      ],
-      "network": { "mode": "nat", "egressAllowlist": ["dns", "https"] }
+    "artifacts": {
+      "outDir": "./artifacts/example-agent"
     },
     "policy": {
-      "policyPackRef": "policy-packs/dev/default",
-      "policyPackHash": "UNSET",
+      "humanGateRequired": false,
       "lane": "staging",
-      "humanGateRequired": false
+      "policyPackHash": "UNSET",
+      "policyPackRef": "policy-packs/dev/default"
     },
     "secrets": {
-      "required": ["EXAMPLE_AGENT_TOKEN_FILE"],
+      "required": [
+        "EXAMPLE_AGENT_TOKEN_FILE"
+      ],
       "secretRefRoot": "secrets://user"
     },
-    "artifacts": { "outDir": "./artifacts/example-agent" },
-    "smoke": { "script": "bundles/example-agent/smoke.sh" }
+    "smoke": {
+      "script": "bundles/example-agent/smoke.sh"
+    },
+    "vm": {
+      "backendIntent": "lima-process",
+      "modulePath": "bundles/example-agent/vm.nix",
+      "mounts": [
+        {
+          "ro": false,
+          "source": "./artifacts/example-agent",
+          "target": "/mnt/artifacts",
+          "type": "9p"
+        }
+      ],
+      "network": {
+        "egressAllowlist": [
+          "dns",
+          "https"
+        ],
+        "mode": "nat"
+      },
+      "resources": {
+        "diskGiB": 8,
+        "memMiB": 2048,
+        "vcpu": 2
+      }
+    }
   }
 }
