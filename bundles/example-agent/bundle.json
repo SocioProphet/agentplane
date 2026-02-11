@@ -20,7 +20,6 @@
     "artifacts": {
       "outDir": "./artifacts/example-agent"
     },
-    "executor": {},
     "policy": {
       "failOnTimeout": true,
       "humanGateRequired": false,
