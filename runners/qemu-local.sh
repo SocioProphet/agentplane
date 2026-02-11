@@ -189,7 +189,7 @@ case "$cmd" in
         ${RUN_SCRIPT} >/dev/null"
 
       # Sync artifacts back
-      rsync -a "${REMOTE}:${REMOTE_ROOT}/artifacts/" "${AP_ROOT}/${out_dir}/"
+      rsync -a --delete "${REMOTE}:${REMOTE_ROOT}/artifacts/" "${AP_ROOT}/${out_dir}/"
 
       echo "[runner] emit placement receipt (host-side scheduling receipt)..."
     else
