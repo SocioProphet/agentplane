@@ -88,7 +88,7 @@ emit_run_artifact() {
   "kind": "RunArtifact",
   "bundle": "${bundle_name}@${bundle_ver}",
   "lane": "${lane}",
-  "backend": "qemu-local",
+  "backend": "${backend}",
   "startedAt": "$(date -Iseconds)",
   "endedAt": "$(date -Iseconds)",
   "result": "pass",
@@ -98,14 +98,14 @@ JSON
 }
 
 emit_placement_receipt() {
-  local out_dir="$1" bundle_name="$2" bundle_ver="$3" lane="$4"
+  local out_dir="$1" bundle_name="$2" bundle_ver="$3" lane="$4" backend="${5:-qemu-local}" site="${6:-local-host}"
   mkdir -p "$out_dir"
   cat > "${out_dir}/placement-receipt.json" <<JSON
 {
   "kind": "PlacementReceipt",
   "bundle": "${bundle_name}@${bundle_ver}",
   "decision": {
-    "chosenSite": "local-host",
+    "chosenSite": "${site}",
     "backend": "qemu-local",
     "constraints": { "lane": "${lane}" },
     "rejectedSites": []
@@ -191,7 +191,7 @@ EOS
 JSON
 
       echo "[runner] emit placement receipt (host-side scheduling receipt)..."
-      emit_placement_receipt "${AP_ROOT}/${out_dir}" "$name" "$ver" "$profile"
+      emit_placement_receipt "${AP_ROOT}/${out_dir}" "$name" "$ver" "$profile" "lima-process" "${REMOTE}"
       echo "[runner] update current-${profile} pointer..."
       printf '%s\n' "${bundle_dir%/}" > "${POINTERS_DIR}/current-${profile}"
       echo "[runner] OK: ${name}@${ver} (${profile}) [lima-process]"
