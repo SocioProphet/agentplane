@@ -181,6 +181,7 @@ case "$cmd" in
     "${AP_ROOT}/scripts/validate_bundle.py" "$bundle_json" >/dev/null
 
     name="$(read_json_field "$bundle_json" "metadata.name")"
+    PLACEMENT_JSON="$(python3 scripts/select-executor.py "$bundle_json")"
     ver="$(read_json_field "$bundle_json" "metadata.version")"
     out_dir="$(read_json_field "$bundle_json" "spec.artifacts.outDir")"
     backend_intent="$(read_json_field "$bundle_json" "spec.vm.backendIntent")"
@@ -212,7 +213,8 @@ PYI
 
     # Local-fast mode: run agent directly in the Lima executor (no nested QEMU under TCG)
     if [[ "${backend_intent}" == "lima-process" ]]; then
-      REMOTE="${executor_ref:-}"
+      REMOTE="$(echo "${PLACEMENT_JSON}" | python3 -c 'import json,sys; print(json.load(sys.stdin)["sshRef"])' 2>/dev/null || true)"
+      REMOTE="${REMOTE:-${executor_ref:-}}"
       if [[ -z "${REMOTE}" ]]; then
         REMOTE="$(read_default_executor_from_inventory || true)"
       fi
@@ -295,6 +297,7 @@ JSON
 JSON
 
       echo "[runner] emit placement receipt (host-side scheduling receipt)..."
+            echo "${PLACEMENT_JSON}" > "${AP_ROOT}/${out_dir}/placement-decision.json"
       emit_placement_receipt "${AP_ROOT}/${out_dir}" "$name" "$ver" "$profile" "lima-process" "${REMOTE}"
       # Drift guard: placement receipt backend must match run-artifact backend
       if [[ -f "${AP_ROOT}/${out_dir}/run-artifact.json" && -f "${AP_ROOT}/${out_dir}/placement-receipt.json" ]]; then
