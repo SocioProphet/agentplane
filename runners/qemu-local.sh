@@ -207,7 +207,7 @@ case "$cmd" in
       if [[ -f "${AP_ROOT}/${out_dir}/runner-exitcode.txt" ]]; then
         RC="$(cat "${AP_ROOT}/${out_dir}/runner-exitcode.txt" | tr -d '\n\r')"
         if [[ "${RC}" == "124" ]]; then
-          echo "[runner] ERROR: VM run timed out after ${REMOTE_TIMEOUT}s (see guest-serial.log)" >&2
+          echo "[runner] ERROR: VM run timed out after ${REMOTE_TIMEOUT}s; see guest-serial.log" >&2
           exit 2
         fi
       fi
