@@ -133,13 +133,14 @@ case "$cmd" in
     ver="$(read_json_field "$bundle_json" "metadata.version")"
     out_dir="$(read_json_field "$bundle_json" "spec.artifacts.outDir")"
     backend_intent="$(read_json_field "$bundle_json" "spec.vm.backendIntent")"
+    max_run_seconds="$(read_json_field "$bundle_json" "spec.policy.maxRunSeconds")"
     smoke_script="$(read_json_field "$bundle_json" "spec.smoke.script")"
 
     # Local-fast mode: run agent directly in the Lima executor (no nested QEMU under TCG)
     if [[ "${backend_intent}" == "lima-process" ]]; then
       REMOTE="lima-nixbuilder"
       REMOTE_ROOT="/tmp/agentplane-run"
-      REMOTE_TIMEOUT="${REMOTE_TIMEOUT:-60}"
+      REMOTE_TIMEOUT="${max_run_seconds}"
 
       echo "[runner] lima-process: delegating to ${REMOTE} (timeout=${REMOTE_TIMEOUT}s)"
       ssh "${REMOTE}" "mkdir -p ${REMOTE_ROOT}/repo ${REMOTE_ROOT}/artifacts && : > ${REMOTE_ROOT}/artifacts/guest-serial.log"
