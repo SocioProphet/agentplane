@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Agentplane Replay Artifact v0.1",
+  "type": "object",
+  "required": ["kind", "bundle", "capturedAt", "executor", "backendIntent", "inputs"],
+  "properties": {
+    "kind": { "const": "ReplayArtifact" },
+    "bundle": { "type": "string" },
+    "capturedAt": { "type": "string", "format": "date-time" },
+    "executor": { "type": "string" },
+    "backendIntent": { "type": "string", "enum": ["qemu", "microvm", "lima-process", "fleet"] },
+    "inputs": {
+      "type": "object",
+      "required": ["bundlePath", "bundleRev", "artifactDir"],
+      "properties": {
+        "bundlePath": { "type": "string" },
+        "bundleRev": { "type": ["string", "null"] },
+        "artifactDir": { "type": "string" },
+        "policyPackRef": { "type": ["string", "null"] },
+        "policyPackHash": { "type": ["string", "null"] },
+        "secretsRequired": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "upstreamArtifacts": {
+          "type": "object",
+          "properties": {
+            "workspaceInventoryRef": { "type": ["string", "null"] },
+            "lockVerificationRef": { "type": ["string", "null"] },
+            "protocolCompatibilityRef": { "type": ["string", "null"] },
+            "taskRunRefs": {
+              "type": "array",
+              "items": { "type": "string" }
+            }
+          },
+          "additionalProperties": false
+        }
+      }
+    }
+  }
+}
