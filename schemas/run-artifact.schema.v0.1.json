@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Agentplane Run Artifact v0.1",
+  "type": "object",
+  "required": ["kind", "bundle", "capturedAt", "lane", "executor", "backendIntent", "status", "exitCode"],
+  "properties": {
+    "kind": { "const": "RunArtifact" },
+    "bundle": { "type": "string" },
+    "bundlePath": { "type": ["string", "null"] },
+    "capturedAt": { "type": "string", "format": "date-time" },
+    "lane": { "type": "string", "enum": ["staging", "prod"] },
+    "executor": { "type": "string" },
+    "backendIntent": { "type": "string", "enum": ["qemu", "microvm", "lima-process", "fleet"] },
+    "status": { "type": "string", "enum": ["success", "failure"] },
+    "exitCode": { "type": "integer" },
+    "stdoutRef": { "type": ["string", "null"] },
+    "stderrRef": { "type": ["string", "null"] },
+    "upstreamArtifacts": {
+      "type": "object",
+      "properties": {
+        "workspaceInventoryRef": { "type": ["string", "null"] },
+        "lockVerificationRef": { "type": ["string", "null"] },
+        "protocolCompatibilityRef": { "type": ["string", "null"] },
+        "taskRunRefs": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}
