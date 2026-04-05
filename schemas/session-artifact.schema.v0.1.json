@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Agentplane Session Artifact v0.1",
+  "type": "object",
+  "required": [
+    "kind",
+    "bundle",
+    "capturedAt",
+    "sessionRef",
+    "status"
+  ],
+  "properties": {
+    "kind": {
+      "const": "SessionArtifact"
+    },
+    "bundle": {
+      "type": "string"
+    },
+    "capturedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "sessionRef": {
+      "type": "string",
+      "pattern": "^urn:srcos:session:"
+    },
+    "status": {
+      "enum": [
+        "success",
+        "failure",
+        "paused",
+        "deferred",
+        "canceled"
+      ]
+    },
+    "receiptRef": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^urn:srcos:receipt:session:"
+    },
+    "runArtifactRef": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "replayArtifactRef": {
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Agentplane Reversal Artifact v0.1",
+  "type": "object",
+  "required": [
+    "kind",
+    "bundle",
+    "capturedAt",
+    "sourcePromotionReceiptRef",
+    "reversalHandle"
+  ],
+  "properties": {
+    "kind": {
+      "const": "ReversalArtifact"
+    },
+    "bundle": {
+      "type": "string"
+    },
+    "capturedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "sourcePromotionReceiptRef": {
+      "type": "string",
+      "pattern": "^urn:srcos:receipt:promotion:"
+    },
+    "reversalHandle": {
+      "type": "string"
+    },
+    "status": {
+      "enum": [
+        "started",
+        "succeeded",
+        "failed"
+      ]
+    }
+  },
+  "additionalProperties": false
+}
