@@ -1,0 +1,33 @@
+{
+  "capabilityId": "summarize.abstractive.v1",
+  "version": "1.0.0",
+  "kind": "analysis",
+  "description": "Deterministic stub binding for abstractive summarization with risk extraction.",
+  "inputSchemaRef": "org.socioprophet.capabilities.v1.SummarizeInput",
+  "outputSchemaRef": "org.socioprophet.capabilities.v1.SummarizeOutput",
+  "execution": {
+    "supportedLanes": ["local", "tenant"],
+    "defaultLane": "local",
+    "requiresGpu": false,
+    "maxContextBytes": 16384,
+    "timeoutSeconds": 60
+  },
+  "trust": {
+    "egressDefault": "deny",
+    "sideEffectsDefault": "deny",
+    "dataLabelsAllowed": ["public", "internal", "tenant_confidential"],
+    "dataLabelsDenied": ["regulated_export_controlled"]
+  },
+  "policyHooks": {
+    "preExec": ["policy.v1.Decision/Evaluate"],
+    "postExec": ["evidence.v1.Event/Append"]
+  },
+  "binding": {
+    "capabilityInstanceId": "capinst.summarize.abstractive.v1.stub",
+    "executionLane": "tenant",
+    "workerEndpoint": "tritrpc://tenant/summarize-01",
+    "workerContract": "worker.v1.Capability/Execute",
+    "credentialScope": "task-scoped",
+    "bindingTtlSeconds": 120
+  }
+}
