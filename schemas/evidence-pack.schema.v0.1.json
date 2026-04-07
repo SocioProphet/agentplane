@@ -1,0 +1,139 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "AgentPlane Evidence Pack v0.1",
+  "description": "Structured evidence collected for one task before reconciliation.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "kind",
+    "bundle",
+    "capturedAt",
+    "taskId",
+    "workflowMode",
+    "evidence"
+  ],
+  "properties": {
+    "kind": {
+      "const": "EvidencePack"
+    },
+    "bundle": {
+      "type": "string"
+    },
+    "capturedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "taskId": {
+      "type": "string"
+    },
+    "workflowMode": {
+      "enum": [
+        "direct",
+        "branch_pr",
+        "unknown"
+      ]
+    },
+    "authorityModel": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "canonicalRef": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "evidence": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "kind",
+          "source"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "task_envelope",
+              "frontmatter",
+              "readme_body",
+              "exported_snapshot",
+              "backend_snapshot",
+              "commit",
+              "verify_artifact",
+              "pr_artifact",
+              "run_bundle",
+              "incident_finding",
+              "other"
+            ]
+          },
+          "source": {
+            "type": "string"
+          },
+          "summary": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "observedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "authorityWeight": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": 0,
+            "maximum": 1
+          },
+          "confidence": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": 0,
+            "maximum": 1
+          },
+          "revisionClaim": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0
+          },
+          "lifecycleClaim": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "fingerprints": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "payloadRef": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      }
+    }
+  }
+}
