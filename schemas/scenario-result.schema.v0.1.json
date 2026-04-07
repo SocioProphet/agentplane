@@ -1,0 +1,115 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "AgentPlane Scenario Result v0.1",
+  "description": "Benchmark result emitted for one state-drift scenario execution.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "kind",
+    "bundle",
+    "capturedAt",
+    "scenarioId",
+    "status",
+    "result"
+  ],
+  "properties": {
+    "kind": {
+      "const": "ScenarioResult"
+    },
+    "bundle": {
+      "type": "string"
+    },
+    "capturedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "scenarioId": {
+      "type": "string"
+    },
+    "status": {
+      "enum": [
+        "passed",
+        "failed",
+        "partial",
+        "skipped"
+      ]
+    },
+    "result": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "contradictions",
+        "safeActions"
+      ],
+      "properties": {
+        "contradictions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "key",
+              "severity"
+            ],
+            "properties": {
+              "key": {
+                "type": "string"
+              },
+              "summary": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "severity": {
+                "enum": [
+                  "info",
+                  "warn",
+                  "error",
+                  "fatal"
+                ]
+              }
+            }
+          }
+        },
+        "safeActions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "unsafeActions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "confidence": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 1
+        },
+        "notes": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "metrics": {
+      "type": "object",
+      "additionalProperties": {
+        "type": [
+          "number",
+          "string",
+          "boolean",
+          "null"
+        ]
+      }
+    }
+  }
+}
