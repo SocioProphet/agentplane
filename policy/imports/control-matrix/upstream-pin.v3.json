@@ -1,0 +1,11 @@
+{
+  "artifact": "agentic_control_matrix_v3_import_pin",
+  "canonical_repository": "SocioProphet/socioprophet-standards-storage",
+  "canonical_commit": "64ee9d062337b4bac6dd50dcd5ef8fed15b23449",
+  "canonical_commit_url": "https://github.com/SocioProphet/socioprophet-standards-storage/commit/64ee9d062337b4bac6dd50dcd5ef8fed15b23449",
+  "canonical_package_path": "examples/control-matrix/v3",
+  "canonical_schema_path": "schemas/control-matrix",
+  "supersedes_manifest_canonical_pr": 10,
+  "status": "pinned-to-mainline-canonical-commit",
+  "note": "Use this pin until the standards package is promoted to a tagged release or dedicated release asset surface."
+}
