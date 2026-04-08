@@ -1,0 +1,73 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Agentplane Placement Decision v0.1",
+  "type": "object",
+  "required": [
+    "kind",
+    "capturedAt",
+    "backendIntent",
+    "requiresKvm",
+    "chosenExecutor",
+    "sshRef",
+    "caps",
+    "rejected"
+  ],
+  "properties": {
+    "kind": {
+      "const": "PlacementDecision"
+    },
+    "capturedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "backendIntent": {
+      "type": "string",
+      "enum": [
+        "qemu",
+        "microvm",
+        "lima-process",
+        "fleet"
+      ]
+    },
+    "requiresKvm": {
+      "type": "boolean"
+    },
+    "chosenExecutor": {
+      "type": "string"
+    },
+    "sshRef": {
+      "type": "string"
+    },
+    "caps": {
+      "type": "object"
+    },
+    "rejected": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "sshRef": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "reason": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}
