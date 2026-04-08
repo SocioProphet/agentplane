@@ -1,5 +1,12 @@
 # Runtime governance integration plan
 
+> **Status: Plan document — not yet implemented.**  
+> The control matrix import lane has been seeded (`policy/imports/control-matrix/`), but the
+> compiled policy, monitor, and test bundles have not yet been generated or bound. The three
+> enforcement surfaces described below are design targets, not current behavior.  
+> See [policy/imports/control-matrix/README.md](../../policy/imports/control-matrix/README.md)
+> for the current import manifest status.
+
 This document defines the first expected binding points for the imported control bundle.
 
 ## Initial enforcement surfaces
