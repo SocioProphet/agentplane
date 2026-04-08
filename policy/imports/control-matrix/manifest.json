@@ -1,0 +1,24 @@
+{
+  "artifact": "agentic_control_matrix_v3_import",
+  "canonical_repository": "SocioProphet/socioprophet-standards-storage",
+  "canonical_pr": 10,
+  "canonical_package_path": "examples/control-matrix/v3",
+  "canonical_schema_path": "schemas/control-matrix",
+  "version": "v3",
+  "as_of_date": "2026-04-05",
+  "row_counts": {
+    "reachable_rows": 187,
+    "denied_rows": 16,
+    "tests": 1177,
+    "monitors": 686,
+    "exceptions": 8,
+    "incidents": 12
+  },
+  "expected_bundles": {
+    "policy": "policy/imports/control-matrix/compiled_policy_bundle_v3.json",
+    "monitor": "monitors/generated/control-matrix/compiled_monitor_bundle_v3.json",
+    "test": "tests/generated/control-matrix/compiled_test_bundle_v3.json"
+  },
+  "status": "seeded-import-lane",
+  "next_step": "Pin the merged standards release and bind the policy bundle to the first runtime gate."
+}
