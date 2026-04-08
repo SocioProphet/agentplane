@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Agentplane Promotion Artifact v0.1",
+  "type": "object",
+  "required": [
+    "kind",
+    "bundle",
+    "capturedAt",
+    "promotionReceiptRef",
+    "promotedObjectRef"
+  ],
+  "properties": {
+    "kind": {
+      "const": "PromotionArtifact"
+    },
+    "bundle": {
+      "type": "string"
+    },
+    "capturedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "promotionReceiptRef": {
+      "type": "string",
+      "pattern": "^urn:srcos:receipt:promotion:"
+    },
+    "promotedObjectRef": {
+      "type": "string"
+    },
+    "reviewSessionRef": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^urn:srcos:session:"
+    }
+  },
+  "additionalProperties": false
+}

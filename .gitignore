@@ -11,3 +11,4 @@ state/pointers/*
 # Python caches
 __pycache__/
 *.pyc
+agentos-spine/

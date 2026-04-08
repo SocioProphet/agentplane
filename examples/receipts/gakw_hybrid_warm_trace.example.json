@@ -1,0 +1,153 @@
+{
+  "trace_id": "trace_gakw_hybrid_warm_001",
+  "events": [
+    {
+      "event_id": "evt_001",
+      "trace_id": "trace_gakw_hybrid_warm_001",
+      "span_id": "span_workspace",
+      "event_type": "workspace.locked",
+      "ts": "2026-04-05T07:30:00Z",
+      "producer": "sociosphere",
+      "payload": {
+        "workspace_manifest_id": "workspace://gakw/hybrid-warm-answer",
+        "workspace_lock_digest": "sha256:lock-example",
+        "benchmark_family": "assistive_knowledge_work",
+        "case_id": "gakw_hybrid_warm_answer",
+        "mission_weight": 1.2,
+        "utility_rubric_version": "gakw-utility-v0.1",
+        "latency_slo_ms": 2500,
+        "risk_class": "high"
+      }
+    },
+    {
+      "event_id": "evt_002",
+      "trace_id": "trace_gakw_hybrid_warm_001",
+      "span_id": "span_context_1",
+      "event_type": "context.pack.selected",
+      "ts": "2026-04-05T07:30:01Z",
+      "producer": "slash-topics",
+      "payload": {
+        "pack_ids": [
+          "topicpack://slash-topics/community-health@1",
+          "topicpack://slash-topics/governance@1"
+        ],
+        "pack_digests": [
+          "sha256:pack01",
+          "sha256:pack03"
+        ],
+        "policy_bundle_id": "hdt-policy-2026-04",
+        "locality_class": "warm-local"
+      }
+    },
+    {
+      "event_id": "evt_003",
+      "trace_id": "trace_gakw_hybrid_warm_001",
+      "span_id": "span_context_2",
+      "event_type": "context.pack.fetched",
+      "ts": "2026-04-05T07:30:02Z",
+      "producer": "slash-topics",
+      "payload": {
+        "total_bytes": 65536,
+        "cache_hits": 1,
+        "cache_misses": 1,
+        "working_set_hit_rate": 0.5,
+        "remote_fetch_count": 1
+      }
+    },
+    {
+      "event_id": "evt_004",
+      "trace_id": "trace_gakw_hybrid_warm_001",
+      "span_id": "span_policy",
+      "event_type": "policy.evaluated",
+      "ts": "2026-04-05T07:30:03Z",
+      "producer": "human-digital-twin",
+      "payload": {
+        "policy_bundle_id": "hdt-policy-2026-04",
+        "policy_pass": true,
+        "risk_class": "high",
+        "approval_required": true,
+        "human_approved": true
+      }
+    },
+    {
+      "event_id": "evt_005",
+      "trace_id": "trace_gakw_hybrid_warm_001",
+      "span_id": "span_place",
+      "event_type": "placement.selected",
+      "ts": "2026-04-05T07:30:04Z",
+      "producer": "agentplane",
+      "payload": {
+        "site": "hybrid-us-east-1",
+        "node_pool": "edge-plus-cloud",
+        "host_id": "node-edge-a-01",
+        "accelerator_type": "cpu+npu",
+        "execution_mode": "hybrid",
+        "planner_version": "agentplane-0.1.0",
+        "model_id": "model://gpt-class/small-retrieval-agent",
+        "model_digest": "sha256:model01",
+        "adapter_digest": "sha256:adapter01",
+        "runtime_id": "runtime://vllm-like@0.1",
+        "compiler_id": "compiler://none",
+        "quantization": "int8",
+        "context_window_tokens": 8192
+      }
+    },
+    {
+      "event_id": "evt_006",
+      "trace_id": "trace_gakw_hybrid_warm_001",
+      "span_id": "span_run_start",
+      "event_type": "run.started",
+      "ts": "2026-04-05T07:30:05Z",
+      "producer": "agentplane",
+      "payload": {}
+    },
+    {
+      "event_id": "evt_007",
+      "trace_id": "trace_gakw_hybrid_warm_001",
+      "span_id": "span_run_end",
+      "event_type": "run.completed",
+      "ts": "2026-04-05T07:30:07Z",
+      "producer": "agentplane",
+      "payload": {
+        "train_amortized": 0.0,
+        "inference_j": 22.0,
+        "data_move_j": 11.0,
+        "network_j": 9.5,
+        "storage_j": 4.0,
+        "control_j": 6.0,
+        "idle_j": 8.0,
+        "cooling_adjusted_j": 7.0,
+        "replay_j": 3.0,
+        "accounting_boundary": "device+host+allocated-network+storage+cooling",
+        "estimation_model": "mixed-meter-v0.1",
+        "quality": 0.87,
+        "calibration": 0.82,
+        "robustness": 0.88,
+        "latency_ms": 1860,
+        "replayable": true
+      }
+    },
+    {
+      "event_id": "evt_008",
+      "trace_id": "trace_gakw_hybrid_warm_001",
+      "span_id": "span_evidence",
+      "event_type": "evidence.sealed",
+      "ts": "2026-04-05T07:30:08Z",
+      "producer": "agentplane",
+      "payload": {
+        "input_digest": "sha256:input01",
+        "output_digest": "sha256:output01",
+        "evidence_refs": [
+          "evidence://run/trace_gakw_hybrid_warm_001/output",
+          "evidence://run/trace_gakw_hybrid_warm_001/log"
+        ],
+        "attestation_refs": [
+          "attest://hdt/approval/001"
+        ],
+        "signature": "sig:example",
+        "replay_supported": true,
+        "replay_manifest_id": "replay://trace_gakw_hybrid_warm_001"
+      }
+    }
+  ]
+}
