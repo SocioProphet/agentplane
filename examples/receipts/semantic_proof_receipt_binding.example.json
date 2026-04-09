@@ -1,0 +1,67 @@
+{
+  "receipt_id": "receipt_sp_001",
+  "trace_id": "trace_sp_runtime_001",
+  "timestamp": "2026-04-09T15:40:00Z",
+  "task": {
+    "task_id": "task_case_1001_replayable"
+  },
+  "context": {
+    "policy_bundle_id": "policy_snap_1"
+  },
+  "placement": {
+    "site": "tenant-a",
+    "executor_id": "queue_auth_support"
+  },
+  "model_runtime": {
+    "runtime_id": "agentplane-local-hybrid-v0"
+  },
+  "energy_j": {
+    "train_amortized": 0.0,
+    "inference": 11.4,
+    "data_move": 1.2,
+    "network": 0.9,
+    "storage": 0.4,
+    "control": 0.6,
+    "idle": 0.3,
+    "cooling_adjusted": 1.1,
+    "total": 15.9,
+    "accounting_boundary": "device+host+allocated-network+storage+cooling-adjusted-site-factor",
+    "estimation_model": "agentplane-example-v0"
+  },
+  "outcome": {
+    "quality": 0.96,
+    "calibration": 0.91,
+    "robustness": 0.88,
+    "latency_ms": 96,
+    "replayable": true,
+    "policy_pass": true,
+    "human_approved": true
+  },
+  "evidence": {
+    "proof_refs": [
+      {
+        "proof_id": "proof:wv1:incl:controls021",
+        "proof_type": "inclusion",
+        "proof_version": "1"
+      }
+    ],
+    "verification_results": [
+      {
+        "proof_id": "proof:wv1:incl:controls021",
+        "verified": true,
+        "failure_code": null,
+        "details": {
+          "root_hash": "sha256:c44bbe038a6cf60bb3aeee87c904095594758c320ed9f9bbdcfb95067f5ef29c"
+        }
+      }
+    ],
+    "transport_failure": null
+  },
+  "replay": {
+    "cairn_ref": "cairn://case_1001/cairn_2",
+    "replay_boundary_hash": "sha256:replayboundary001",
+    "proof_ids_attached": [
+      "proof:wv1:incl:controls021"
+    ]
+  }
+}
