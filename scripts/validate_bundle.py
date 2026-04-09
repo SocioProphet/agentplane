@@ -1,9 +1,14 @@
 #!/usr/bin/env python3
 import json, sys, os, datetime
+from pathlib import Path
+
+from evaluate_control_matrix_gate import ControlGateError, evaluate_bundle_gate, write_gate_artifact
+
 
 def die(msg: str, code: int = 2) -> None:
     print(f"[validate] ERROR: {msg}", file=sys.stderr)
     raise SystemExit(code)
+
 
 def main() -> int:
     if len(sys.argv) != 2:
@@ -48,10 +53,9 @@ def main() -> int:
     if not isinstance(mrs, int) or mrs < 5 or mrs > 3600:
         die("spec.policy.maxRunSeconds must be an int in [5, 3600]", 2)
 
-
     vm = spec["vm"]
     backend_intent = vm.get("backendIntent")
-    allowed = {"qemu","microvm","lima-process","fleet"}
+    allowed = {"qemu", "microvm", "lima-process", "fleet"}
     if backend_intent not in allowed:
         die(f"spec.vm.backendIntent must be one of {sorted(allowed)}", 2)
     if "modulePath" not in vm or "backendIntent" not in vm:
@@ -62,20 +66,40 @@ def main() -> int:
     if not out_dir:
         die("spec.artifacts.outDir is required", 2)
 
-    # Evidence-forward: emit a validation artifact next to artifacts.outDir
+    # Evidence-forward: emit validation + control-gate artifacts next to artifacts.outDir
     os.makedirs(out_dir, exist_ok=True)
+    gate_artifact_path = Path(out_dir) / "control-gate-artifact.json"
+    try:
+        gate_artifact = evaluate_bundle_gate(b, Path(bundle_path))
+        write_gate_artifact(gate_artifact, gate_artifact_path)
+    except ControlGateError as e:
+        die(str(e), 2)
+
+    if gate_artifact["result"] != "allow":
+        die(
+            f"control matrix gate denied bundle: {gate_artifact['reason']} (rows={gate_artifact['blockingRowIds'] or gate_artifact['candidateRowIds']})",
+            2,
+        )
+
     report = {
         "kind": "ValidationArtifact",
         "bundle": f'{md.get("name")}@{md.get("version")}',
         "bundlePath": os.path.abspath(bundle_path),
         "validatedAt": datetime.datetime.now(datetime.timezone.utc).isoformat(),
         "result": "pass",
+        "controlGate": {
+            "result": gate_artifact["result"],
+            "reason": gate_artifact["reason"],
+            "artifactPath": str(gate_artifact_path),
+            "matchedRowIds": gate_artifact["matchedRowIds"],
+        },
     }
     report_path = os.path.join(out_dir, "validation-artifact.json")
     with open(report_path, "w", encoding="utf-8") as f:
         json.dump(report, f, indent=2, sort_keys=True)
     print(f"[validate] OK: wrote {report_path}")
     return 0
+
 
 if __name__ == "__main__":
     raise SystemExit(main())
