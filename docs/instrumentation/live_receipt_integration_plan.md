@@ -1,6 +1,12 @@
 # Live Receipt Integration Plan v0.1
 ## SocioProphet AI+HW+State stack
 
+> **Status: Plan document — phases not yet complete.**  
+> Phase 0 (schema and event freeze) is in progress. The `maipj-run-receipt.schema.json` schema
+> is pending publication in `SocioProphet/socioprophet-standards-storage`. Phases 1–3 have not
+> started. The reference assembler and example trace are available in `examples/receipts/`.  
+> See [docs/receipt-lifecycle.md](../receipt-lifecycle.md) for the current working specification.
+
 ### Purpose
 This plan turns the MAIPJ doctrine and GAKW benchmark family into a first live integration path.
 The target is one real governed execution path that emits one valid MAIPJ run receipt with
