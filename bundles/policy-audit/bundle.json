@@ -1,0 +1,63 @@
+{
+  "apiVersion": "agentplane.socioprophet.org/v0.1",
+  "kind": "Bundle",
+  "metadata": {
+    "createdAt": "2026-04-11T00:00:00Z",
+    "licensePolicy": {
+      "allowAGPL": false,
+      "notes": "Banking twin tranche remains permissive-only and evidence-forward."
+    },
+    "name": "policy-audit",
+    "source": {
+      "git": {
+        "dirty": true,
+        "rev": "UNSET"
+      }
+    },
+    "version": "0.1.0"
+  },
+  "spec": {
+    "artifacts": {
+      "outDir": "./artifacts/policy-audit"
+    },
+    "policy": {
+      "failOnTimeout": true,
+      "humanGateRequired": true,
+      "lane": "staging",
+      "maxRunSeconds": 300,
+      "policyPackHash": "UNSET",
+      "policyPackRef": "policy-packs/banking/policy-audit"
+    },
+    "secrets": {
+      "required": [],
+      "secretRefRoot": "secrets://tenant"
+    },
+    "smoke": {
+      "script": "bundles/policy-audit/smoke.sh"
+    },
+    "vm": {
+      "backendIntent": "lima-process",
+      "modulePath": "bundles/policy-audit/vm.nix",
+      "mounts": [
+        {
+          "ro": false,
+          "source": "./artifacts/policy-audit",
+          "target": "/mnt/artifacts",
+          "type": "9p"
+        }
+      ],
+      "network": {
+        "egressAllowlist": [
+          "dns",
+          "https"
+        ],
+        "mode": "nat"
+      },
+      "resources": {
+        "diskGiB": 16,
+        "memMiB": 4096,
+        "vcpu": 2
+      }
+    }
+  }
+}
