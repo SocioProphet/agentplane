@@ -1,0 +1,118 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Agentplane Governance Context v0.1",
+  "type": "object",
+  "properties": {
+    "principal": {
+      "type": "object",
+      "required": [
+        "spiffe_id",
+        "aum_digest"
+      ],
+      "properties": {
+        "spiffe_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "aum_digest": {
+          "type": "string",
+          "pattern": "^sha256:[a-f0-9]{64}$"
+        },
+        "session_id": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 6
+        }
+      },
+      "additionalProperties": false
+    },
+    "grantRef": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "policyDecisionRef": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "policyHash": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^sha256:[a-f0-9]{64}$"
+    },
+    "runtimeEvidence": {
+      "type": "object",
+      "properties": {
+        "eventIrRef": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "proofArtifactRef": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "hdtDecisionSummaryRef": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "attestationBundleRef": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "transportReceiptRef": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "controlMatrix": {
+      "type": "object",
+      "properties": {
+        "rowIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": []
+        },
+        "exceptionRefs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": []
+        },
+        "incidentRefs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": []
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "principal"
+  ],
+  "additionalProperties": false
+}
