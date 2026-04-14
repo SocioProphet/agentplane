@@ -1,0 +1,25 @@
+{
+  "principal": {
+    "spiffe_id": "spiffe://socioprophet.dev/agentplane/example-agent",
+    "aum_digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "session_id": "sess-example-agent-01"
+  },
+  "grantRef": "grant://mcp-a2a-zero-trust/example-agent/staging",
+  "policyDecisionRef": "decision://mcp-a2a-zero-trust/example-agent/staging",
+  "policyHash": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+  "runtimeEvidence": {
+    "eventIrRef": "evidence://prime-er/example-agent/event-ir/2026-04-06",
+    "proofArtifactRef": "evidence://prime-er/example-agent/proof/2026-04-06",
+    "hdtDecisionSummaryRef": "evidence://hdt/example-agent/decision/2026-04-06",
+    "attestationBundleRef": "attest://tsi/example-agent/bundle/2026-04-06",
+    "transportReceiptRef": "receipt://tritrpc/example-agent/session/2026-04-06"
+  },
+  "controlMatrix": {
+    "rowIds": [
+      "RG-001",
+      "ID-004"
+    ],
+    "exceptionRefs": [],
+    "incidentRefs": []
+  }
+}
