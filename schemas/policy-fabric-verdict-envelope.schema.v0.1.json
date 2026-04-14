@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Agentplane Policy Fabric Verdict Envelope v0.1",
+  "description": "Typed execution-side envelope for consuming governed promotion verdicts from Policy Fabric.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "kind",
+    "capturedAt",
+    "policyBundle",
+    "domain",
+    "promote",
+    "fit",
+    "verdictArtifactRef",
+    "verdictExplanationRef"
+  ],
+  "properties": {
+    "kind": {"const": "PolicyFabricVerdictEnvelope"},
+    "capturedAt": {"type": "string", "format": "date-time"},
+    "policyBundle": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "version"],
+      "properties": {
+        "id": {"type": "string"},
+        "version": {"type": "string"}
+      }
+    },
+    "bundle": {"type": ["string", "null"]},
+    "lane": {"type": ["string", "null"]},
+    "domain": {"type": "string"},
+    "promote": {"type": "boolean"},
+    "fit": {"enum": ["surjection", "injection", "bijection"]},
+    "failedPredicates": {
+      "type": "array",
+      "items": {"type": "string"}
+    },
+    "reasons": {
+      "type": "array",
+      "items": {"type": "string"}
+    },
+    "summary": {"type": ["string", "null"]},
+    "thresholds": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "minBijectiveStability": {"type": "number"},
+        "surjectionUpperBoundMultiplier": {"type": "number"},
+        "injectionUpperBoundMultiplier": {"type": "number"}
+      }
+    },
+    "verdictArtifactRef": {"type": "string"},
+    "verdictExplanationRef": {"type": "string"}
+  }
+}
