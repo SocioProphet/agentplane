@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Agentplane Signal Artifact v0.1",
+  "type": "object",
+  "required": ["kind", "bundle", "capturedAt", "signalType", "executor", "backendIntent"],
+  "properties": {
+    "kind": { "const": "SignalArtifact" },
+    "bundle": { "type": "string" },
+    "capturedAt": { "type": "string", "format": "date-time" },
+    "signalType": { "type": "string", "enum": ["prune", "requeue_after"] },
+    "executor": { "type": "string" },
+    "backendIntent": { "type": "string" },
+    "delayMs": { "type": ["integer", "null"] },
+    "data": { "type": ["object", "null"] }
+  }
+}
