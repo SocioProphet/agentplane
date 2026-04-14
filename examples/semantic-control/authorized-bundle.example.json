@@ -1,0 +1,54 @@
+{
+  "apiVersion": "agentplane.socioprophet.org/v0.1",
+  "kind": "Bundle",
+  "metadata": {
+    "name": "semantic-control-demo",
+    "version": "0.1.0",
+    "createdAt": "2026-04-12T00:00:00Z",
+    "licensePolicy": {
+      "allowAGPL": false
+    }
+  },
+  "spec": {
+    "artifacts": {
+      "outDir": "artifacts/semantic-control-demo"
+    },
+    "policy": {
+      "lane": "staging",
+      "humanGateRequired": true,
+      "maxRunSeconds": 900,
+      "semanticControl": {
+        "profileRef": "examples/semantic-control/semantic-control-profile.example.json",
+        "profileHash": "1111111111111111111111111111111111111111111111111111111111111111",
+        "profileSignatureRef": "secrets://semantic-control/signatures/deconfliction-example.sig",
+        "profileKeyId": "scp-key-001",
+        "authorizedAudience": ["agentplane/authorized-executors"],
+        "deliveryMode": "a2a-envelope",
+        "projectionOverride": {
+          "lane": "staging",
+          "humanGateRequired": true,
+          "maxRunSeconds": 900,
+          "plannerBranchBudget": 3,
+          "toolBudget": 5,
+          "memoryScope": "local-only",
+          "disclosureScope": "restricted",
+          "handoffPolicy": "mediated",
+          "interruptPolicy": "graceful-escalate"
+        },
+        "failClosed": true,
+        "redactionMode": "withhold-profile"
+      }
+    },
+    "secrets": {
+      "required": [],
+      "secretRefRoot": "secrets://user"
+    },
+    "smoke": {
+      "script": "bundles/example-agent/smoke.sh"
+    },
+    "vm": {
+      "backendIntent": "lima-process",
+      "modulePath": "bundles/example-agent/vm.nix"
+    }
+  }
+}
