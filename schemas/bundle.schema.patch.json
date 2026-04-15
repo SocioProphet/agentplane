@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "JSON Merge Patch-style fragment showing new agent-runtime fields to add under spec.",
+  "spec": {
+    "sessionPolicyRef": {
+      "type": "string"
+    },
+    "skillRefs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "memoryNamespace": {
+      "type": "string"
+    },
+    "worktreeStrategy": {
+      "enum": [
+        "none",
+        "existing",
+        "create-temp",
+        "named"
+      ]
+    },
+    "rolloutFlags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "telemetrySink": {
+      "type": "string"
+    },
+    "receiptSchemaVersion": {
+      "type": "string"
+    }
+  }
+}

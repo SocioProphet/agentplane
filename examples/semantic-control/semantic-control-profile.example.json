@@ -1,0 +1,48 @@
+{
+  "apiVersion": "sct.socioprophet.org/v0.1",
+  "kind": "SCTControlProfile",
+  "metadata": {
+    "name": "deconfliction-example",
+    "version": "0.1.0",
+    "issuedAt": "2026-04-12T00:00:00Z",
+    "expiresAt": "2026-05-12T00:00:00Z",
+    "issuer": "socioprophet-control-authority",
+    "audience": ["agentplane/authorized-executors"],
+    "keyId": "scp-key-001",
+    "profileSha256": "1111111111111111111111111111111111111111111111111111111111111111",
+    "signatureRef": "secrets://semantic-control/signatures/deconfliction-example.sig",
+    "tags": ["deconfliction", "semaphoric", "agentplane"]
+  },
+  "spec": {
+    "motifs": [
+      {"name": "gate", "weight": 1.0, "notes": "admit authorized execution lane"},
+      {"name": "bridge", "weight": 0.8, "notes": "allow constrained handoff"},
+      {"name": "chapel", "weight": 0.7, "notes": "retain local reserve and no-export memory"},
+      {"name": "seal", "weight": 0.6, "notes": "finalize with evidence"}
+    ],
+    "runtimeProjection": {
+      "lane": "staging",
+      "plannerBranchBudget": 3,
+      "toolBudget": 5,
+      "memoryScope": "local-only",
+      "disclosureScope": "restricted",
+      "handoffPolicy": "mediated",
+      "interruptPolicy": "graceful-escalate",
+      "humanGateRequired": true,
+      "maxRunSeconds": 900
+    },
+    "delivery": {
+      "mode": "a2a-envelope",
+      "authorizedAudience": ["agentplane/authorized-executors"],
+      "failClosed": true,
+      "redactionMode": "withhold-profile"
+    },
+    "deconfliction": {
+      "breakGlassAllowed": false,
+      "breakGlassReasonRequired": true,
+      "unauthorizedTelemetry": true,
+      "replayBindProfileHash": true
+    },
+    "failMode": "deny"
+  }
+}

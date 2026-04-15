@@ -1,9 +1,14 @@
 #!/usr/bin/env python3
 import json, sys, os, datetime
+from pathlib import Path
+
+from evaluate_control_matrix_gate import ControlGateError, evaluate_bundle_gate, write_gate_artifact
+
 
 def die(msg: str, code: int = 2) -> None:
     print(f"[validate] ERROR: {msg}", file=sys.stderr)
     raise SystemExit(code)
+
 
 def main() -> int:
     if len(sys.argv) != 2:
@@ -48,10 +53,41 @@ def main() -> int:
     if not isinstance(mrs, int) or mrs < 5 or mrs > 3600:
         die("spec.policy.maxRunSeconds must be an int in [5, 3600]", 2)
 
+    abstract_reasoning = pol.get("abstractReasoning") or {}
+    if abstract_reasoning:
+        reasoning_class = abstract_reasoning.get("reasoningClass", "REACTIVE")
+        verification_mode = abstract_reasoning.get("verificationMode", "NONE")
+        llm_only_forbidden = bool(abstract_reasoning.get("llmOnlyForbidden", False))
+        requires_counterexample_search = bool(abstract_reasoning.get("requiresCounterexampleSearch", False))
+        requires_program_candidate = bool(abstract_reasoning.get("requiresProgramCandidate", False))
+        requires_backtracking_capability = bool(abstract_reasoning.get("requiresBacktrackingCapability", False))
+
+        allowed_reasoning_classes = {"REACTIVE", "RETRIEVAL", "ABSTRACT", "CAUSAL", "PROGRAM_INDUCTION"}
+        allowed_verification_modes = {
+            "NONE",
+            "POLICY_ONLY",
+            "COUNTEREXAMPLE_SEARCH",
+            "PROGRAM_EXECUTION",
+            "CAUSAL_CHECK",
+            "HUMAN_REVIEW",
+            "COMPOSITE",
+        }
+        if reasoning_class not in allowed_reasoning_classes:
+            die(f"spec.policy.abstractReasoning.reasoningClass must be one of {sorted(allowed_reasoning_classes)}", 2)
+        if verification_mode not in allowed_verification_modes:
+            die(f"spec.policy.abstractReasoning.verificationMode must be one of {sorted(allowed_verification_modes)}", 2)
+        if reasoning_class in {"ABSTRACT", "PROGRAM_INDUCTION"} and llm_only_forbidden and verification_mode == "NONE":
+            die("abstractReasoning forbids llm-only evaluation when reasoningClass is ABSTRACT or PROGRAM_INDUCTION", 2)
+        if requires_program_candidate and not abstract_reasoning.get("programCandidateRef"):
+            die("abstractReasoning requires programCandidateRef", 2)
+        if requires_counterexample_search and not (abstract_reasoning.get("counterexampleRefs") or []):
+            die("abstractReasoning requires counterexampleRefs", 2)
+        if requires_backtracking_capability and not abstract_reasoning.get("backtrackingCapable", False):
+            die("abstractReasoning requires backtrackingCapable=true", 2)
 
     vm = spec["vm"]
     backend_intent = vm.get("backendIntent")
-    allowed = {"qemu","microvm","lima-process","fleet"}
+    allowed = {"qemu", "microvm", "lima-process", "fleet"}
     if backend_intent not in allowed:
         die(f"spec.vm.backendIntent must be one of {sorted(allowed)}", 2)
     if "modulePath" not in vm or "backendIntent" not in vm:
@@ -62,20 +98,48 @@ def main() -> int:
     if not out_dir:
         die("spec.artifacts.outDir is required", 2)
 
-    # Evidence-forward: emit a validation artifact next to artifacts.outDir
+    # Evidence-forward: emit validation + control-gate artifacts next to artifacts.outDir
     os.makedirs(out_dir, exist_ok=True)
+    gate_artifact_path = Path(out_dir) / "control-gate-artifact.json"
+    try:
+        gate_artifact = evaluate_bundle_gate(b, Path(bundle_path))
+        write_gate_artifact(gate_artifact, gate_artifact_path)
+    except ControlGateError as e:
+        die(str(e), 2)
+
+    if gate_artifact["result"] != "allow":
+        die(
+            f"control matrix gate denied bundle: {gate_artifact['reason']} (rows={gate_artifact['blockingRowIds'] or gate_artifact['candidateRowIds']})",
+            2,
+        )
+
     report = {
         "kind": "ValidationArtifact",
         "bundle": f'{md.get("name")}@{md.get("version")}',
         "bundlePath": os.path.abspath(bundle_path),
         "validatedAt": datetime.datetime.now(datetime.timezone.utc).isoformat(),
         "result": "pass",
+        "controlGate": {
+            "result": gate_artifact["result"],
+            "reason": gate_artifact["reason"],
+            "artifactPath": str(gate_artifact_path),
+            "matchedRowIds": gate_artifact["matchedRowIds"],
+        },
+        "abstractGate": {
+            "reasoningClass": gate_artifact["gateContext"].get("reasoning_class"),
+            "verificationMode": gate_artifact["gateContext"].get("verification_mode"),
+            "llmOnlyForbidden": gate_artifact["gateContext"].get("llm_only_forbidden"),
+            "requiresCounterexampleSearch": gate_artifact["gateContext"].get("requires_counterexample_search"),
+            "requiresProgramCandidate": gate_artifact["gateContext"].get("requires_program_candidate"),
+            "requiresBacktrackingCapability": gate_artifact["gateContext"].get("requires_backtracking_capability"),
+        },
     }
     report_path = os.path.join(out_dir, "validation-artifact.json")
     with open(report_path, "w", encoding="utf-8") as f:
         json.dump(report, f, indent=2, sort_keys=True)
     print(f"[validate] OK: wrote {report_path}")
     return 0
+
 
 if __name__ == "__main__":
     raise SystemExit(main())

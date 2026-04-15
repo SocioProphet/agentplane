@@ -1,0 +1,227 @@
+[
+  {
+    "row_id": "R103",
+    "policy_key": "R103|stabilize|policy\u2194action",
+    "allow_if": {
+      "phase": "stabilize",
+      "authority": "draft",
+      "environment_tier": "dev",
+      "approval_mode": "dual_control",
+      "tenant_scope": "single_tenant"
+    },
+    "enforcement_point": "policy_engine",
+    "control_type": "preventive",
+    "runbook_id": "RB-001",
+    "ship_blocker": "PASS"
+  },
+  {
+    "row_id": "R104",
+    "policy_key": "R104|stabilize|policy\u2194action",
+    "allow_if": {
+      "phase": "stabilize",
+      "authority": "draft",
+      "environment_tier": "dev",
+      "approval_mode": "dual_control",
+      "tenant_scope": "single_tenant"
+    },
+    "enforcement_point": "policy_engine",
+    "control_type": "preventive",
+    "runbook_id": "RB-001",
+    "ship_blocker": "PASS"
+  },
+  {
+    "row_id": "R105",
+    "policy_key": "R105|stabilize|policy\u2194action",
+    "allow_if": {
+      "phase": "stabilize",
+      "authority": "draft",
+      "environment_tier": "dev",
+      "approval_mode": "dual_control",
+      "tenant_scope": "single_tenant"
+    },
+    "enforcement_point": "policy_engine",
+    "control_type": "compensating",
+    "runbook_id": "RB-008",
+    "ship_blocker": "PASS"
+  },
+  {
+    "row_id": "R106",
+    "policy_key": "R106|harden|policy\u2194action",
+    "allow_if": {
+      "phase": "harden",
+      "authority": "constrained_action",
+      "environment_tier": "staging",
+      "approval_mode": "dual_control",
+      "tenant_scope": "single_tenant"
+    },
+    "enforcement_point": "policy_engine",
+    "control_type": "preventive",
+    "runbook_id": "RB-001",
+    "ship_blocker": "PASS"
+  },
+  {
+    "row_id": "R107",
+    "policy_key": "R107|harden|policy\u2194action",
+    "allow_if": {
+      "phase": "harden",
+      "authority": "constrained_action",
+      "environment_tier": "staging",
+      "approval_mode": "dual_control",
+      "tenant_scope": "single_tenant"
+    },
+    "enforcement_point": "policy_engine",
+    "control_type": "preventive",
+    "runbook_id": "RB-001",
+    "ship_blocker": "PASS"
+  },
+  {
+    "row_id": "R108",
+    "policy_key": "R108|harden|policy\u2194action",
+    "allow_if": {
+      "phase": "harden",
+      "authority": "constrained_action",
+      "environment_tier": "staging",
+      "approval_mode": "dual_control",
+      "tenant_scope": "single_tenant"
+    },
+    "enforcement_point": "policy_engine",
+    "control_type": "compensating",
+    "runbook_id": "RB-008",
+    "ship_blocker": "PASS"
+  },
+  {
+    "row_id": "R109",
+    "policy_key": "R109|operate|policy\u2194action",
+    "allow_if": {
+      "phase": "operate",
+      "authority": "constrained_action",
+      "environment_tier": "prod",
+      "approval_mode": "dual_control",
+      "tenant_scope": "single_tenant"
+    },
+    "enforcement_point": "policy_engine",
+    "control_type": "preventive",
+    "runbook_id": "RB-001",
+    "ship_blocker": "PASS"
+  },
+  {
+    "row_id": "R110",
+    "policy_key": "R110|operate|policy\u2194action",
+    "allow_if": {
+      "phase": "operate",
+      "authority": "constrained_action",
+      "environment_tier": "prod",
+      "approval_mode": "dual_control",
+      "tenant_scope": "single_tenant"
+    },
+    "enforcement_point": "policy_engine",
+    "control_type": "preventive",
+    "runbook_id": "RB-001",
+    "ship_blocker": "PASS"
+  },
+  {
+    "row_id": "R111",
+    "policy_key": "R111|operate|policy\u2194action",
+    "allow_if": {
+      "phase": "operate",
+      "authority": "emergency_override",
+      "environment_tier": "prod",
+      "approval_mode": "break_glass",
+      "tenant_scope": "single_tenant"
+    },
+    "enforcement_point": "policy_engine",
+    "control_type": "compensating",
+    "runbook_id": "RB-008",
+    "ship_blocker": "PASS"
+  },
+  {
+    "row_id": "R174",
+    "policy_key": "R174|harden|policy\u2194action",
+    "allow_if": {
+      "phase": "harden",
+      "authority": "constrained_action",
+      "environment_tier": "staging",
+      "approval_mode": "dual_control",
+      "tenant_scope": "single_tenant"
+    },
+    "enforcement_point": "policy_engine",
+    "control_type": "preventive",
+    "runbook_id": "RB-001",
+    "ship_blocker": "PASS"
+  },
+  {
+    "row_id": "R175",
+    "policy_key": "R175|harden|policy\u2194action",
+    "allow_if": {
+      "phase": "harden",
+      "authority": "constrained_action",
+      "environment_tier": "staging",
+      "approval_mode": "dual_control",
+      "tenant_scope": "single_tenant"
+    },
+    "enforcement_point": "policy_engine",
+    "control_type": "preventive",
+    "runbook_id": "RB-001",
+    "ship_blocker": "PASS"
+  },
+  {
+    "row_id": "R176",
+    "policy_key": "R176|harden|policy\u2194action",
+    "allow_if": {
+      "phase": "harden",
+      "authority": "constrained_action",
+      "environment_tier": "staging",
+      "approval_mode": "dual_control",
+      "tenant_scope": "single_tenant"
+    },
+    "enforcement_point": "policy_engine",
+    "control_type": "compensating",
+    "runbook_id": "RB-008",
+    "ship_blocker": "PASS"
+  },
+  {
+    "row_id": "R177",
+    "policy_key": "R177|operate|policy\u2194action",
+    "allow_if": {
+      "phase": "operate",
+      "authority": "constrained_action",
+      "environment_tier": "prod",
+      "approval_mode": "dual_control",
+      "tenant_scope": "single_tenant"
+    },
+    "enforcement_point": "policy_engine",
+    "control_type": "preventive",
+    "runbook_id": "RB-001",
+    "ship_blocker": "PASS"
+  },
+  {
+    "row_id": "R178",
+    "policy_key": "R178|operate|policy\u2194action",
+    "allow_if": {
+      "phase": "operate",
+      "authority": "constrained_action",
+      "environment_tier": "prod",
+      "approval_mode": "dual_control",
+      "tenant_scope": "single_tenant"
+    },
+    "enforcement_point": "policy_engine",
+    "control_type": "preventive",
+    "runbook_id": "RB-001",
+    "ship_blocker": "PASS"
+  },
+  {
+    "row_id": "R179",
+    "policy_key": "R179|operate|policy\u2194action",
+    "allow_if": {
+      "phase": "operate",
+      "authority": "emergency_override",
+      "environment_tier": "prod",
+      "approval_mode": "break_glass",
+      "tenant_scope": "single_tenant"
+    },
+    "enforcement_point": "policy_engine",
+    "control_type": "compensating",
+    "runbook_id": "RB-008",
+    "ship_blocker": "PASS"
+  }
+]
