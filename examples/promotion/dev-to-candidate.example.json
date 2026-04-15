@@ -1,0 +1,21 @@
+{
+  "channel": "candidate",
+  "artifact_set": "sha256:example-sourceos-candidate-artifact-set",
+  "source_rev": "git:example-commit-sha",
+  "flake_lock": "sha256:example-flake-lock",
+  "capabilities": {
+    "image-build": "0.1.0",
+    "promotion": "0.1.0",
+    "rollback": "0.1.0"
+  },
+  "eval_bundle": "eval-example-sourceos-candidate",
+  "data_snapshots": {
+    "policies": "snapshot-policy-0001",
+    "benchmarks": "snapshot-bench-0001"
+  },
+  "promoted_at": "2026-04-15T19:05:00Z",
+  "rollback_to": "dev-sha256:example-previous-artifact-set",
+  "approved_by": [
+    "operator"
+  ]
+}
