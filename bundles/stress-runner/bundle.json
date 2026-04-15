@@ -1,0 +1,63 @@
+{
+  "apiVersion": "agentplane.socioprophet.org/v0.1",
+  "kind": "Bundle",
+  "metadata": {
+    "createdAt": "2026-04-11T00:00:00Z",
+    "licensePolicy": {
+      "allowAGPL": false,
+      "notes": "Banking twin tranche remains permissive-only and evidence-forward."
+    },
+    "name": "stress-runner",
+    "source": {
+      "git": {
+        "dirty": true,
+        "rev": "UNSET"
+      }
+    },
+    "version": "0.1.0"
+  },
+  "spec": {
+    "artifacts": {
+      "outDir": "./artifacts/stress-runner"
+    },
+    "policy": {
+      "failOnTimeout": true,
+      "humanGateRequired": false,
+      "lane": "staging",
+      "maxRunSeconds": 900,
+      "policyPackHash": "UNSET",
+      "policyPackRef": "policy-packs/banking/stress-runner"
+    },
+    "secrets": {
+      "required": [],
+      "secretRefRoot": "secrets://tenant"
+    },
+    "smoke": {
+      "script": "bundles/stress-runner/smoke.sh"
+    },
+    "vm": {
+      "backendIntent": "lima-process",
+      "modulePath": "bundles/stress-runner/vm.nix",
+      "mounts": [
+        {
+          "ro": false,
+          "source": "./artifacts/stress-runner",
+          "target": "/mnt/artifacts",
+          "type": "9p"
+        }
+      ],
+      "network": {
+        "egressAllowlist": [
+          "dns",
+          "https"
+        ],
+        "mode": "nat"
+      },
+      "resources": {
+        "diskGiB": 16,
+        "memMiB": 4096,
+        "vcpu": 2
+      }
+    }
+  }
+}

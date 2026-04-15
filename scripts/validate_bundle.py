@@ -53,6 +53,38 @@ def main() -> int:
     if not isinstance(mrs, int) or mrs < 5 or mrs > 3600:
         die("spec.policy.maxRunSeconds must be an int in [5, 3600]", 2)
 
+    abstract_reasoning = pol.get("abstractReasoning") or {}
+    if abstract_reasoning:
+        reasoning_class = abstract_reasoning.get("reasoningClass", "REACTIVE")
+        verification_mode = abstract_reasoning.get("verificationMode", "NONE")
+        llm_only_forbidden = bool(abstract_reasoning.get("llmOnlyForbidden", False))
+        requires_counterexample_search = bool(abstract_reasoning.get("requiresCounterexampleSearch", False))
+        requires_program_candidate = bool(abstract_reasoning.get("requiresProgramCandidate", False))
+        requires_backtracking_capability = bool(abstract_reasoning.get("requiresBacktrackingCapability", False))
+
+        allowed_reasoning_classes = {"REACTIVE", "RETRIEVAL", "ABSTRACT", "CAUSAL", "PROGRAM_INDUCTION"}
+        allowed_verification_modes = {
+            "NONE",
+            "POLICY_ONLY",
+            "COUNTEREXAMPLE_SEARCH",
+            "PROGRAM_EXECUTION",
+            "CAUSAL_CHECK",
+            "HUMAN_REVIEW",
+            "COMPOSITE",
+        }
+        if reasoning_class not in allowed_reasoning_classes:
+            die(f"spec.policy.abstractReasoning.reasoningClass must be one of {sorted(allowed_reasoning_classes)}", 2)
+        if verification_mode not in allowed_verification_modes:
+            die(f"spec.policy.abstractReasoning.verificationMode must be one of {sorted(allowed_verification_modes)}", 2)
+        if reasoning_class in {"ABSTRACT", "PROGRAM_INDUCTION"} and llm_only_forbidden and verification_mode == "NONE":
+            die("abstractReasoning forbids llm-only evaluation when reasoningClass is ABSTRACT or PROGRAM_INDUCTION", 2)
+        if requires_program_candidate and not abstract_reasoning.get("programCandidateRef"):
+            die("abstractReasoning requires programCandidateRef", 2)
+        if requires_counterexample_search and not (abstract_reasoning.get("counterexampleRefs") or []):
+            die("abstractReasoning requires counterexampleRefs", 2)
+        if requires_backtracking_capability and not abstract_reasoning.get("backtrackingCapable", False):
+            die("abstractReasoning requires backtrackingCapable=true", 2)
+
     vm = spec["vm"]
     backend_intent = vm.get("backendIntent")
     allowed = {"qemu", "microvm", "lima-process", "fleet"}
@@ -92,6 +124,14 @@ def main() -> int:
             "reason": gate_artifact["reason"],
             "artifactPath": str(gate_artifact_path),
             "matchedRowIds": gate_artifact["matchedRowIds"],
+        },
+        "abstractGate": {
+            "reasoningClass": gate_artifact["gateContext"].get("reasoning_class"),
+            "verificationMode": gate_artifact["gateContext"].get("verification_mode"),
+            "llmOnlyForbidden": gate_artifact["gateContext"].get("llm_only_forbidden"),
+            "requiresCounterexampleSearch": gate_artifact["gateContext"].get("requires_counterexample_search"),
+            "requiresProgramCandidate": gate_artifact["gateContext"].get("requires_program_candidate"),
+            "requiresBacktrackingCapability": gate_artifact["gateContext"].get("requires_backtracking_capability"),
         },
     }
     report_path = os.path.join(out_dir, "validation-artifact.json")
