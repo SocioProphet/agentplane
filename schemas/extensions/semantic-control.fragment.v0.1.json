@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agentplane.socioprophet.org/schemas/extensions/semantic-control.fragment.v0.1.json",
+  "title": "AgentPlane Bundle semanticControl extension fragment v0.1",
+  "type": "object",
+  "properties": {
+    "semanticControl": {
+      "type": "object",
+      "required": [
+        "profileRef",
+        "profileHash",
+        "authorizedAudience",
+        "deliveryMode",
+        "failClosed"
+      ],
+      "properties": {
+        "profileRef": {"type": "string"},
+        "profileHash": {
+          "type": "string",
+          "pattern": "^[a-fA-F0-9]{64}$"
+        },
+        "profileSignatureRef": {"type": "string"},
+        "profileKeyId": {"type": "string"},
+        "authorizedAudience": {
+          "type": "array",
+          "items": {"type": "string"},
+          "minItems": 1
+        },
+        "deliveryMode": {
+          "type": "string",
+          "enum": ["mcp-sidecar", "a2a-envelope", "local-host-context"]
+        },
+        "projectionOverride": {
+          "type": "object",
+          "properties": {
+            "lane": {"type": "string"},
+            "humanGateRequired": {"type": "boolean"},
+            "maxRunSeconds": {"type": "integer", "minimum": 1},
+            "plannerBranchBudget": {"type": "integer", "minimum": 0},
+            "toolBudget": {"type": "integer", "minimum": 0},
+            "memoryScope": {"type": "string"},
+            "disclosureScope": {"type": "string"},
+            "handoffPolicy": {"type": "string"},
+            "interruptPolicy": {"type": "string"}
+          },
+          "additionalProperties": false
+        },
+        "failClosed": {"type": "boolean"},
+        "redactionMode": {"type": "string"}
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}
