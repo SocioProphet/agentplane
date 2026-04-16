@@ -1,0 +1,141 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agentplane.socioprophet.org/schemas/sct-control-profile.schema.v0.1.json",
+  "title": "SCTControlProfile v0.1",
+  "type": "object",
+  "required": [
+    "apiVersion",
+    "kind",
+    "metadata",
+    "spec"
+  ],
+  "properties": {
+    "apiVersion": {
+      "const": "sct.socioprophet.org/v0.1",
+      "type": "string"
+    },
+    "kind": {
+      "const": "SCTControlProfile",
+      "type": "string"
+    },
+    "metadata": {
+      "type": "object",
+      "required": [
+        "name",
+        "version",
+        "issuedAt",
+        "expiresAt",
+        "issuer",
+        "audience",
+        "profileSha256"
+      ],
+      "properties": {
+        "name": {"type": "string"},
+        "version": {"type": "string"},
+        "issuedAt": {"type": "string", "format": "date-time"},
+        "expiresAt": {"type": "string", "format": "date-time"},
+        "issuer": {"type": "string"},
+        "audience": {
+          "type": "array",
+          "items": {"type": "string"},
+          "minItems": 1
+        },
+        "keyId": {"type": "string"},
+        "profileSha256": {
+          "type": "string",
+          "pattern": "^[a-fA-F0-9]{64}$"
+        },
+        "signatureRef": {"type": "string"},
+        "tags": {
+          "type": "array",
+          "items": {"type": "string"}
+        }
+      }
+    },
+    "spec": {
+      "type": "object",
+      "required": [
+        "motifs",
+        "runtimeProjection",
+        "delivery",
+        "deconfliction",
+        "failMode"
+      ],
+      "properties": {
+        "motifs": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["name"],
+            "properties": {
+              "name": {
+                "type": "string",
+                "enum": [
+                  "gate",
+                  "river",
+                  "fork",
+                  "neck",
+                  "chapel",
+                  "bridge",
+                  "rupture",
+                  "seal"
+                ]
+              },
+              "weight": {"type": "number", "minimum": 0.0, "maximum": 1.0},
+              "notes": {"type": "string"}
+            }
+          }
+        },
+        "runtimeProjection": {
+          "type": "object",
+          "properties": {
+            "lane": {"type": "string"},
+            "plannerBranchBudget": {"type": "integer", "minimum": 0},
+            "toolBudget": {"type": "integer", "minimum": 0},
+            "memoryScope": {"type": "string"},
+            "disclosureScope": {"type": "string"},
+            "handoffPolicy": {"type": "string"},
+            "interruptPolicy": {"type": "string"},
+            "humanGateRequired": {"type": "boolean"},
+            "maxRunSeconds": {"type": "integer", "minimum": 1}
+          },
+          "additionalProperties": false
+        },
+        "delivery": {
+          "type": "object",
+          "required": ["mode", "authorizedAudience", "failClosed"],
+          "properties": {
+            "mode": {
+              "type": "string",
+              "enum": ["mcp-sidecar", "a2a-envelope", "local-host-context"]
+            },
+            "authorizedAudience": {
+              "type": "array",
+              "items": {"type": "string"},
+              "minItems": 1
+            },
+            "failClosed": {"type": "boolean"},
+            "redactionMode": {"type": "string"}
+          }
+        },
+        "deconfliction": {
+          "type": "object",
+          "properties": {
+            "breakGlassAllowed": {"type": "boolean"},
+            "breakGlassReasonRequired": {"type": "boolean"},
+            "unauthorizedTelemetry": {"type": "boolean"},
+            "replayBindProfileHash": {"type": "boolean"}
+          },
+          "additionalProperties": false
+        },
+        "failMode": {
+          "type": "string",
+          "enum": ["deny", "degrade", "human-escalate"]
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}
