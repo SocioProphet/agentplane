@@ -1,0 +1,75 @@
+{
+  "apiVersion": "agentplane.socioprophet.org/v0.1",
+  "kind": "Bundle",
+  "metadata": {
+    "name": "sourceos-asahi-stage",
+    "version": "0.1.0",
+    "createdAt": "2026-04-15T16:30:00Z",
+    "licensePolicy": {
+      "allowAGPL": false,
+      "notes": "Stage bundle for Fedora Asahi + Nix substrate lane."
+    },
+    "source": {
+      "git": {
+        "rev": "main",
+        "dirty": false
+      }
+    }
+  },
+  "spec": {
+    "vm": {
+      "modulePath": "bundles/sourceos-asahi-stage/vm.nix",
+      "backendIntent": "qemu",
+      "resources": {
+        "vcpu": 2,
+        "memMiB": 4096,
+        "diskGiB": 20
+      },
+      "network": {
+        "mode": "nat",
+        "egressAllowlist": []
+      },
+      "mounts": [
+        {
+          "type": "virtiofs",
+          "source": "/srv/sourceos/config",
+          "target": "/mnt/config",
+          "ro": true
+        },
+        {
+          "type": "virtiofs",
+          "source": "/srv/sourceos/state/hn-tick",
+          "target": "/mnt/state/hn-tick",
+          "ro": false
+        },
+        {
+          "type": "virtiofs",
+          "source": "/srv/sourceos/evidence",
+          "target": "/mnt/evidence",
+          "ro": false
+        }
+      ]
+    },
+    "secrets": {
+      "required": [
+        "HN_TICK_API_KEY_FILE",
+        "HN_TICK_DB_URL_FILE"
+      ],
+      "secretRefRoot": "/var/run/sourceos-secrets"
+    },
+    "policy": {
+      "lane": "staging",
+      "humanGateRequired": true,
+      "failOnTimeout": true,
+      "maxRunSeconds": 600,
+      "policyPackRef": "protocol/agentic-workbench/v1/policy_packs/workspace-default.v0.1.json",
+      "policyPackHash": "sha256:pending"
+    },
+    "artifacts": {
+      "outDir": "artifacts/sourceos-asahi-stage"
+    },
+    "smoke": {
+      "script": "bundles/sourceos-asahi-stage/smoke.sh"
+    }
+  }
+}
