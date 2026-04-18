@@ -1,0 +1,20 @@
+{
+  "event_id": "exec_report_evt_0001",
+  "order_intent_event_id": "evt_order_intent_0001",
+  "venue_id": "XNAS",
+  "report_kind": "partial_fill",
+  "order_ref": "venue-order-448812",
+  "fill_quantity": "40",
+  "fill_price": "182.41",
+  "remaining_quantity": "60",
+  "sequence_ref": "889144201",
+  "reported_at": "2026-04-15T16:00:03Z",
+  "provenance_links": [
+    {"ref": "approval_evt_0001"},
+    {"ref": "evt_order_intent_0001"}
+  ],
+  "details": {
+    "normalization_note": "venue-native partial fill normalized to canonical execution-report-event",
+    "venue_status": "open"
+  }
+}
