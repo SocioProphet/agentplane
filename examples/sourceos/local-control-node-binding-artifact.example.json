@@ -1,0 +1,20 @@
+{
+  "kind": "LocalControlNodeBindingArtifact",
+  "validatedAt": "2026-04-20T21:45:00Z",
+  "inputPath": "/repo/examples/sourceos/local-control-node-promotion-input.example.json",
+  "result": "pass",
+  "consumedRefs": {
+    "controlNodeProfileRef": "urn:srcos:control-node:macbook-air-operator-01",
+    "nodeCommanderRuntimeRef": "urn:srcos:node-commander:runtime:macbook-air-operator-01",
+    "candidateBuildRef": "urn:srcos:build:sourceos-workstation-v0-2026-04-15",
+    "promotionGateRef": "urn:srcos:image-gate:sourceos-workstation-v0-dev",
+    "validationEvidenceBundleRef": "urn:srcos:build-evidence:sourceos-workstation-v0-2026-04-15"
+  },
+  "expectedAgentplaneOutputs": {
+    "validationArtifact": "urn:agentplane:artifact:validation:bundle-sourceos-workstation-v0-2026-04-15",
+    "placementDecision": "urn:agentplane:placement:local-macbook-air-operator-01",
+    "runArtifact": "urn:agentplane:artifact:run:sourceos-workstation-v0-2026-04-15",
+    "replayArtifact": "urn:agentplane:artifact:replay:sourceos-workstation-v0-2026-04-15"
+  },
+  "scenarioCount": 2
+}
