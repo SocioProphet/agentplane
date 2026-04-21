@@ -1,0 +1,29 @@
+{
+  "overlayId": "oprisk-overlay-rollback-2026-q2-001",
+  "overlayType": "SoftwareOperationalReceiptOverlayExample",
+  "executionPhase": "reverse",
+  "executionArtifactRef": "ReversalArtifact:example-agent:2026-04-20T23:55:00Z",
+  "summary": "Rollback executed after runtime instability crossed operator policy threshold and recovery controls were activated.",
+  "opriskRefs": {
+    "watchItems": [
+      "urn:srcos:upstream-watch:socioprophet-agentplane-main"
+    ],
+    "incidents": [
+      "urn:srcos:oprisk-incident:github-control-plane-degradation-2026-03-03"
+    ],
+    "scenarioRuns": [
+      "urn:srcos:oprisk-scenario-run:devtools-agent-baseline-2026-q2"
+    ],
+    "reserveReports": [
+      "urn:srcos:oprisk-reserve-report:devtools-agent-2026-q2"
+    ],
+    "analysisBundles": [
+      "urn:srcos:oprisk-analysis-bundle:devtools-agent-2026-q2"
+    ]
+  },
+  "executionNotes": {
+    "trigger": "Runtime instability exceeded tolerated execution threshold.",
+    "recoveryAction": "ReversalArtifact emitted and prior state restored.",
+    "controlNarrative": "Rollback serves as explicit duration and severity reduction evidence in the operational-risk chain."
+  }
+}
