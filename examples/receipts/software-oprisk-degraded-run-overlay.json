@@ -1,0 +1,32 @@
+{
+  "overlayId": "oprisk-overlay-degraded-run-2026-q2-001",
+  "overlayType": "SoftwareOperationalReceiptOverlayExample",
+  "executionPhase": "run",
+  "executionArtifactRef": "RunArtifact:example-agent:2026-04-20T23:30:00Z",
+  "summary": "Run completed under degraded upstream provider conditions with elevated latency and watch-state execution notes.",
+  "opriskRefs": {
+    "watchItems": [
+      "urn:srcos:upstream-watch:provider:openai-codex"
+    ],
+    "incidents": [
+      "urn:srcos:oprisk-incident:openai-codex-unresponsive-2026-03-09"
+    ],
+    "scenarioRuns": [
+      "urn:srcos:oprisk-scenario-run:devtools-agent-baseline-2026-q2"
+    ],
+    "reserveReports": [
+      "urn:srcos:oprisk-reserve-report:devtools-agent-2026-q2"
+    ],
+    "analysisBundles": [
+      "urn:srcos:oprisk-analysis-bundle:devtools-agent-2026-q2"
+    ]
+  },
+  "executionNotes": {
+    "surfaceDecision": "Run permitted on watched execution surface because no lower-risk surface was available.",
+    "degradedSignals": [
+      "elevated dependency latency",
+      "provider watch-state carried into run evidence"
+    ],
+    "controlNarrative": "Observed degradation informs severity and duration analysis but did not require immediate reversal."
+  }
+}
