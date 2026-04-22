@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/SocioProphet/agentplane/blob/main/schemas/extensions/shared-content-build-release.fragment.v0.1.json",
+  "title": "Agentplane shared content/build/release binding fragment v0.1",
+  "description": "Additive fragment documenting the expected shape for SourceOS/SociOS content/build/release refs carried by an agentplane bundle or execution artifact.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "contentSpecRef": {
+      "type": "string"
+    },
+    "overlayRefs": {
+      "type": "array",
+      "items": {"type": "string"}
+    },
+    "buildRequestRef": {
+      "type": "string"
+    },
+    "releaseManifestRef": {
+      "type": "string"
+    },
+    "enrollmentProfileRef": {
+      "type": "string"
+    },
+    "evidenceBundleRef": {
+      "type": "string"
+    },
+    "localExecutionProtocolRef": {
+      "type": "string"
+    },
+    "remoteExecutionProtocolRef": {
+      "type": "string"
+    }
+  }
+}
