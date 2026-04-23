@@ -4,10 +4,40 @@ from pathlib import Path
 
 from evaluate_control_matrix_gate import ControlGateError, evaluate_bundle_gate, write_gate_artifact
 
+SOURCEOS_BINDING_KEYS = {
+    "contentSpecRef",
+    "overlayRefs",
+    "buildRequestRef",
+    "releaseManifestRef",
+    "enrollmentProfileRef",
+    "evidenceBundleRef",
+    "localExecutionProtocolRef",
+    "remoteExecutionProtocolRef",
+}
+
 
 def die(msg: str, code: int = 2) -> None:
     print(f"[validate] ERROR: {msg}", file=sys.stderr)
     raise SystemExit(code)
+
+
+def extract_sourceos_bindings(spec: dict) -> dict:
+    integration_refs = spec.get("integrationRefs") or {}
+    sourceos = integration_refs.get("sourceos") or spec.get("sourceosBuildRelease") or {}
+    if not sourceos:
+        return {}
+    if not isinstance(sourceos, dict):
+        die("spec.integrationRefs.sourceos must be an object when present", 2)
+
+    out = {}
+    for key in SOURCEOS_BINDING_KEYS:
+        value = sourceos.get(key)
+        if value not in (None, "", []):
+            out[key] = value
+
+    if "overlayRefs" in out and not isinstance(out["overlayRefs"], list):
+        die("spec.integrationRefs.sourceos.overlayRefs must be an array when present", 2)
+    return out
 
 
 def main() -> int:
@@ -38,13 +68,14 @@ def main() -> int:
             die(f"metadata.{k} is required", 2)
 
     lp = md.get("licensePolicy") or {}
-    # Our hard constraint: never allow AGPL in shipped content.
     if lp.get("allowAGPL", False) is not False:
         die("metadata.licensePolicy.allowAGPL must be false", 2)
-    # Spec checks (v0.1)
+
     for k in ("vm", "policy", "secrets", "artifacts", "smoke"):
         if k not in spec:
             die(f"spec.{k} is required", 2)
+
+    sourceos_bindings = extract_sourceos_bindings(spec)
 
     pol = spec.get("policy") or {}
     mrs = pol.get("maxRunSeconds")
@@ -98,7 +129,6 @@ def main() -> int:
     if not out_dir:
         die("spec.artifacts.outDir is required", 2)
 
-    # Evidence-forward: emit validation + control-gate artifacts next to artifacts.outDir
     os.makedirs(out_dir, exist_ok=True)
     gate_artifact_path = Path(out_dir) / "control-gate-artifact.json"
     try:
@@ -119,6 +149,7 @@ def main() -> int:
         "bundlePath": os.path.abspath(bundle_path),
         "validatedAt": datetime.datetime.now(datetime.timezone.utc).isoformat(),
         "result": "pass",
+        "sourceosBindings": sourceos_bindings,
         "controlGate": {
             "result": gate_artifact["result"],
             "reason": gate_artifact["reason"],
