@@ -22,6 +22,17 @@ import os
 import sys
 from pathlib import Path
 
+SOURCEOS_BINDING_KEYS = {
+    "contentSpecRef",
+    "overlayRefs",
+    "buildRequestRef",
+    "releaseManifestRef",
+    "enrollmentProfileRef",
+    "evidenceBundleRef",
+    "localExecutionProtocolRef",
+    "remoteExecutionProtocolRef",
+}
+
 
 def die(msg: str, code: int = 2) -> None:
     print(f"[run-artifact] ERROR: {msg}", file=sys.stderr)
@@ -37,6 +48,20 @@ def load_bundle(path: Path) -> dict:
         return json.loads(path.read_text(encoding="utf-8"))
     except Exception as e:
         die(f"invalid bundle json: {e}", 2)
+
+
+def extract_sourceos_bindings(spec: dict) -> dict:
+    integration_refs = spec.get("integrationRefs") or {}
+    sourceos = integration_refs.get("sourceos") or spec.get("sourceosBuildRelease") or {}
+    if not isinstance(sourceos, dict):
+        return {}
+
+    out = {}
+    for key in SOURCEOS_BINDING_KEYS:
+        value = sourceos.get(key)
+        if value not in (None, "", []):
+            out[key] = value
+    return out
 
 
 def main() -> int:
@@ -93,6 +118,7 @@ def main() -> int:
         "stdoutRef": args.stdout_ref,
         "stderrRef": args.stderr_ref,
         "upstreamArtifacts": upstream,
+        "sourceosBindings": extract_sourceos_bindings(spec),
     }
 
     out = Path(out_dir)
