@@ -1,0 +1,30 @@
+name: broker-execution-bundle
+
+on:
+  pull_request:
+    paths:
+      - "schemas/broker-execution-bundle.schema.v0.1.json"
+      - "examples/broker-execution-bundle.example.json"
+      - "scripts/validate_broker_execution_bundle.py"
+      - ".github/workflows/broker-execution-bundle.yml"
+  push:
+    branches:
+      - main
+    paths:
+      - "schemas/broker-execution-bundle.schema.v0.1.json"
+      - "examples/broker-execution-bundle.example.json"
+      - "scripts/validate_broker_execution_bundle.py"
+      - ".github/workflows/broker-execution-bundle.yml"
+
+jobs:
+  validate-broker-execution-bundle:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install validation dependency
+        run: python -m pip install jsonschema
+      - name: Validate broker execution bundle
+        run: python scripts/validate_broker_execution_bundle.py
