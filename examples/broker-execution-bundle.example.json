@@ -1,0 +1,21 @@
+{
+  "bundle_id": "bundle-provider-binding-smoke-001",
+  "purpose": "Smoke-test approved ProviderBinding before production use.",
+  "provider_binding_id": "binding-standard-app-env-public-cloud-001",
+  "policy_decision_id": "decision-standard-app-env-001",
+  "execution_type": "smoke",
+  "placement_constraints": [
+    "linux-executor",
+    "network-restricted"
+  ],
+  "expected_artifacts": [
+    "ValidationArtifact",
+    "PlacementDecision",
+    "RunArtifact",
+    "ReplayArtifact"
+  ],
+  "evidence_refs": [
+    "evidence.standard-environment.v1"
+  ],
+  "max_run_seconds": 600
+}
