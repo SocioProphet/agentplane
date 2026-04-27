@@ -10,6 +10,109 @@ def die(msg: str, code: int = 2) -> None:
     raise SystemExit(code)
 
 
+def _require_mapping(obj, path: str):
+    if not isinstance(obj, dict):
+        die(f"{path} must be an object", 2)
+    return obj
+
+
+def _require_non_empty(obj: dict, path: str, keys: tuple[str, ...]) -> None:
+    for key in keys:
+        value = obj.get(key)
+        if value is None or value == "" or value == []:
+            die(f"{path}.{key} is required for SourceOS image-production bundles", 2)
+
+
+def validate_sourceos_image_production(spec: dict) -> dict:
+    """Validate the optional SourceOS image-production lane.
+
+    The lane is intentionally optional so existing bundles continue to pass. When a
+    bundle declares any SourceOS or socios automation intent, however, we fail
+    closed unless the authority refs needed for governed execution are present.
+    """
+    sourceos_present = "sourceos" in spec
+    automation_present = "sociosAutomation" in spec
+    outputs_present = "outputs" in spec
+
+    if not (sourceos_present or automation_present or outputs_present):
+        return {"enabled": False, "result": "not_applicable"}
+
+    sourceos = _require_mapping(spec.get("sourceos") or {}, "spec.sourceos")
+    automation = _require_mapping(spec.get("sociosAutomation") or {}, "spec.sociosAutomation")
+    outputs = _require_mapping(spec.get("outputs") or {}, "spec.outputs")
+
+    _require_non_empty(
+        sourceos,
+        "spec.sourceos",
+        (
+            "artifactTruthRef",
+            "flavorRef",
+            "installerProfileRef",
+            "channelRef",
+            "manifestRef",
+            "sourceosSpecRef",
+        ),
+    )
+    _require_non_empty(
+        automation,
+        "spec.sociosAutomation",
+        (
+            "substrateDocRef",
+            "katelloContentModelRef",
+            "tektonPipelineRef",
+            "katelloProduct",
+            "katelloRepository",
+            "katelloLifecycleEnvironment",
+        ),
+    )
+
+    lifecycle = automation.get("katelloLifecycleEnvironment")
+    if lifecycle not in {"dev", "qa", "prod", "site", "custom"}:
+        die("spec.sociosAutomation.katelloLifecycleEnvironment must be one of dev, qa, prod, site, custom", 2)
+
+    secret_refs = spec.get("secrets", {}).get("required") or []
+    if any(not isinstance(ref, str) or not ref.strip() for ref in secret_refs):
+        die("spec.secrets.required entries must be non-empty secret references", 2)
+
+    inline_secret_keys = {
+        key
+        for key in automation
+        if key.lower() in {"password", "token", "secret", "username", "katellopassword", "katellotoken"}
+    }
+    if inline_secret_keys:
+        die(
+            "spec.sociosAutomation must not contain inline secret material; use spec.secrets refs instead "
+            f"(found: {sorted(inline_secret_keys)})",
+            2,
+        )
+
+    expected_output_refs = [
+        "bootReleaseSetRef",
+        "evidenceBundleRef",
+        "katelloContentRef",
+        "ostreeRef",
+        "releaseSetRef",
+        "smokeReceiptRef",
+    ]
+    declared_outputs = [key for key in expected_output_refs if outputs.get(key)]
+
+    return {
+        "enabled": True,
+        "result": "pass",
+        "artifactTruthRef": sourceos.get("artifactTruthRef"),
+        "flavorRef": sourceos.get("flavorRef"),
+        "installerProfileRef": sourceos.get("installerProfileRef"),
+        "channelRef": sourceos.get("channelRef"),
+        "manifestRef": sourceos.get("manifestRef"),
+        "sourceosSpecRef": sourceos.get("sourceosSpecRef"),
+        "tektonPipelineRef": automation.get("tektonPipelineRef"),
+        "katelloProduct": automation.get("katelloProduct"),
+        "katelloRepository": automation.get("katelloRepository"),
+        "katelloLifecycleEnvironment": lifecycle,
+        "declaredOutputs": declared_outputs,
+    }
+
+
 def main() -> int:
     if len(sys.argv) != 2:
         die("usage: scripts/validate_bundle.py <path/to/bundle.json>", 2)
@@ -45,6 +148,8 @@ def main() -> int:
     for k in ("vm", "policy", "secrets", "artifacts", "smoke"):
         if k not in spec:
             die(f"spec.{k} is required", 2)
+
+    sourceos_gate = validate_sourceos_image_production(spec)
 
     pol = spec.get("policy") or {}
     mrs = pol.get("maxRunSeconds")
@@ -125,6 +230,7 @@ def main() -> int:
             "artifactPath": str(gate_artifact_path),
             "matchedRowIds": gate_artifact["matchedRowIds"],
         },
+        "sourceosImageProductionGate": sourceos_gate,
         "abstractGate": {
             "reasoningClass": gate_artifact["gateContext"].get("reasoning_class"),
             "verificationMode": gate_artifact["gateContext"].get("verification_mode"),
