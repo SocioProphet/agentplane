@@ -117,9 +117,106 @@ jobs:
           assert request['kind'] == 'SourceOSDelegatedExecutionRequest'
           assert request['mode'] == 'tekton-submit'
           assert request['modeGate']['sideEffectsAllowed'] is True
-          assert request['modeGate']['submitImplementation'] == 'not_yet_live_recorded_intent_only'
+          assert request['modeGate']['submitImplementation'] == 'recorded_intent_only'
           assert request['submitIntent']['kubeconfigRef'] == 'secrets://sourceos/kubeconfig'
           assert run['sourceosImageProduction']['delegatedExecution']['tektonPipelineRunRef']
           assert replay['inputs']['sourceosImageProduction']['delegatedExecution']['katelloContentRef']
           print('[ci] SourceOS delegated runner modes validated')
+          PY
+
+      - name: SourceOS live Tekton adapter guards
+        run: |
+          if python3 scripts/run_sourceos_delegated.py bundles/sourceos-image-production-smoke/bundle.json \
+            --mode record-only \
+            --execute-live; then
+            echo '[ci] ERROR: record-only --execute-live unexpectedly passed' >&2
+            exit 2
+          fi
+
+          if python3 scripts/run_sourceos_delegated.py bundles/sourceos-image-production-smoke/bundle.json \
+            --mode tekton-observe \
+            --execute-live \
+            --pipeline-run-name sourceos-customize-live-iso-ci \
+            --tekton-namespace sourceos \
+            --kubeconfig-ref secrets://sourceos/kubeconfig \
+            --kubeconfig-env AGENTPLANE_FAKE_KUBECONFIG \
+            --kubectl-bin ./scripts/fake-missing-kubectl; then
+            echo '[ci] ERROR: live observe without kubeconfig env/binary unexpectedly passed' >&2
+            exit 2
+          fi
+
+          mkdir -p .ci/bin .ci/kube
+          cat > .ci/bin/kubectl <<'SH'
+          #!/usr/bin/env bash
+          set -euo pipefail
+          echo "fake kubectl $*" >&2
+          if [[ "$1" == "get" ]]; then
+            echo '{"apiVersion":"tekton.dev/v1","kind":"PipelineRun","metadata":{"name":"sourceos-customize-live-iso-ci","namespace":"sourceos"},"status":{"conditions":[{"type":"Succeeded","status":"True"}]}}'
+            exit 0
+          fi
+          if [[ "$1" == "apply" ]]; then
+            echo 'pipelinerun.tekton.dev/sourceos-customize-live-iso-ci created'
+            exit 0
+          fi
+          echo "unsupported fake kubectl invocation" >&2
+          exit 2
+          SH
+          chmod +x .ci/bin/kubectl
+          cat > .ci/kube/config <<'EOF'
+          apiVersion: v1
+          kind: Config
+          clusters: []
+          contexts: []
+          users: []
+          EOF
+          cat > .ci/pipelinerun.yaml <<'EOF'
+          apiVersion: tekton.dev/v1
+          kind: PipelineRun
+          metadata:
+            name: sourceos-customize-live-iso-ci
+            namespace: sourceos
+          spec:
+            pipelineRef:
+              name: sourceos-customize-live-iso
+          EOF
+          export AGENTPLANE_FAKE_KUBECONFIG="$PWD/.ci/kube/config"
+
+          python3 scripts/run_sourceos_delegated.py bundles/sourceos-image-production-smoke/bundle.json \
+            --mode tekton-observe \
+            --execute-live \
+            --executor ci-sourceos-live-observe \
+            --pipeline-run-name sourceos-customize-live-iso-ci \
+            --tekton-namespace sourceos \
+            --kubeconfig-ref secrets://sourceos/kubeconfig \
+            --kubeconfig-env AGENTPLANE_FAKE_KUBECONFIG \
+            --kubectl-bin .ci/bin/kubectl \
+            --bundle-rev "${{ github.sha }}"
+
+          python3 scripts/run_sourceos_delegated.py bundles/sourceos-image-production-smoke/bundle.json \
+            --mode tekton-submit \
+            --allow-side-effects \
+            --execute-live \
+            --executor ci-sourceos-live-submit \
+            --tekton-namespace sourceos \
+            --tekton-pipeline-name sourceos-customize-live-iso \
+            --pipeline-run-manifest .ci/pipelinerun.yaml \
+            --kubeconfig-ref secrets://sourceos/kubeconfig \
+            --kubeconfig-env AGENTPLANE_FAKE_KUBECONFIG \
+            --tekton-service-account-ref secrets://sourceos/tekton-service-account \
+            --kubectl-bin .ci/bin/kubectl \
+            --bundle-rev "${{ github.sha }}"
+
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          root = Path('artifacts/sourceos-image-production-smoke')
+          request = json.loads((root / 'sourceos-delegated-execution-request.json').read_text())
+          live = request['liveTekton']
+          assert live['requested'] is True
+          assert live['performed'] is True
+          assert live['commandKind'] == 'kubectl_apply_pipelinerun'
+          assert live['kubeconfigRef'] == 'secrets://sourceos/kubeconfig'
+          assert live['kubeconfigEnv'] == 'AGENTPLANE_FAKE_KUBECONFIG'
+          assert request['modeGate']['liveExternalMutationPerformed'] is True
+          print('[ci] SourceOS live Tekton adapter guards validated')
           PY

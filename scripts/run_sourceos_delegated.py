@@ -11,14 +11,15 @@ It is intentionally safe by default:
 - emits Agentplane RunArtifact and ReplayArtifact;
 - defaults to record-only mode;
 - fails closed for submit mode unless side effects and credential refs are explicit;
+- only executes live kubectl calls when --execute-live is explicit;
 - does not inline secrets.
 
 Modes:
 - record-only: render and emit evidence only. No external mutation.
-- tekton-observe: record an existing Tekton PipelineRun/TaskRun surface. No external mutation.
-- tekton-submit: record a guarded submit intent. Requires explicit side-effect permission
-  and credential refs. The current implementation still does not call Tekton directly;
-  it prepares the evidence path for a future live submit backend.
+- tekton-observe: record or observe an existing Tekton PipelineRun/TaskRun surface.
+- tekton-submit: guarded submit intent. Requires explicit side-effect permission
+  and credential refs. Live submission additionally requires --execute-live,
+  a manifest, and a kubeconfig environment binding.
 """
 
 from __future__ import annotations
@@ -27,6 +28,7 @@ import argparse
 import datetime as dt
 import json
 import os
+import shutil
 import subprocess
 import sys
 from pathlib import Path
@@ -89,6 +91,17 @@ def run_checked(cmd: list[str], env: dict[str, str] | None = None) -> None:
         die(f"command failed ({result.returncode}): {' '.join(cmd)}", result.returncode)
 
 
+def run_capture(cmd: list[str], env: dict[str, str], timeout_seconds: int) -> subprocess.CompletedProcess[str]:
+    return subprocess.run(
+        cmd,
+        cwd=REPO_ROOT,
+        env=env,
+        text=True,
+        capture_output=True,
+        timeout=timeout_seconds,
+    )
+
+
 def merge_env(base: dict[str, str], updates: dict[str, str | None]) -> dict[str, str]:
     env = dict(base)
     for key, value in updates.items():
@@ -106,6 +119,35 @@ def require_non_empty(value: str | None, name: str) -> None:
         die(f"{name} is required", 2)
 
 
+def credential_env(args: argparse.Namespace) -> dict[str, str]:
+    if not args.kubeconfig_env:
+        die("--kubeconfig-env is required for live Tekton modes", 2)
+    kubeconfig_value = os.getenv(args.kubeconfig_env)
+    if not kubeconfig_value:
+        die(f"environment variable {args.kubeconfig_env} must be set for live Tekton modes", 2)
+    return {"KUBECONFIG": kubeconfig_value}
+
+
+def validate_live_adapter(args: argparse.Namespace) -> None:
+    if not args.execute_live:
+        return
+    if args.mode == "record-only":
+        die("--execute-live is not valid with record-only mode", 2)
+    if not shutil.which(args.kubectl_bin):
+        die(f"kubectl binary not found: {args.kubectl_bin}", 2)
+    require_non_empty(args.kubeconfig_ref, "--kubeconfig-ref is required for live Tekton modes")
+    require_non_empty(args.kubeconfig_env, "--kubeconfig-env is required for live Tekton modes")
+    credential_env(args)
+    if args.mode == "tekton-observe":
+        require_non_empty(args.pipeline_run_name, "--pipeline-run-name is required for live tekton-observe")
+        require_non_empty(args.tekton_namespace, "--tekton-namespace is required for live tekton-observe")
+    if args.mode == "tekton-submit":
+        require_non_empty(args.pipeline_run_manifest, "--pipeline-run-manifest is required for live tekton-submit")
+        manifest = Path(args.pipeline_run_manifest)
+        if not manifest.exists():
+            die(f"pipeline run manifest not found: {manifest}", 2)
+
+
 def validate_mode(args: argparse.Namespace, bundle: dict[str, Any]) -> dict[str, Any]:
     if args.mode not in VALID_MODES:
         die(f"--mode must be one of {sorted(VALID_MODES)}", 2)
@@ -119,14 +161,17 @@ def validate_mode(args: argparse.Namespace, bundle: dict[str, Any]) -> dict[str,
     mode_gate = {
         "mode": args.mode,
         "sideEffectsAllowed": bool(args.allow_side_effects),
+        "executeLiveRequested": bool(args.execute_live),
         "liveExternalMutationPerformed": False,
         "credentialRefsOnly": True,
         "requiredSecretRefs": required_secret_refs,
     }
 
     if args.mode == "tekton-observe":
-        require_non_empty(args.pipeline_run_ref, "--pipeline-run-ref is required for tekton-observe mode")
+        if not args.execute_live:
+            require_non_empty(args.pipeline_run_ref, "--pipeline-run-ref is required for tekton-observe mode")
         mode_gate["requirement"] = "observe_existing_pipeline_run"
+        validate_live_adapter(args)
         return mode_gate
 
     if args.mode == "tekton-submit":
@@ -143,11 +188,98 @@ def validate_mode(args: argparse.Namespace, bundle: dict[str, Any]) -> dict[str,
         mode_gate["tektonPipelineName"] = args.tekton_pipeline_name
         mode_gate["kubeconfigRef"] = args.kubeconfig_ref
         mode_gate["tektonServiceAccountRef"] = args.tekton_service_account_ref
-        mode_gate["submitImplementation"] = "not_yet_live_recorded_intent_only"
+        mode_gate["submitImplementation"] = "live_kubectl_apply" if args.execute_live else "recorded_intent_only"
+        validate_live_adapter(args)
         return mode_gate
 
+    validate_live_adapter(args)
     mode_gate["requirement"] = "record_only"
     return mode_gate
+
+
+def run_live_adapter(args: argparse.Namespace, out_dir: Path) -> dict[str, Any]:
+    if not args.execute_live:
+        return {
+            "requested": False,
+            "performed": False,
+            "result": "not_requested",
+        }
+
+    live_dir = out_dir / "live-tekton"
+    live_dir.mkdir(parents=True, exist_ok=True)
+    env = merge_env(os.environ, credential_env(args))
+
+    if args.mode == "tekton-observe":
+        cmd = [
+            args.kubectl_bin,
+            "get",
+            "pipelinerun",
+            args.pipeline_run_name,
+            "-n",
+            args.tekton_namespace,
+            "-o",
+            "json",
+        ]
+        command_kind = "kubectl_get_pipelinerun"
+    elif args.mode == "tekton-submit":
+        cmd = [
+            args.kubectl_bin,
+            "apply",
+            "-n",
+            args.tekton_namespace,
+            "-f",
+            args.pipeline_run_manifest,
+        ]
+        command_kind = "kubectl_apply_pipelinerun"
+    else:
+        die(f"unsupported live mode: {args.mode}", 2)
+
+    started = now_iso()
+    try:
+        completed = run_capture(cmd, env, args.live_timeout_seconds)
+        exit_code = completed.returncode
+        stdout = completed.stdout or ""
+        stderr = completed.stderr or ""
+    except subprocess.TimeoutExpired as exc:
+        exit_code = 124
+        stdout = exc.stdout or "" if isinstance(exc.stdout, str) else ""
+        stderr = exc.stderr or "" if isinstance(exc.stderr, str) else ""
+        stderr += f"\nTimed out after {args.live_timeout_seconds}s"
+
+    stdout_path = live_dir / f"{command_kind}.stdout.txt"
+    stderr_path = live_dir / f"{command_kind}.stderr.txt"
+    stdout_path.write_text(stdout, encoding="utf-8")
+    stderr_path.write_text(stderr, encoding="utf-8")
+
+    observed_ref = args.pipeline_run_ref
+    if args.mode == "tekton-observe" and args.pipeline_run_name:
+        observed_ref = args.pipeline_run_ref or f"tekton://pipelinerun/{args.tekton_namespace}/{args.pipeline_run_name}"
+    elif args.mode == "tekton-submit":
+        observed_ref = args.pipeline_run_ref or f"tekton://pipelinerun/{args.tekton_namespace}/{Path(args.pipeline_run_manifest).stem}"
+
+    result = {
+        "requested": True,
+        "performed": exit_code == 0,
+        "result": "success" if exit_code == 0 else "failure",
+        "mode": args.mode,
+        "commandKind": command_kind,
+        "command": {
+            "argv": cmd,
+            "redacted": False,
+        },
+        "startedAt": started,
+        "completedAt": now_iso(),
+        "exitCode": exit_code,
+        "stdoutRef": str(stdout_path),
+        "stderrRef": str(stderr_path),
+        "pipelineRunRef": observed_ref,
+        "kubeconfigRef": args.kubeconfig_ref,
+        "kubeconfigEnv": args.kubeconfig_env,
+    }
+    write_json(live_dir / "live-tekton-result.json", result)
+    if exit_code != 0:
+        die(f"live Tekton adapter failed with exit code {exit_code}; see {stderr_path}", exit_code)
+    return result
 
 
 def render_execution_request(
@@ -155,6 +287,7 @@ def render_execution_request(
     bundle_path: Path,
     args: argparse.Namespace,
     mode_gate: dict[str, Any],
+    live_result: dict[str, Any],
 ) -> dict[str, Any]:
     spec = bundle.get("spec") or {}
     sourceos = spec.get("sourceos") or {}
@@ -167,16 +300,23 @@ def render_execution_request(
         "does not publish to Katello",
         "does not inline secrets",
     ]
-    if args.mode in {"record-only", "tekton-observe"}:
+    if args.mode == "record-only":
         non_goals.extend([
             "does not invoke Tekton directly",
             "does not mutate host state",
         ])
-    if args.mode == "tekton-submit":
+    if args.mode == "tekton-observe" and not args.execute_live:
         non_goals.extend([
-            "does not invoke Tekton directly in this implementation tranche",
+            "does not invoke Tekton directly",
+            "does not mutate host state",
+        ])
+    if args.mode == "tekton-submit" and not args.execute_live:
+        non_goals.extend([
+            "does not invoke Tekton directly in this invocation",
             "records guarded submit intent only",
         ])
+
+    delegated_pipeline_ref = args.pipeline_run_ref or live_result.get("pipelineRunRef")
 
     return {
         "kind": "SourceOSDelegatedExecutionRequest",
@@ -186,6 +326,7 @@ def render_execution_request(
         "createdAt": now_iso(),
         "mode": args.mode,
         "modeGate": mode_gate,
+        "liveTekton": live_result,
         "executor": args.executor,
         "policy": {
             "lane": policy.get("lane"),
@@ -197,7 +338,7 @@ def render_execution_request(
         "sociosAutomation": automation,
         "declaredOutputs": outputs,
         "delegatedExecution": {
-            "tektonPipelineRunRef": args.pipeline_run_ref,
+            "tektonPipelineRunRef": delegated_pipeline_ref,
             "tektonTaskRunRefs": args.task_run_ref,
             "katelloContentRef": args.katello_content_ref,
             "katelloContentViewRef": args.katello_content_view_ref,
@@ -212,6 +353,7 @@ def render_execution_request(
         "submitIntent": {
             "tektonNamespace": args.tekton_namespace,
             "tektonPipelineName": args.tekton_pipeline_name,
+            "pipelineRunManifest": args.pipeline_run_manifest,
             "kubeconfigRef": args.kubeconfig_ref,
             "tektonServiceAccountRef": args.tekton_service_account_ref,
         } if args.mode == "tekton-submit" else None,
@@ -228,13 +370,19 @@ def main() -> int:
     parser.add_argument("bundle", help="Path to Agentplane bundle.json")
     parser.add_argument("--mode", choices=sorted(VALID_MODES), default="record-only")
     parser.add_argument("--allow-side-effects", action="store_true")
+    parser.add_argument("--execute-live", action="store_true")
     parser.add_argument("--executor", default="sourceos-delegated-record", help="Executor name to record in artifacts")
     parser.add_argument("--pipeline-run-ref", default=os.getenv("AGENTPLANE_SOURCEOS_TEKTON_PIPELINE_RUN_REF"))
+    parser.add_argument("--pipeline-run-name", default=os.getenv("AGENTPLANE_SOURCEOS_TEKTON_PIPELINE_RUN_NAME"))
+    parser.add_argument("--pipeline-run-manifest", default=os.getenv("AGENTPLANE_SOURCEOS_TEKTON_PIPELINE_RUN_MANIFEST"))
     parser.add_argument("--task-run-ref", action="append", default=[])
     parser.add_argument("--tekton-namespace", default=os.getenv("AGENTPLANE_SOURCEOS_TEKTON_NAMESPACE"))
     parser.add_argument("--tekton-pipeline-name", default=os.getenv("AGENTPLANE_SOURCEOS_TEKTON_PIPELINE_NAME"))
     parser.add_argument("--tekton-service-account-ref", default=os.getenv("AGENTPLANE_SOURCEOS_TEKTON_SERVICE_ACCOUNT_REF"))
     parser.add_argument("--kubeconfig-ref", default=os.getenv("AGENTPLANE_SOURCEOS_KUBECONFIG_REF"))
+    parser.add_argument("--kubeconfig-env", default=os.getenv("AGENTPLANE_SOURCEOS_KUBECONFIG_ENV", "KUBECONFIG"))
+    parser.add_argument("--kubectl-bin", default=os.getenv("AGENTPLANE_SOURCEOS_KUBECTL_BIN", "kubectl"))
+    parser.add_argument("--live-timeout-seconds", type=int, default=int(os.getenv("AGENTPLANE_SOURCEOS_LIVE_TIMEOUT_SECONDS", "120")))
     parser.add_argument("--katello-content-ref", default=os.getenv("AGENTPLANE_SOURCEOS_KATELLO_CONTENT_REF"))
     parser.add_argument("--katello-content-view-ref", default=os.getenv("AGENTPLANE_SOURCEOS_KATELLO_CONTENT_VIEW_REF"))
     parser.add_argument("--katello-lifecycle-environment-ref", default=os.getenv("AGENTPLANE_SOURCEOS_KATELLO_LIFECYCLE_ENVIRONMENT_REF"))
@@ -264,7 +412,14 @@ def main() -> int:
 
     args.task_run_ref = task_run_refs
     mode_gate = validate_mode(args, bundle)
-    request = render_execution_request(bundle, bundle_path, args, mode_gate)
+    live_result = run_live_adapter(args, out_dir)
+    if live_result.get("pipelineRunRef") and not args.pipeline_run_ref:
+        args.pipeline_run_ref = live_result["pipelineRunRef"]
+    if args.execute_live:
+        mode_gate["liveExternalMutationPerformed"] = bool(live_result.get("performed") and args.mode == "tekton-submit")
+        mode_gate["liveResult"] = live_result.get("result")
+
+    request = render_execution_request(bundle, bundle_path, args, mode_gate, live_result)
     write_json(out_dir / "sourceos-delegated-execution-request.json", request)
 
     artifact_env = merge_env(
