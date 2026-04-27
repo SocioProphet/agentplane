@@ -1,0 +1,32 @@
+name: MeshRush Candidate
+
+on:
+  push:
+    paths:
+      - 'docs/integrations/MESHRUSH_ADAPTER_CONTRACT.md'
+      - 'schemas/meshrush-execution-candidate.schema.v0.1.json'
+      - 'examples/meshrush/**'
+      - 'scripts/validate_meshrush_candidate.py'
+      - '.github/workflows/meshrush-candidate.yml'
+  pull_request:
+    paths:
+      - 'docs/integrations/MESHRUSH_ADAPTER_CONTRACT.md'
+      - 'schemas/meshrush-execution-candidate.schema.v0.1.json'
+      - 'examples/meshrush/**'
+      - 'scripts/validate_meshrush_candidate.py'
+      - '.github/workflows/meshrush-candidate.yml'
+
+jobs:
+  validate-meshrush-candidate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Validate MeshRush execution candidate fixture
+        run: python3 scripts/validate_meshrush_candidate.py
