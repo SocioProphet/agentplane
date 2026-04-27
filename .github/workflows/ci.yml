@@ -26,3 +26,31 @@ jobs:
         run: |
           python3 scripts/validate_bundle.py bundles/example-agent/bundle.json
           python3 scripts/validate_bundle.py bundles/sourceos-image-production-smoke/bundle.json
+
+      - name: SourceOS delegated artifact emission
+        env:
+          AGENTPLANE_SOURCEOS_TEKTON_PIPELINE_RUN_REF: tekton://sourceos-customize-live-iso/pr-smoke
+          AGENTPLANE_SOURCEOS_TEKTON_TASK_RUN_REFS: tekton://task/customize-live-iso,tekton://task/publish-katello-file-repo,tekton://task/smoke-live-iso
+          AGENTPLANE_SOURCEOS_KATELLO_CONTENT_REF: katello://SourceOS/SourceOS Recovery/sourceos-live.iso@ci-smoke
+          AGENTPLANE_SOURCEOS_KATELLO_CONTENT_VIEW_REF: katello://content-view/sourceos-recovery/qa
+          AGENTPLANE_SOURCEOS_KATELLO_LIFECYCLE_ENVIRONMENT_REF: katello://lifecycle-environment/qa
+          AGENTPLANE_SOURCEOS_OUTPUT_ARTIFACT_REF: file://artifacts/sourceos-image-production-smoke/sourceos-live.iso
+          AGENTPLANE_SOURCEOS_OUTPUT_DIGEST: sha256:UNSET-CI-SMOKE
+          AGENTPLANE_SOURCEOS_RELEASE_SET_REF: SocioProphet/prophet-platform:artifacts/sourceos/m2-lifecycle-proof/release-set.json
+          AGENTPLANE_SOURCEOS_BOOT_RELEASE_SET_REF: SocioProphet/prophet-platform:artifacts/sourceos/m2-lifecycle-proof/boot-release-set.json
+          AGENTPLANE_SOURCEOS_SMOKE_RECEIPT_REF: file://artifacts/sourceos-image-production-smoke/smoke-receipt.json
+        run: |
+          python3 scripts/emit_run_artifact.py bundles/sourceos-image-production-smoke/bundle.json ci-sourceos-delegated 0
+          python3 scripts/emit_replay_artifact.py bundles/sourceos-image-production-smoke/bundle.json ci-sourceos-delegated --bundle-rev "${{ github.sha }}"
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          run = json.loads(Path('artifacts/sourceos-image-production-smoke/run-artifact.json').read_text())
+          replay = json.loads(Path('artifacts/sourceos-image-production-smoke/replay-artifact.json').read_text())
+          assert run['sourceosImageProduction']['enabled'] is True
+          assert run['sourceosImageProduction']['delegatedExecution']['tektonPipelineRunRef']
+          assert run['sourceosImageProduction']['delegatedExecution']['katelloContentRef']
+          assert replay['inputs']['sourceosImageProduction']['delegatedExecution']['tektonPipelineRunRef']
+          assert replay['inputs']['sourceosImageProduction']['delegatedExecution']['katelloContentRef']
+          print('[ci] SourceOS delegated artifact emission validated')
+          PY
