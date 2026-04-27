@@ -9,17 +9,16 @@ It is intentionally safe by default:
 - renders an execution request artifact;
 - records delegated execution refs supplied by arguments or environment;
 - emits Agentplane RunArtifact and ReplayArtifact;
-- does not mutate a cluster, invoke Tekton, or publish to Katello unless a future
-  runner backend explicitly implements that behavior.
+- defaults to record-only mode;
+- fails closed for submit mode unless side effects and credential refs are explicit;
+- does not inline secrets.
 
-Usage:
-  scripts/run_sourceos_delegated.py bundles/sourceos-image-production-smoke/bundle.json \
-    --executor ci-sourceos-delegated \
-    --pipeline-run-ref tekton://sourceos-customize-live-iso/pr-smoke \
-    --task-run-ref tekton://task/customize-live-iso \
-    --task-run-ref tekton://task/publish-katello-file-repo \
-    --katello-content-ref katello://SourceOS/SourceOS-Recovery/sourceos-live.iso@ci-smoke \
-    --output-digest sha256:UNSET-CI-SMOKE
+Modes:
+- record-only: render and emit evidence only. No external mutation.
+- tekton-observe: record an existing Tekton PipelineRun/TaskRun surface. No external mutation.
+- tekton-submit: record a guarded submit intent. Requires explicit side-effect permission
+  and credential refs. The current implementation still does not call Tekton directly;
+  it prepares the evidence path for a future live submit backend.
 """
 
 from __future__ import annotations
@@ -34,6 +33,7 @@ from pathlib import Path
 from typing import Any
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
+VALID_MODES = {"record-only", "tekton-observe", "tekton-submit"}
 
 
 def die(message: str, code: int = 2) -> None:
@@ -101,10 +101,60 @@ def split_csv(values: list[str]) -> str:
     return ",".join([value.strip() for value in values if value.strip()])
 
 
+def require_non_empty(value: str | None, name: str) -> None:
+    if value in (None, ""):
+        die(f"{name} is required", 2)
+
+
+def validate_mode(args: argparse.Namespace, bundle: dict[str, Any]) -> dict[str, Any]:
+    if args.mode not in VALID_MODES:
+        die(f"--mode must be one of {sorted(VALID_MODES)}", 2)
+
+    spec = bundle.get("spec") or {}
+    secrets = spec.get("secrets") or {}
+    required_secret_refs = secrets.get("required") or []
+    if any(not isinstance(ref, str) or not ref.strip() for ref in required_secret_refs):
+        die("spec.secrets.required must contain non-empty secret reference names", 2)
+
+    mode_gate = {
+        "mode": args.mode,
+        "sideEffectsAllowed": bool(args.allow_side_effects),
+        "liveExternalMutationPerformed": False,
+        "credentialRefsOnly": True,
+        "requiredSecretRefs": required_secret_refs,
+    }
+
+    if args.mode == "tekton-observe":
+        require_non_empty(args.pipeline_run_ref, "--pipeline-run-ref is required for tekton-observe mode")
+        mode_gate["requirement"] = "observe_existing_pipeline_run"
+        return mode_gate
+
+    if args.mode == "tekton-submit":
+        if not args.allow_side_effects:
+            die("tekton-submit requires --allow-side-effects", 2)
+        require_non_empty(args.tekton_namespace, "--tekton-namespace is required for tekton-submit mode")
+        require_non_empty(args.tekton_pipeline_name, "--tekton-pipeline-name is required for tekton-submit mode")
+        require_non_empty(args.kubeconfig_ref, "--kubeconfig-ref is required for tekton-submit mode")
+        require_non_empty(args.tekton_service_account_ref, "--tekton-service-account-ref is required for tekton-submit mode")
+        if not required_secret_refs:
+            die("tekton-submit requires spec.secrets.required credential references", 2)
+        mode_gate["requirement"] = "guarded_submit_intent"
+        mode_gate["tektonNamespace"] = args.tekton_namespace
+        mode_gate["tektonPipelineName"] = args.tekton_pipeline_name
+        mode_gate["kubeconfigRef"] = args.kubeconfig_ref
+        mode_gate["tektonServiceAccountRef"] = args.tekton_service_account_ref
+        mode_gate["submitImplementation"] = "not_yet_live_recorded_intent_only"
+        return mode_gate
+
+    mode_gate["requirement"] = "record_only"
+    return mode_gate
+
+
 def render_execution_request(
     bundle: dict[str, Any],
     bundle_path: Path,
     args: argparse.Namespace,
+    mode_gate: dict[str, Any],
 ) -> dict[str, Any]:
     spec = bundle.get("spec") or {}
     sourceos = spec.get("sourceos") or {}
@@ -113,13 +163,29 @@ def render_execution_request(
     policy = spec.get("policy") or {}
     secrets = spec.get("secrets") or {}
 
+    non_goals = [
+        "does not publish to Katello",
+        "does not inline secrets",
+    ]
+    if args.mode in {"record-only", "tekton-observe"}:
+        non_goals.extend([
+            "does not invoke Tekton directly",
+            "does not mutate host state",
+        ])
+    if args.mode == "tekton-submit":
+        non_goals.extend([
+            "does not invoke Tekton directly in this implementation tranche",
+            "records guarded submit intent only",
+        ])
+
     return {
         "kind": "SourceOSDelegatedExecutionRequest",
         "apiVersion": "agentplane.socioprophet.org/v0.1",
         "bundle": bundle_name(bundle),
         "bundlePath": str(bundle_path),
         "createdAt": now_iso(),
-        "mode": "record-only",
+        "mode": args.mode,
+        "modeGate": mode_gate,
         "executor": args.executor,
         "policy": {
             "lane": policy.get("lane"),
@@ -143,25 +209,32 @@ def render_execution_request(
             "bootReleaseSetRef": args.boot_release_set_ref,
             "smokeReceiptRef": args.smoke_receipt_ref,
         },
+        "submitIntent": {
+            "tektonNamespace": args.tekton_namespace,
+            "tektonPipelineName": args.tekton_pipeline_name,
+            "kubeconfigRef": args.kubeconfig_ref,
+            "tektonServiceAccountRef": args.tekton_service_account_ref,
+        } if args.mode == "tekton-submit" else None,
         "secretRefs": {
             "secretRefRoot": secrets.get("secretRefRoot"),
             "required": secrets.get("required") or [],
         },
-        "nonGoals": [
-            "does not invoke Tekton directly",
-            "does not publish to Katello",
-            "does not mutate host state",
-            "does not inline secrets",
-        ],
+        "nonGoals": non_goals,
     }
 
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Record SourceOS delegated execution evidence.")
     parser.add_argument("bundle", help="Path to Agentplane bundle.json")
+    parser.add_argument("--mode", choices=sorted(VALID_MODES), default="record-only")
+    parser.add_argument("--allow-side-effects", action="store_true")
     parser.add_argument("--executor", default="sourceos-delegated-record", help="Executor name to record in artifacts")
     parser.add_argument("--pipeline-run-ref", default=os.getenv("AGENTPLANE_SOURCEOS_TEKTON_PIPELINE_RUN_REF"))
     parser.add_argument("--task-run-ref", action="append", default=[])
+    parser.add_argument("--tekton-namespace", default=os.getenv("AGENTPLANE_SOURCEOS_TEKTON_NAMESPACE"))
+    parser.add_argument("--tekton-pipeline-name", default=os.getenv("AGENTPLANE_SOURCEOS_TEKTON_PIPELINE_NAME"))
+    parser.add_argument("--tekton-service-account-ref", default=os.getenv("AGENTPLANE_SOURCEOS_TEKTON_SERVICE_ACCOUNT_REF"))
+    parser.add_argument("--kubeconfig-ref", default=os.getenv("AGENTPLANE_SOURCEOS_KUBECONFIG_REF"))
     parser.add_argument("--katello-content-ref", default=os.getenv("AGENTPLANE_SOURCEOS_KATELLO_CONTENT_REF"))
     parser.add_argument("--katello-content-view-ref", default=os.getenv("AGENTPLANE_SOURCEOS_KATELLO_CONTENT_VIEW_REF"))
     parser.add_argument("--katello-lifecycle-environment-ref", default=os.getenv("AGENTPLANE_SOURCEOS_KATELLO_LIFECYCLE_ENVIRONMENT_REF"))
@@ -190,7 +263,8 @@ def main() -> int:
         task_run_refs = [value for value in (os.getenv("AGENTPLANE_SOURCEOS_TEKTON_TASK_RUN_REFS") or "").split(",") if value]
 
     args.task_run_ref = task_run_refs
-    request = render_execution_request(bundle, bundle_path, args)
+    mode_gate = validate_mode(args, bundle)
+    request = render_execution_request(bundle, bundle_path, args, mode_gate)
     write_json(out_dir / "sourceos-delegated-execution-request.json", request)
 
     artifact_env = merge_env(
