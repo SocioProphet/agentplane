@@ -10,6 +10,7 @@ This artifact records the minimum inputs needed to replay a run deterministicall
 - policy pack refs/hashes
 - required secret refs (names only)
 - optional upstream workspace artifact references
+- SourceOS delegated execution references when the bundle uses that lane
 """
 
 from __future__ import annotations
@@ -20,6 +21,7 @@ import json
 import os
 import sys
 from pathlib import Path
+from typing import Any
 
 SOURCEOS_BINDING_KEYS = {
     "contentSpecRef",
@@ -32,6 +34,20 @@ SOURCEOS_BINDING_KEYS = {
     "remoteExecutionProtocolRef",
 }
 
+SOURCEOS_ENV_KEYS = {
+    "tektonPipelineRunRef": "AGENTPLANE_SOURCEOS_TEKTON_PIPELINE_RUN_REF",
+    "tektonTaskRunRefs": "AGENTPLANE_SOURCEOS_TEKTON_TASK_RUN_REFS",
+    "katelloContentRef": "AGENTPLANE_SOURCEOS_KATELLO_CONTENT_REF",
+    "katelloContentViewRef": "AGENTPLANE_SOURCEOS_KATELLO_CONTENT_VIEW_REF",
+    "katelloLifecycleEnvironmentRef": "AGENTPLANE_SOURCEOS_KATELLO_LIFECYCLE_ENVIRONMENT_REF",
+    "outputArtifactRef": "AGENTPLANE_SOURCEOS_OUTPUT_ARTIFACT_REF",
+    "outputDigest": "AGENTPLANE_SOURCEOS_OUTPUT_DIGEST",
+    "ostreeRef": "AGENTPLANE_SOURCEOS_OSTREE_REF",
+    "releaseSetRef": "AGENTPLANE_SOURCEOS_RELEASE_SET_REF",
+    "bootReleaseSetRef": "AGENTPLANE_SOURCEOS_BOOT_RELEASE_SET_REF",
+    "smokeReceiptRef": "AGENTPLANE_SOURCEOS_SMOKE_RECEIPT_REF",
+}
+
 
 def die(msg: str, code: int = 2) -> None:
     print(f"[replay-artifact] ERROR: {msg}", file=sys.stderr)
@@ -42,25 +58,120 @@ def now_iso() -> str:
     return dt.datetime.now(dt.timezone.utc).isoformat()
 
 
-def load_bundle(path: Path) -> dict:
+def load_bundle(path: Path) -> dict[str, Any]:
     try:
         return json.loads(path.read_text(encoding="utf-8"))
     except Exception as e:
         die(f"invalid bundle json: {e}", 2)
 
 
-def extract_sourceos_bindings(spec: dict) -> dict:
+def _non_empty(value: Any) -> bool:
+    return value not in (None, "", [])
+
+
+def _string_or_none(value: Any) -> str | None:
+    if value in (None, ""):
+        return None
+    return str(value)
+
+
+def _split_env_list(name: str) -> list[str]:
+    raw = os.getenv(name) or ""
+    return [part.strip() for part in raw.split(",") if part.strip()]
+
+
+def _copy_non_empty(source: dict[str, Any], keys: list[str] | tuple[str, ...]) -> dict[str, Any]:
+    out: dict[str, Any] = {}
+    for key in keys:
+        value = source.get(key)
+        if _non_empty(value):
+            out[key] = value
+    return out
+
+
+def extract_sourceos_bindings(spec: dict[str, Any]) -> dict[str, Any]:
     integration_refs = spec.get("integrationRefs") or {}
     sourceos = integration_refs.get("sourceos") or spec.get("sourceosBuildRelease") or {}
     if not isinstance(sourceos, dict):
         return {}
 
-    out = {}
+    out: dict[str, Any] = {}
     for key in SOURCEOS_BINDING_KEYS:
         value = sourceos.get(key)
-        if value not in (None, "", []):
+        if _non_empty(value):
             out[key] = value
     return out
+
+
+def extract_sourceos_image_production(spec: dict[str, Any]) -> dict[str, Any]:
+    sourceos = spec.get("sourceos") if isinstance(spec.get("sourceos"), dict) else {}
+    automation = spec.get("sociosAutomation") if isinstance(spec.get("sociosAutomation"), dict) else {}
+    outputs = spec.get("outputs") if isinstance(spec.get("outputs"), dict) else {}
+
+    enabled = bool(sourceos or automation or outputs)
+
+    declared = {
+        "sourceos": _copy_non_empty(
+            sourceos,
+            (
+                "artifactTruthRef",
+                "flavorRef",
+                "installerProfileRef",
+                "channelRef",
+                "manifestRef",
+                "sourceosSpecRef",
+                "cosaRef",
+                "butaneRefs",
+                "releaseSetRef",
+                "bootReleaseSetRef",
+            ),
+        ),
+        "sociosAutomation": _copy_non_empty(
+            automation,
+            (
+                "substrateDocRef",
+                "katelloContentModelRef",
+                "tektonPipelineRef",
+                "tektonTaskRefs",
+                "katelloProduct",
+                "katelloRepository",
+                "katelloContentView",
+                "katelloLifecycleEnvironment",
+                "smartProxyRef",
+                "argocdApplicationRef",
+            ),
+        ),
+        "outputs": _copy_non_empty(
+            outputs,
+            (
+                "releaseSetRef",
+                "bootReleaseSetRef",
+                "evidenceBundleRef",
+                "katelloContentRef",
+                "ostreeRef",
+                "smokeReceiptRef",
+            ),
+        ),
+    }
+
+    delegated: dict[str, Any] = {}
+    for field, env_name in SOURCEOS_ENV_KEYS.items():
+        if field == "tektonTaskRunRefs":
+            value = _split_env_list(env_name)
+        else:
+            value = _string_or_none(os.getenv(env_name))
+        if _non_empty(value):
+            delegated[field] = value
+
+    for field in ("katelloContentRef", "ostreeRef", "releaseSetRef", "bootReleaseSetRef", "smokeReceiptRef"):
+        if field not in delegated and _non_empty(outputs.get(field)):
+            delegated[field] = outputs[field]
+
+    return {
+        "enabled": enabled,
+        "declared": declared,
+        "delegatedExecution": delegated,
+    }
 
 
 def main() -> int:
@@ -117,6 +228,7 @@ def main() -> int:
             "secretsRequired": secrets.get("required") or [],
             "upstreamArtifacts": upstream,
             "sourceosBindings": extract_sourceos_bindings(spec),
+            "sourceosImageProduction": extract_sourceos_image_production(spec),
         },
     }
 
