@@ -54,3 +54,35 @@ jobs:
           assert replay['inputs']['sourceosImageProduction']['delegatedExecution']['katelloContentRef']
           print('[ci] SourceOS delegated artifact emission validated')
           PY
+
+      - name: SourceOS delegated runner
+        run: |
+          rm -rf artifacts/sourceos-image-production-smoke
+          python3 scripts/run_sourceos_delegated.py bundles/sourceos-image-production-smoke/bundle.json \
+            --executor ci-sourceos-delegated-runner \
+            --pipeline-run-ref tekton://sourceos-customize-live-iso/pr-smoke \
+            --task-run-ref tekton://task/customize-live-iso \
+            --task-run-ref tekton://task/publish-katello-file-repo \
+            --task-run-ref tekton://task/smoke-live-iso \
+            --katello-content-ref 'katello://SourceOS/SourceOS Recovery/sourceos-live.iso@ci-smoke' \
+            --katello-content-view-ref katello://content-view/sourceos-recovery/qa \
+            --katello-lifecycle-environment-ref katello://lifecycle-environment/qa \
+            --output-artifact-ref file://artifacts/sourceos-image-production-smoke/sourceos-live.iso \
+            --output-digest sha256:UNSET-CI-SMOKE \
+            --release-set-ref SocioProphet/prophet-platform:artifacts/sourceos/m2-lifecycle-proof/release-set.json \
+            --boot-release-set-ref SocioProphet/prophet-platform:artifacts/sourceos/m2-lifecycle-proof/boot-release-set.json \
+            --smoke-receipt-ref file://artifacts/sourceos-image-production-smoke/smoke-receipt.json \
+            --bundle-rev "${{ github.sha }}"
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          root = Path('artifacts/sourceos-image-production-smoke')
+          request = json.loads((root / 'sourceos-delegated-execution-request.json').read_text())
+          run = json.loads((root / 'run-artifact.json').read_text())
+          replay = json.loads((root / 'replay-artifact.json').read_text())
+          assert request['kind'] == 'SourceOSDelegatedExecutionRequest'
+          assert request['mode'] == 'record-only'
+          assert run['sourceosImageProduction']['delegatedExecution']['tektonPipelineRunRef']
+          assert replay['inputs']['sourceosImageProduction']['delegatedExecution']['katelloContentRef']
+          print('[ci] SourceOS delegated runner validated')
+          PY
