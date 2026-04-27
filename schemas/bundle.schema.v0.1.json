@@ -86,6 +86,30 @@
           },
           "type": "object"
         },
+        "outputs": {
+          "description": "Optional output references emitted by image-production, proof, or release lanes.",
+          "properties": {
+            "bootReleaseSetRef": {
+              "type": "string"
+            },
+            "evidenceBundleRef": {
+              "type": "string"
+            },
+            "katelloContentRef": {
+              "type": "string"
+            },
+            "ostreeRef": {
+              "type": "string"
+            },
+            "releaseSetRef": {
+              "type": "string"
+            },
+            "smokeReceiptRef": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
         "policy": {
           "description": "TrustFirst Policy Pack pointer(s) and hashes; contents live elsewhere.",
           "properties": {
@@ -117,7 +141,7 @@
           "type": "object"
         },
         "secrets": {
-          "description": "Secrets are refs/paths only \u2014 never inline values.",
+          "description": "Secrets are refs/paths only — never inline values.",
           "properties": {
             "required": {
               "items": {
@@ -140,6 +164,91 @@
           "required": [
             "script"
           ],
+          "type": "object"
+        },
+        "sociosAutomation": {
+          "description": "Optional binding to SociOS-Linux/socios automation lanes such as Foreman/Katello, Smart Proxy, Tekton, and Argo CD.",
+          "properties": {
+            "argocdApplicationRef": {
+              "type": "string"
+            },
+            "katelloContentModelRef": {
+              "type": "string"
+            },
+            "katelloContentView": {
+              "type": "string"
+            },
+            "katelloLifecycleEnvironment": {
+              "enum": [
+                "dev",
+                "qa",
+                "prod",
+                "site",
+                "custom"
+              ],
+              "type": "string"
+            },
+            "katelloProduct": {
+              "type": "string"
+            },
+            "katelloRepository": {
+              "type": "string"
+            },
+            "smartProxyRef": {
+              "type": "string"
+            },
+            "substrateDocRef": {
+              "type": "string"
+            },
+            "tektonPipelineRef": {
+              "type": "string"
+            },
+            "tektonTaskRefs": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          },
+          "type": "object"
+        },
+        "sourceos": {
+          "description": "Optional SourceOS artifact-truth binding for image-production, installer, recovery, ReleaseSet, and BootReleaseSet lanes.",
+          "properties": {
+            "artifactTruthRef": {
+              "type": "string"
+            },
+            "bootReleaseSetRef": {
+              "type": "string"
+            },
+            "butaneRefs": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "channelRef": {
+              "type": "string"
+            },
+            "cosaRef": {
+              "type": "string"
+            },
+            "flavorRef": {
+              "type": "string"
+            },
+            "installerProfileRef": {
+              "type": "string"
+            },
+            "manifestRef": {
+              "type": "string"
+            },
+            "releaseSetRef": {
+              "type": "string"
+            },
+            "sourceosSpecRef": {
+              "type": "string"
+            }
+          },
           "type": "object"
         },
         "vm": {
