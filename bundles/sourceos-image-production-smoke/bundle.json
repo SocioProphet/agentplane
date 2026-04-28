@@ -1,0 +1,97 @@
+{
+  "apiVersion": "agentplane.socioprophet.org/v0.1",
+  "kind": "Bundle",
+  "metadata": {
+    "createdAt": "2026-04-27T00:00:00-04:00",
+    "licensePolicy": {
+      "allowAGPL": false,
+      "notes": "SourceOS image-production smoke bundle must remain shippable under permissive-friendly policy."
+    },
+    "name": "sourceos-image-production-smoke",
+    "source": {
+      "git": {
+        "dirty": true,
+        "rev": "UNSET"
+      }
+    },
+    "version": "0.1.0"
+  },
+  "spec": {
+    "artifacts": {
+      "outDir": "./artifacts/sourceos-image-production-smoke"
+    },
+    "outputs": {
+      "bootReleaseSetRef": "SocioProphet/prophet-platform:artifacts/sourceos/m2-lifecycle-proof/boot-release-set.json",
+      "evidenceBundleRef": "urn:srcos:evidence-bundle:sourceos-image-production-smoke",
+      "katelloContentRef": "katello://SourceOS/SourceOS Recovery/sourceos-live.iso@UNSET",
+      "releaseSetRef": "SocioProphet/prophet-platform:artifacts/sourceos/m2-lifecycle-proof/release-set.json",
+      "smokeReceiptRef": "SociOS-Linux/socios:.workstation/state/smoke/sourceos-live-iso/receipt.json"
+    },
+    "policy": {
+      "failOnTimeout": true,
+      "humanGateRequired": true,
+      "lane": "staging",
+      "maxRunSeconds": 120,
+      "policyPackHash": "UNSET",
+      "policyPackRef": "policy-packs/sourceos/image-production-staging"
+    },
+    "secrets": {
+      "required": [
+        "KATELLO_CLI_USERNAME_FILE",
+        "KATELLO_CLI_PASSWORD_FILE"
+      ],
+      "secretRefRoot": "secrets://sourceos/katello"
+    },
+    "smoke": {
+      "script": "bundles/sourceos-image-production-smoke/smoke.sh"
+    },
+    "sociosAutomation": {
+      "katelloContentModelRef": "SociOS-Linux/socios:foreman/KATELLO_CONTENT_MODEL.md",
+      "katelloLifecycleEnvironment": "qa",
+      "katelloProduct": "SourceOS Recovery",
+      "katelloRepository": "sourceos-live-iso",
+      "substrateDocRef": "SociOS-Linux/socios:docs/FCOS_FOREMAN_KATELLO_SUBSTRATE.md",
+      "tektonPipelineRef": "SociOS-Linux/socios:pipelines/tekton/pipeline-customize-live-iso.yaml",
+      "tektonTaskRefs": [
+        "SociOS-Linux/socios:pipelines/tekton/task-customize-live-iso.yaml",
+        "SociOS-Linux/socios:pipelines/tekton/task-publish-katello-file-repo.yaml",
+        "SociOS-Linux/socios:pipelines/tekton/task-smoke-live-iso.yaml"
+      ]
+    },
+    "sourceos": {
+      "artifactTruthRef": "SociOS-Linux/SourceOS:docs/ARTIFACT_TRUTH.md",
+      "butaneRefs": [
+        "SociOS-Linux/SourceOS:butane/workstation/base.bu"
+      ],
+      "channelRef": "SociOS-Linux/SourceOS:channels/README.md#qa",
+      "flavorRef": "SociOS-Linux/SourceOS:flavors/sourceos-workstation.example.yaml",
+      "installerProfileRef": "SociOS-Linux/SourceOS:installer/README.md#live-usb-default",
+      "manifestRef": "SociOS-Linux/SourceOS:manifests/README.md",
+      "sourceosSpecRef": "SourceOS-Linux/sourceos-spec:ARCHITECTURE.md"
+    },
+    "vm": {
+      "backendIntent": "lima-process",
+      "modulePath": "bundles/sourceos-image-production-smoke/vm.nix",
+      "mounts": [
+        {
+          "ro": false,
+          "source": "./artifacts/sourceos-image-production-smoke",
+          "target": "/mnt/artifacts",
+          "type": "9p"
+        }
+      ],
+      "network": {
+        "egressAllowlist": [
+          "dns",
+          "https"
+        ],
+        "mode": "nat"
+      },
+      "resources": {
+        "diskGiB": 8,
+        "memMiB": 2048,
+        "vcpu": 2
+      }
+    }
+  }
+}

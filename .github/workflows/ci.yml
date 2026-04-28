@@ -13,7 +13,10 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Bash syntax
-        run: bash -n runners/qemu-local.sh
+        run: |
+          bash -n runners/qemu-local.sh
+          bash -n bundles/example-agent/smoke.sh
+          bash -n bundles/sourceos-image-production-smoke/smoke.sh
 
       - name: Python syntax
         run: |
@@ -22,3 +25,101 @@ jobs:
       - name: Bundle validation
         run: |
           python3 scripts/validate_bundle.py bundles/example-agent/bundle.json
+          python3 scripts/validate_bundle.py bundles/sourceos-image-production-smoke/bundle.json
+
+      - name: SourceOS delegated artifact emission
+        env:
+          AGENTPLANE_SOURCEOS_TEKTON_PIPELINE_RUN_REF: tekton://sourceos-customize-live-iso/pr-smoke
+          AGENTPLANE_SOURCEOS_TEKTON_TASK_RUN_REFS: tekton://task/customize-live-iso,tekton://task/publish-katello-file-repo,tekton://task/smoke-live-iso
+          AGENTPLANE_SOURCEOS_KATELLO_CONTENT_REF: katello://SourceOS/SourceOS Recovery/sourceos-live.iso@ci-smoke
+          AGENTPLANE_SOURCEOS_KATELLO_CONTENT_VIEW_REF: katello://content-view/sourceos-recovery/qa
+          AGENTPLANE_SOURCEOS_KATELLO_LIFECYCLE_ENVIRONMENT_REF: katello://lifecycle-environment/qa
+          AGENTPLANE_SOURCEOS_OUTPUT_ARTIFACT_REF: file://artifacts/sourceos-image-production-smoke/sourceos-live.iso
+          AGENTPLANE_SOURCEOS_OUTPUT_DIGEST: sha256:UNSET-CI-SMOKE
+          AGENTPLANE_SOURCEOS_RELEASE_SET_REF: SocioProphet/prophet-platform:artifacts/sourceos/m2-lifecycle-proof/release-set.json
+          AGENTPLANE_SOURCEOS_BOOT_RELEASE_SET_REF: SocioProphet/prophet-platform:artifacts/sourceos/m2-lifecycle-proof/boot-release-set.json
+          AGENTPLANE_SOURCEOS_SMOKE_RECEIPT_REF: file://artifacts/sourceos-image-production-smoke/smoke-receipt.json
+        run: |
+          python3 scripts/emit_run_artifact.py bundles/sourceos-image-production-smoke/bundle.json ci-sourceos-delegated 0
+          python3 scripts/emit_replay_artifact.py bundles/sourceos-image-production-smoke/bundle.json ci-sourceos-delegated --bundle-rev "${{ github.sha }}"
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          run = json.loads(Path('artifacts/sourceos-image-production-smoke/run-artifact.json').read_text())
+          replay = json.loads(Path('artifacts/sourceos-image-production-smoke/replay-artifact.json').read_text())
+          assert run['sourceosImageProduction']['enabled'] is True
+          assert run['sourceosImageProduction']['delegatedExecution']['tektonPipelineRunRef']
+          assert run['sourceosImageProduction']['delegatedExecution']['katelloContentRef']
+          assert replay['inputs']['sourceosImageProduction']['delegatedExecution']['tektonPipelineRunRef']
+          assert replay['inputs']['sourceosImageProduction']['delegatedExecution']['katelloContentRef']
+          print('[ci] SourceOS delegated artifact emission validated')
+          PY
+
+      - name: SourceOS delegated runner modes
+        run: |
+          rm -rf artifacts/sourceos-image-production-smoke
+          python3 scripts/run_sourceos_delegated.py bundles/sourceos-image-production-smoke/bundle.json \
+            --mode record-only \
+            --executor ci-sourceos-delegated-record \
+            --pipeline-run-ref tekton://sourceos-customize-live-iso/pr-smoke \
+            --task-run-ref tekton://task/customize-live-iso \
+            --task-run-ref tekton://task/publish-katello-file-repo \
+            --task-run-ref tekton://task/smoke-live-iso \
+            --katello-content-ref 'katello://SourceOS/SourceOS Recovery/sourceos-live.iso@ci-smoke' \
+            --katello-content-view-ref katello://content-view/sourceos-recovery/qa \
+            --katello-lifecycle-environment-ref katello://lifecycle-environment/qa \
+            --output-artifact-ref file://artifacts/sourceos-image-production-smoke/sourceos-live.iso \
+            --output-digest sha256:UNSET-CI-SMOKE \
+            --release-set-ref SocioProphet/prophet-platform:artifacts/sourceos/m2-lifecycle-proof/release-set.json \
+            --boot-release-set-ref SocioProphet/prophet-platform:artifacts/sourceos/m2-lifecycle-proof/boot-release-set.json \
+            --smoke-receipt-ref file://artifacts/sourceos-image-production-smoke/smoke-receipt.json \
+            --bundle-rev "${{ github.sha }}"
+
+          python3 scripts/run_sourceos_delegated.py bundles/sourceos-image-production-smoke/bundle.json \
+            --mode tekton-observe \
+            --executor ci-sourceos-delegated-observe \
+            --pipeline-run-ref tekton://sourceos-customize-live-iso/pr-smoke-observe \
+            --task-run-ref tekton://task/customize-live-iso \
+            --katello-content-ref 'katello://SourceOS/SourceOS Recovery/sourceos-live.iso@ci-smoke-observe' \
+            --bundle-rev "${{ github.sha }}"
+
+          if python3 scripts/run_sourceos_delegated.py bundles/sourceos-image-production-smoke/bundle.json \
+            --mode tekton-submit \
+            --executor ci-sourceos-delegated-submit-blocked \
+            --tekton-namespace sourceos \
+            --tekton-pipeline-name sourceos-customize-live-iso \
+            --kubeconfig-ref secrets://sourceos/kubeconfig \
+            --tekton-service-account-ref secrets://sourceos/tekton-service-account; then
+            echo '[ci] ERROR: tekton-submit without --allow-side-effects unexpectedly passed' >&2
+            exit 2
+          fi
+
+          python3 scripts/run_sourceos_delegated.py bundles/sourceos-image-production-smoke/bundle.json \
+            --mode tekton-submit \
+            --allow-side-effects \
+            --executor ci-sourceos-delegated-submit-intent \
+            --tekton-namespace sourceos \
+            --tekton-pipeline-name sourceos-customize-live-iso \
+            --kubeconfig-ref secrets://sourceos/kubeconfig \
+            --tekton-service-account-ref secrets://sourceos/tekton-service-account \
+            --pipeline-run-ref tekton://sourceos-customize-live-iso/pr-submit-intent \
+            --task-run-ref tekton://task/customize-live-iso \
+            --katello-content-ref 'katello://SourceOS/SourceOS Recovery/sourceos-live.iso@ci-submit-intent' \
+            --bundle-rev "${{ github.sha }}"
+
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          root = Path('artifacts/sourceos-image-production-smoke')
+          request = json.loads((root / 'sourceos-delegated-execution-request.json').read_text())
+          run = json.loads((root / 'run-artifact.json').read_text())
+          replay = json.loads((root / 'replay-artifact.json').read_text())
+          assert request['kind'] == 'SourceOSDelegatedExecutionRequest'
+          assert request['mode'] == 'tekton-submit'
+          assert request['modeGate']['sideEffectsAllowed'] is True
+          assert request['modeGate']['submitImplementation'] == 'not_yet_live_recorded_intent_only'
+          assert request['submitIntent']['kubeconfigRef'] == 'secrets://sourceos/kubeconfig'
+          assert run['sourceosImageProduction']['delegatedExecution']['tektonPipelineRunRef']
+          assert replay['inputs']['sourceosImageProduction']['delegatedExecution']['katelloContentRef']
+          print('[ci] SourceOS delegated runner modes validated')
+          PY

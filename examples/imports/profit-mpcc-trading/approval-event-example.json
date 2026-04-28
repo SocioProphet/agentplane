@@ -1,0 +1,23 @@
+{
+  "approval_event_id": "approval_evt_0001",
+  "effect_id": "fx_req_0001",
+  "decision": "approved",
+  "approver_id": "risk-engine-us-equities",
+  "authority_context": {
+    "principal": "system",
+    "delegation_chain": ["desk:equities-us", "risk:pretrade"],
+    "approval_state": "approved"
+  },
+  "policy_basis": [
+    "policy/pretrade/us-equities/default",
+    "policy/limits/notional/day"
+  ],
+  "approved_effect": {
+    "operation": "submit_order",
+    "instrument_id": "AAPL",
+    "side": "buy",
+    "quantity": "100",
+    "limit_price": "182.45"
+  },
+  "approved_at": "2026-04-15T16:00:02Z"
+}

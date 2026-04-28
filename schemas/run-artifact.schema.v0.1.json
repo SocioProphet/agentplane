@@ -27,6 +27,14 @@
         }
       },
       "additionalProperties": false
+    },
+    "sourceosBindings": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "sourceosImageProduction": {
+      "type": "object",
+      "additionalProperties": true
     }
   }
 }

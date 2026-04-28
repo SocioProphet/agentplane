@@ -10,14 +10,18 @@ The canonical standards package lives in:
 
 `agentplane` is the consumer/runtime lane. It should import and pin released bundle versions from the standards repository rather than redefining the ontology locally.
 
-## Seed state
+## Current state
 
-This PR adds the import manifest and expected bundle paths so the runtime lane has a stable place to bind:
+The import lane now contains:
 
-- policy bundle
-- monitor bundle
-- test bundle
+- manifest and upstream pin metadata
+- imported `compiled_policy_bundle_v3.json`
+- a first live policy-gate binding in `scripts/validate_bundle.py`
 
-## Next step
+The validator now emits `control-gate-artifact.json` and fails closed when no exact `policy_engine` row matches the derived bundle execution context. The vendored `compiled_policy_bundle_v3.json` is the first executable policy-engine slice, not yet the full multi-surface bundle release.
 
-After the standards PR merges, pin the released package version and bind the imported policy bundle to the first runtime enforcement surface.
+## Remaining follow-on
+
+- bind the generated monitor bundle to runtime monitor health checks
+- bind the generated test bundle into integration / release gates
+- move from commit-pin semantics to tagged release or release-asset pinning

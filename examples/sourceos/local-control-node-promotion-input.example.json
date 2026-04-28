@@ -1,0 +1,26 @@
+{
+  "controlNodeProfileRef": "urn:srcos:control-node:macbook-air-operator-01",
+  "nodeCommanderRuntimeRef": "urn:srcos:node-commander:runtime:macbook-air-operator-01",
+  "candidateBuildRef": "urn:srcos:build:sourceos-workstation-v0-2026-04-15",
+  "targetImageRef": "urn:srcos:image:sourceos-workstation-v0-dev",
+  "promotionGateRef": "urn:srcos:image-gate:sourceos-workstation-v0-dev",
+  "validationEvidenceBundleRef": "urn:srcos:build-evidence:sourceos-workstation-v0-2026-04-15",
+  "scenarioResults": [
+    {
+      "scenarioId": "sourceos.first_boot.dev_init.v1",
+      "status": "passed",
+      "artifactRef": "urn:agentplane:artifact:validation:sourceos.first_boot.dev_init.v1"
+    },
+    {
+      "scenarioId": "node-commander.local.bootstrap.v0",
+      "status": "passed",
+      "artifactRef": "urn:agentplane:artifact:run:node-commander.local.bootstrap.v0"
+    }
+  ],
+  "expectedAgentplaneOutputs": {
+    "validationArtifact": "urn:agentplane:artifact:validation:bundle-sourceos-workstation-v0-2026-04-15",
+    "placementDecision": "urn:agentplane:placement:local-macbook-air-operator-01",
+    "runArtifact": "urn:agentplane:artifact:run:sourceos-workstation-v0-2026-04-15",
+    "replayArtifact": "urn:agentplane:artifact:replay:sourceos-workstation-v0-2026-04-15"
+  }
+}

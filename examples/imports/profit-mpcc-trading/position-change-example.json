@@ -1,0 +1,14 @@
+{
+  "event_id": "position_evt_0001",
+  "instrument_id": "AAPL",
+  "account_id": "acct_main",
+  "position_delta": "40",
+  "cash_delta": "-7296.40",
+  "fee_delta": "-0.40",
+  "unrealized_pnl_snapshot": "0.00",
+  "source_execution_refs": ["exec_report_evt_0001"],
+  "recorded_at": "2026-04-15T16:00:04Z",
+  "details": {
+    "note": "position updated from first partial fill"
+  }
+}

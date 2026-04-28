@@ -1,0 +1,27 @@
+{
+  "kind": "PolicyFabricVerdictEnvelope",
+  "capturedAt": "2026-04-14T04:12:00Z",
+  "policyBundle": {
+    "id": "intell_agency_companion_v0",
+    "version": "0.1.0"
+  },
+  "bundle": "example-agent@0.1.0",
+  "lane": "staging",
+  "domain": "governed-domain",
+  "promote": false,
+  "fit": "surjection",
+  "failedPredicates": [
+    "governed_domain_requires_stronger_fit"
+  ],
+  "reasons": [
+    "domain is not promotable under the current governed fit state"
+  ],
+  "summary": "Blocked under current policy verdict semantics.",
+  "thresholds": {
+    "minBijectiveStability": 0.6,
+    "surjectionUpperBoundMultiplier": 0.7,
+    "injectionUpperBoundMultiplier": 0.98
+  },
+  "verdictArtifactRef": "urn:srcos:artifact:policy-fabric:verdict-report:2026-04-14-001",
+  "verdictExplanationRef": "urn:srcos:artifact:policy-fabric:verdict-explanations:2026-04-14-001"
+}

@@ -1,0 +1,19 @@
+{
+  "event_id": "evt_recon_0001",
+  "scope_kind": "position",
+  "scope_ref": "acct_main:AAPL",
+  "status": "variance_detected",
+  "variance_kind": "position_mismatch",
+  "expected_value": {
+    "position": "100"
+  },
+  "observed_value": {
+    "position": "90"
+  },
+  "compensation_refs": ["fx_comp_0001"],
+  "policy_labels": ["requires_investigation"],
+  "recorded_at": "2026-04-15T16:05:00Z",
+  "details": {
+    "notes": "example variance detected between expected and observed position"
+  }
+}
