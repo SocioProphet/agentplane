@@ -1,0 +1,22 @@
+name: lint
+
+on:
+  pull_request:
+  push:
+    branches:
+      - standards-multidomain-geospatial-agentplane
+
+jobs:
+  lint:
+    name: lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Validate Markdown standards docs
+        run: |
+          set -euo pipefail
+          test -f docs/standards/COMPLIES_WITH_MULTIDOMAIN_GEOSPATIAL_STANDARDS.md
+          grep -q "Standards consumed" docs/standards/COMPLIES_WITH_MULTIDOMAIN_GEOSPATIAL_STANDARDS.md
+          grep -q "Promotion gate" docs/standards/COMPLIES_WITH_MULTIDOMAIN_GEOSPATIAL_STANDARDS.md
+          echo "OK: lint"
