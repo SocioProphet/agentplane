@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.org/schemas/approval-event.schema.json",
+  "title": "ApprovalEvent",
+  "type": "object",
+  "required": [
+    "approval_event_id",
+    "effect_id",
+    "decision",
+    "approver_id",
+    "approved_at"
+  ],
+  "properties": {
+    "approval_event_id": { "type": "string" },
+    "effect_id": { "type": "string" },
+    "decision": {
+      "type": "string",
+      "enum": ["approved", "denied", "pending", "expired", "revoked"]
+    },
+    "approver_id": { "type": "string" },
+    "authority_context": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "policy_basis": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "approved_effect": {
+      "type": ["object", "null"],
+      "additionalProperties": true
+    },
+    "reasons": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "approved_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "expires_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "provenance_links": {
+      "type": "array",
+      "items": { "type": "object" }
+    }
+  },
+  "additionalProperties": true
+}

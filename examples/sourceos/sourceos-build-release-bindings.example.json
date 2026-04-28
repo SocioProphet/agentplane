@@ -1,0 +1,13 @@
+{
+  "contentSpecRef": "urn:srcos:content-spec:sourceos-workstation",
+  "overlayRefs": [
+    "urn:srcos:overlay:customer-branding-acme",
+    "urn:srcos:overlay:vpn-profile-default"
+  ],
+  "buildRequestRef": "urn:srcos:build-request:sourceos-workstation-dev-0001",
+  "releaseManifestRef": "urn:srcos:release:sourceos-workstation-dev-0001",
+  "enrollmentProfileRef": "urn:srcos:enrollment-profile:default-workstation",
+  "evidenceBundleRef": "urn:srcos:evidence-bundle:sourceos-workstation-dev-0001",
+  "localExecutionProtocolRef": "urn:srcos:contract:workstation-contracts:m2-ipc:v1.0",
+  "remoteExecutionProtocolRef": "urn:srcos:protocol:tritrpc:v1"
+}

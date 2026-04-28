@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.org/schemas/effect-request.schema.json",
+  "title": "EffectRequest",
+  "type": "object",
+  "required": [
+    "effect_id",
+    "requested_by_event_id",
+    "requested_at",
+    "operation"
+  ],
+  "properties": {
+    "effect_id": { "type": "string" },
+    "requested_by_event_id": { "type": "string" },
+    "requested_by_actor_id": { "type": "string" },
+    "workspace_id": { "type": "string" },
+    "branch_id": { "type": "string" },
+    "target_kind": { "type": "string" },
+    "operation": { "type": "string" },
+    "parameters": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "authority_context_ref": { "type": "string" },
+    "idempotence_key": { "type": "string" },
+    "policy_labels": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "risk_labels": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "requested_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "notes": { "type": "string" }
+  },
+  "additionalProperties": true
+}
