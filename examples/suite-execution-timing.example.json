@@ -1,0 +1,29 @@
+{
+  "apiVersion": "agentplane.socioprophet.dev/v1",
+  "kind": "AgentExecutionRecord",
+  "metadata": {
+    "taskId": "task:sourceos-carry-validate-demo",
+    "agentId": "agent:codex:demo",
+    "agentKind": "codex",
+    "workstream": "SourceOS Carry",
+    "repo": "SourceOS-Linux/sourceos-model-carry",
+    "issueRef": "https://github.com/SourceOS-Linux/sourceos-model-carry/issues/3"
+  },
+  "spec": {
+    "command": "sourceos-ai carry validate --refs examples",
+    "queueStartedAt": "2026-04-28T19:00:00Z",
+    "runStartedAt": "2026-04-28T19:00:12Z",
+    "runCompletedAt": "2026-04-28T19:00:15Z",
+    "wallClockMs": 3000,
+    "status": "succeeded",
+    "exitCode": 0,
+    "retryCount": 0,
+    "stdoutRef": "artifact://agentplane/demo/sourceos-carry-validate/stdout.txt",
+    "stderrRef": "artifact://agentplane/demo/sourceos-carry-validate/stderr.txt",
+    "artifactRefs": [
+      "artifact://agentplane/demo/sourceos-carry-validate/validation.json"
+    ],
+    "evidenceRef": "evidence://agentplane/demo/sourceos-carry-validate",
+    "replayRef": "replay://agentplane/demo/sourceos-carry-validate"
+  }
+}
