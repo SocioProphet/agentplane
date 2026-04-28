@@ -1,0 +1,70 @@
+{
+  "schemaVersion": "v0.1",
+  "candidateId": "agentplane-candidate-meshrush-soil-demo-0001",
+  "sourceArtifactRef": "meshrush-crystal-soil-intelligence-demo-0001",
+  "contextRef": "graph-view-gaia-ofif-soil-demo-0001",
+  "entryRefs": [
+    "ofif-event-0001-soil-field-demo"
+  ],
+  "evidenceRefs": [
+    "ofif-event-0001-soil-field-demo",
+    "gaia-feature-ofif-event-0001-soil-field-demo",
+    "gaia-soil-fusion-demo-0001",
+    "gaia-decision-card-soil-demo-0001",
+    "mesh-telemetry-local-m2-demo-001"
+  ],
+  "claims": [
+    {
+      "claimId": "claim-soil-demo-evidence-chain-complete",
+      "claim": "The soil-intelligence demo has a complete non-actuating evidence chain from OFIF event to GAIA decision card to Sherlock discovery.",
+      "confidence": 0.82
+    },
+    {
+      "claimId": "claim-soil-demo-runtime-is-planning-reference",
+      "claim": "Runtime reference exists, but Lattice Forge admission remains gated until executable runtime validation is complete.",
+      "confidence": 0.9
+    }
+  ],
+  "requestedActionType": "validate",
+  "approvalBoundary": "advisory",
+  "validationStatus": "valid",
+  "approvalState": {
+    "status": "not_required",
+    "reason": "Advisory candidate is evidence-record-only and cannot execute."
+  },
+  "policyRefs": [
+    "policy://gaia/soil-intelligence/demo-standard-v1",
+    "acceptable-use://socioprophet/demo-non-actuating"
+  ],
+  "sourceRefs": [
+    "SocioProphet/meshrush:fixtures/graph-views/soil-intelligence-crystallization.sample.v1.json"
+  ],
+  "handlingTags": [
+    "demo",
+    "meshrush",
+    "gaia",
+    "ofif",
+    "soil-intelligence",
+    "advisory-only"
+  ],
+  "replayRequirements": {
+    "required": true,
+    "notes": "Replay should re-read source MeshRush crystallization artifact and referenced GAIA/OFIF fixtures; no external action is run.",
+    "inputRefs": [
+      "meshrush-crystal-soil-intelligence-demo-0001",
+      "gaia-decision-card-soil-demo-0001"
+    ]
+  },
+  "rollbackSemantics": {
+    "strategy": "evidence_only",
+    "notes": "No execution state is mutated; rollback only marks this candidate superseded or withdrawn."
+  },
+  "classification": {
+    "dataClass": "internal",
+    "handlingTags": [
+      "demo",
+      "advisory",
+      "evidence-record-only"
+    ]
+  }
+}
