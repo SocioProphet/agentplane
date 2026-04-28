@@ -15,7 +15,7 @@ on:
       - '.github/workflows/lint.yml'
 
 jobs:
-  validate:
+  lint:
     runs-on: ubuntu-latest
     permissions:
       contents: read
