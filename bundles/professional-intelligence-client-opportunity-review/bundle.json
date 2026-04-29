@@ -1,0 +1,60 @@
+{
+  "apiVersion": "agentplane.socioprophet.org/v0.1",
+  "kind": "Bundle",
+  "metadata": {
+    "createdAt": "2026-04-29T16:20:00-04:00",
+    "licensePolicy": {
+      "allowAGPL": false,
+      "notes": "Professional Intelligence OS demo bundle uses repo-local seed artifacts only."
+    },
+    "name": "professional-intelligence-client-opportunity-review",
+    "source": {
+      "git": {
+        "dirty": true,
+        "rev": "UNSET"
+      }
+    },
+    "version": "0.1.0"
+  },
+  "spec": {
+    "artifacts": {
+      "outDir": "./artifacts/professional-intelligence-client-opportunity-review"
+    },
+    "policy": {
+      "failOnTimeout": true,
+      "humanGateRequired": true,
+      "lane": "staging",
+      "maxRunSeconds": 30,
+      "policyPackHash": "UNSET",
+      "policyPackRef": "policy-packs/professional-intelligence/demo"
+    },
+    "secrets": {
+      "required": [],
+      "secretRefRoot": "secrets://user"
+    },
+    "smoke": {
+      "script": "bundles/professional-intelligence-client-opportunity-review/smoke.sh"
+    },
+    "vm": {
+      "backendIntent": "lima-process",
+      "modulePath": "bundles/professional-intelligence-client-opportunity-review/vm.nix",
+      "mounts": [
+        {
+          "ro": false,
+          "source": "./artifacts/professional-intelligence-client-opportunity-review",
+          "target": "/mnt/artifacts",
+          "type": "9p"
+        }
+      ],
+      "network": {
+        "egressAllowlist": [],
+        "mode": "none"
+      },
+      "resources": {
+        "diskGiB": 8,
+        "memMiB": 2048,
+        "vcpu": 2
+      }
+    }
+  }
+}
