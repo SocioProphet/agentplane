@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "BrokerExecutionBundle v0.1",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "bundleId": { "type": "string", "minLength": 1 },
+    "purpose": { "type": "string", "minLength": 1 },
+    "providerBindingId": { "type": "string", "minLength": 1 },
+    "policyDecisionId": { "type": "string", "minLength": 1 },
+    "executionType": { "type": "string", "enum": ["validation", "smoke", "continuity", "exit", "cost_meter", "evidence_completeness"] },
+    "placementConstraints": { "type": "array", "items": { "type": "string" } },
+    "expectedArtifacts": {
+      "type": "array",
+      "items": { "type": "string", "enum": ["ValidationArtifact", "PlacementDecision", "RunArtifact", "ReplayArtifact"] },
+      "minItems": 1
+    },
+    "evidenceRefs": { "type": "array", "items": { "type": "string" } },
+    "maxRunSeconds": { "type": "integer", "minimum": 1 }
+  },
+  "required": ["bundleId", "purpose", "providerBindingId", "policyDecisionId", "executionType", "expectedArtifacts", "maxRunSeconds"]
+}
