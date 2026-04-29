@@ -1,0 +1,75 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://socioprophet.org/agentplane/schemas/meshrush-execution-candidate.schema.v0.1.json",
+  "title": "MeshRushExecutionCandidate v0.1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "candidateId",
+    "sourceArtifactRef",
+    "contextRef",
+    "requestedActionType",
+    "approvalBoundary",
+    "validationStatus",
+    "approvalState",
+    "evidenceRefs",
+    "policyRefs",
+    "claims",
+    "replayRequirements",
+    "rollbackSemantics",
+    "classification"
+  ],
+  "properties": {
+    "schemaVersion": {"type": "string", "const": "v0.1"},
+    "candidateId": {"type": "string"},
+    "sourceArtifactRef": {"type": "string"},
+    "contextRef": {"type": "string"},
+    "entryRefs": {"type": "array", "items": {"type": "string"}},
+    "evidenceRefs": {"type": "array", "items": {"type": "string"}, "minItems": 1},
+    "claims": {"type": "array", "items": {"type": "object"}, "minItems": 1},
+    "requestedActionType": {"type": "string"},
+    "approvalBoundary": {"type": "string", "enum": ["advisory", "approval_required", "executable", "blocked"]},
+    "validationStatus": {"type": "string", "enum": ["not_validated", "valid", "invalid", "blocked"]},
+    "approvalState": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status"],
+      "properties": {
+        "status": {"type": "string", "enum": ["not_required", "required", "approved", "rejected", "blocked"]},
+        "approverRef": {"type": "string"},
+        "reason": {"type": "string"}
+      }
+    },
+    "policyRefs": {"type": "array", "items": {"type": "string"}, "minItems": 1},
+    "sourceRefs": {"type": "array", "items": {"type": "string"}},
+    "handlingTags": {"type": "array", "items": {"type": "string"}},
+    "replayRequirements": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["required"],
+      "properties": {
+        "required": {"type": "boolean"},
+        "notes": {"type": "string"},
+        "inputRefs": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "rollbackSemantics": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["strategy"],
+      "properties": {
+        "strategy": {"type": "string", "enum": ["none", "evidence_only", "stop_execution", "revert_state", "custom"]},
+        "notes": {"type": "string"}
+      }
+    },
+    "classification": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "dataClass": {"type": "string", "enum": ["public", "internal", "restricted", "sensitive"]},
+        "handlingTags": {"type": "array", "items": {"type": "string"}}
+      }
+    }
+  }
+}

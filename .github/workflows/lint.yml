@@ -1,0 +1,46 @@
+name: lint
+
+on:
+  push:
+    paths:
+      - '**/*.py'
+      - '**/*.json'
+      - '**/*.md'
+      - '.github/workflows/lint.yml'
+  pull_request:
+    paths:
+      - '**/*.py'
+      - '**/*.json'
+      - '**/*.md'
+      - '.github/workflows/lint.yml'
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Validate JSON files
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          for path in sorted(Path('.').rglob('*.json')):
+              if '.git' in path.parts:
+                  continue
+              with path.open('r', encoding='utf-8') as handle:
+                  json.load(handle)
+              print(f'valid json: {path}')
+          PY
+
+      - name: Compile Python scripts
+        run: |
+          python3 -m py_compile scripts/validate_meshrush_candidate.py
