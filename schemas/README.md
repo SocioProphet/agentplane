@@ -12,6 +12,7 @@ All schemas use [JSON Schema Draft 2020-12](https://json-schema.org/specificatio
 |---|---|---|---|
 | [`bundle.schema.v0.1.json`](bundle.schema.v0.1.json) | `Bundle` | v0.1 | Bundle manifest schema. Defines the structure of `bundle.json`. |
 | [`bundle.schema.patch.json`](bundle.schema.patch.json) | patch fragment | — | Staged future fields for agent-runtime bundles (not yet enforced). |
+| [`broker-execution-bundle.schema.v0.1.json`](broker-execution-bundle.schema.v0.1.json) | `BrokerExecutionBundle` | v0.1 | Broker validation/smoke/continuity/exit/cost-meter execution bundle contract. |
 | [`run-artifact.schema.v0.1.json`](run-artifact.schema.v0.1.json) | `RunArtifact` | v0.1 | Evidence record of a completed run. |
 | [`replay-artifact.schema.v0.1.json`](replay-artifact.schema.v0.1.json) | `ReplayArtifact` | v0.1 | Inputs needed for deterministic replay. |
 | [`session-artifact.schema.v0.1.json`](session-artifact.schema.v0.1.json) | `SessionArtifact` | v0.1 | Session-level lifecycle record (status, receipt/run/replay refs). |
