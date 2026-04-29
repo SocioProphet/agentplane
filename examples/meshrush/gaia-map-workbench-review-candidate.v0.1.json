@@ -1,0 +1,91 @@
+{
+  "schemaVersion": "v0.1",
+  "candidateId": "agentplane-candidate-meshrush-gaia-map-osm-demo-0001",
+  "sourceArtifactRef": "meshrush-crystal-gaia-map-osm-demo-0001",
+  "contextRef": "graph-view-gaia-map-osm-demo-0001",
+  "entryRefs": [
+    "gaia-osm-demo-road-layer-v1"
+  ],
+  "evidenceRefs": [
+    "gaia-osm-demo-road-layer-v1",
+    "osm-binding-demo-way-424242",
+    "gaia-road-segment-demo-osm-way-424242",
+    "h3:8928308280fffff",
+    "gaia-osm-route-graph-way-424242-v1",
+    "search-gaia-osm-demo-road-layer-v1",
+    "gaia-osm-ingestion-runtime",
+    "gaia-osm-route-graph-runtime",
+    "gaia-osm-tile-export-runtime",
+    "gaia-ofif-meshlab-capability-map-v1"
+  ],
+  "claims": [
+    {
+      "claimId": "claim-gaia-map-osm-evidence-chain-complete-demo-0001",
+      "claim": "The GAIA /map OSM demo has a complete evidence chain from map layer to OSM feature binding, GAIA feature, H3 spatial coverage, advisory route graph, and Sherlock discovery record.",
+      "confidence": 0.86
+    },
+    {
+      "claimId": "claim-gaia-map-osm-runtime-boundary-known-demo-0001",
+      "claim": "The OSM map workbench proof identifies ingestion, route graph, and tile export runtimes, but those runtimes remain proof/runtime-boundary records and are not Lattice-admitted runtime assets.",
+      "confidence": 0.82
+    },
+    {
+      "claimId": "claim-gaia-map-osm-advisory-boundary-preserved-demo-0001",
+      "claim": "The GAIA /map OSM route graph remains advisory and is not approved for safety-critical navigation, dispatch authority, or live route guidance.",
+      "confidence": 0.94
+    }
+  ],
+  "requestedActionType": "open_map_evidence_review",
+  "approvalBoundary": "advisory",
+  "validationStatus": "valid",
+  "approvalState": {
+    "status": "not_required",
+    "reason": "This candidate opens evidence and governance review only. It does not execute routing, dispatch, runtime admission, or infrastructure action."
+  },
+  "policyRefs": [
+    "policy://gaia/osm/advisory-route-graph-v1",
+    "policy://gaia/map-workbench/evidence-panel-v1",
+    "policy://gaia/runtime-boundary/lattice-admission-required-v1",
+    "policy://sociosphere/governance/validation-lanes-v1"
+  ],
+  "sourceRefs": [
+    "SocioProphet/meshrush:fixtures/graph-views/gaia-map-workbench-osm-crystallization.sample.v1.json",
+    "SocioProphet/sherlock-search:examples/gaia-osm-derived-road-layer.sherlock-result.v1.json",
+    "SocioProphet/gaia-world-model:fixtures/geospatial/osm-road-feature-binding.sample.v1.json",
+    "SocioProphet/gaia-world-model:fixtures/geospatial/osm-route-graph.sample.v1.json"
+  ],
+  "handlingTags": [
+    "demo",
+    "meshrush",
+    "gaia",
+    "osm",
+    "map-workbench",
+    "h3",
+    "advisory",
+    "non-runnable",
+    "evidence-review"
+  ],
+  "replayRequirements": {
+    "required": true,
+    "notes": "Replay should re-read the MeshRush GAIA map crystallization fixture and the referenced GAIA/Sherlock/SocioSphere evidence. No route execution, runtime admission, dispatch, or external actuation is run.",
+    "inputRefs": [
+      "meshrush-crystal-gaia-map-osm-demo-0001",
+      "search-gaia-osm-demo-road-layer-v1",
+      "gaia-osm-route-graph-way-424242-v1",
+      "gaia-ofif-meshlab-capability-map-v1"
+    ]
+  },
+  "rollbackSemantics": {
+    "strategy": "evidence_only",
+    "notes": "No execution state is mutated by this candidate. If withdrawn, mark candidate superseded and preserve all evidence, provenance, and advisory-boundary refs."
+  },
+  "classification": {
+    "dataClass": "internal",
+    "handlingTags": [
+      "demo",
+      "advisory",
+      "evidence-record-only",
+      "map-workbench"
+    ]
+  }
+}

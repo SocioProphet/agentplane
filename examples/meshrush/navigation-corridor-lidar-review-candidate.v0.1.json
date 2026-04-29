@@ -1,0 +1,82 @@
+{
+  "schemaVersion": "v0.1",
+  "candidateId": "agentplane-candidate-meshrush-navigation-lidar-demo-0001",
+  "sourceArtifactRef": "meshrush-crystal-navigation-corridor-lidar-demo-0001",
+  "contextRef": "graph-view-gaia-lidar-navigation-demo-0001",
+  "entryRefs": [
+    "gaia-nav-lidar-rail-demo-0001"
+  ],
+  "evidenceRefs": [
+    "gaia-nav-lidar-rail-demo-0001",
+    "gaia.navigation.lidar_feature_extract.output",
+    "navigation-safety-case-lidar-advisory-demo-0001",
+    "search-gaia-lidar-derived-infrastructure-assets-demo-0001",
+    "risk-exposure-rail-vegetation-demo-0001",
+    "work-order-candidate-rail-vegetation-demo-0001",
+    "lidar-runtime-rollback-plan-demo-0001"
+  ],
+  "claims": [
+    {
+      "claimId": "claim-lidar-evidence-chain-complete-demo-0001",
+      "claim": "The LiDAR navigation demo has a complete evidence chain from corridor observation to derived infrastructure assets to advisory safety case to Sherlock discovery.",
+      "confidence": 0.84
+    },
+    {
+      "claimId": "claim-lidar-safety-boundary-advisory-demo-0001",
+      "claim": "The current LiDAR-derived route/corridor evidence remains advisory and is not approved for safety-critical navigation, automatic route closure, speed restriction, or unapproved work dispatch.",
+      "confidence": 0.93
+    },
+    {
+      "claimId": "claim-control-tower-review-path-exists-demo-0001",
+      "claim": "A control-tower review path exists through risk exposure and work-order candidate records, but the action boundary remains approval-required.",
+      "confidence": 0.81
+    }
+  ],
+  "requestedActionType": "create_review_task",
+  "approvalBoundary": "approval_required",
+  "validationStatus": "valid",
+  "approvalState": {
+    "status": "required",
+    "reason": "Navigation LiDAR review candidate is non-runnable until a human/operator approval transition occurs."
+  },
+  "policyRefs": [
+    "policy://gaia/navigation/advisory-only-v1",
+    "policy://gaia/navigation/safety-case/approval-required-v1",
+    "policy://gaia/control-tower/human-review-v1"
+  ],
+  "sourceRefs": [
+    "SocioProphet/meshrush:fixtures/graph-views/navigation-corridor-lidar-crystallization.sample.v1.json"
+  ],
+  "handlingTags": [
+    "demo",
+    "meshrush",
+    "gaia",
+    "navigation",
+    "lidar",
+    "advisory",
+    "approval-required",
+    "non-runnable"
+  ],
+  "replayRequirements": {
+    "required": true,
+    "notes": "Replay should re-read MeshRush navigation crystallization and referenced GAIA/Sherlock/control-tower fixtures. No external actuation is run.",
+    "inputRefs": [
+      "meshrush-crystal-navigation-corridor-lidar-demo-0001",
+      "navigation-safety-case-lidar-advisory-demo-0001",
+      "lidar-runtime-rollback-plan-demo-0001"
+    ]
+  },
+  "rollbackSemantics": {
+    "strategy": "evidence_only",
+    "notes": "No execution state is mutated by this candidate. If withdrawn, mark candidate superseded and preserve evidence/rollback plan refs."
+  },
+  "classification": {
+    "dataClass": "internal",
+    "handlingTags": [
+      "demo",
+      "advisory",
+      "approval-required",
+      "evidence-record-only"
+    ]
+  }
+}
