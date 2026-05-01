@@ -1,0 +1,131 @@
+{
+  "apiVersion": "agentplane.socioprophet.dev/v0",
+  "kind": "LatticeDataGovernAIExecutionRefsFixture",
+  "metadata": {
+    "name": "lattice-data-governai-execution-refs",
+    "version": "0.1.0",
+    "description": "AgentPlane dry-run fixture preserving Lattice Data/GovernAI refs in RunArtifact and ReplayArtifact surfaces."
+  },
+  "sourceRefs": {
+    "umbrellaIssue": "SocioProphet/prophet-platform#291",
+    "schemaPr": "SourceOS-Linux/sourceos-spec#75",
+    "platformPr": "SocioProphet/prophet-platform#299",
+    "runtimePr": "SocioProphet/lattice-forge#10",
+    "mlopsPr": "SocioProphet/prophet-platform-fabric-mlops-ts-suite#33",
+    "policyPr": "SocioProphet/policy-fabric#39",
+    "topologyPr": "SocioProphet/sociosphere#238",
+    "sherlockPr": "SocioProphet/sherlock-search#30",
+    "slashTopicsPr": "SocioProphet/slash-topics#23",
+    "newHopePr": "SocioProphet/new-hope#7"
+  },
+  "latticeRefs": {
+    "runtimeAssetRef": "runtime-asset:prophet-python-ml:0.1.0",
+    "dataProductRef": "urn:srcos:data-product:community_truth_demo",
+    "dataContractRef": "urn:srcos:data-contract:community_truth_demo",
+    "notebookSessionRef": "notebook-session:community-truth-demo",
+    "queryRunRef": "query-run:community-truth-demo:001",
+    "modelAssetRef": "urn:srcos:model:community_truth_demo_candidate",
+    "evaluationBundleRef": "urn:srcos:evaluation-bundle:community_truth_demo_model_eval",
+    "factsheetRef": "urn:srcos:factsheet:community_truth_demo_model",
+    "publicationArtifactRef": "urn:srcos:publication-artifact:community_truth_demo_report",
+    "policyBundleRef": "urn:srcos:policy:mlops-governed-execution-demo",
+    "topicScopeRef": "slash-topic://lattice/data-governai",
+    "topicPackRef": "slash-topics://packs/lattice-data-governai@0.1.0",
+    "semanticMembraneRef": "newhope://membranes/lattice-data-governai-admission@0.1.0"
+  },
+  "runArtifact": {
+    "kind": "RunArtifact",
+    "bundle": "lattice-data-governai-dry-run",
+    "bundlePath": "fixtures/lattice-data-governai/execution-refs.v0.1.json",
+    "capturedAt": "2026-05-01T20:55:00Z",
+    "lane": "staging",
+    "executor": "agentplane-dry-run",
+    "backendIntent": "fleet",
+    "status": "success",
+    "exitCode": 0,
+    "stdoutRef": "urn:srcos:evidence:agentplane-lattice-data-governai-stdout",
+    "stderrRef": null,
+    "upstreamArtifacts": {
+      "workspaceInventoryRef": "SocioProphet/sociosphere#238",
+      "lockVerificationRef": null,
+      "protocolCompatibilityRef": "SocioProphet/slash-topics#23",
+      "taskRunRefs": [
+        "rayjob:community-truth-demo-train:0001",
+        "beam:community-truth-demo-quality:0001"
+      ]
+    },
+    "sourceosBindings": {
+      "role": "lattice-ref-consumer",
+      "mustNotOwnCanonicalSchemas": true,
+      "runtimeAssetRef": "runtime-asset:prophet-python-ml:0.1.0",
+      "dataProductRef": "urn:srcos:data-product:community_truth_demo",
+      "dataContractRef": "urn:srcos:data-contract:community_truth_demo",
+      "modelAssetRef": "urn:srcos:model:community_truth_demo_candidate",
+      "evaluationBundleRef": "urn:srcos:evaluation-bundle:community_truth_demo_model_eval",
+      "factsheetRef": "urn:srcos:factsheet:community_truth_demo_model",
+      "publicationArtifactRef": "urn:srcos:publication-artifact:community_truth_demo_report",
+      "policyBundleRef": "urn:srcos:policy:mlops-governed-execution-demo",
+      "topicScopeRef": "slash-topic://lattice/data-governai",
+      "semanticMembraneRef": "newhope://membranes/lattice-data-governai-admission@0.1.0",
+      "platformAssetRecordRefs": [
+        "urn:srcos:data-product:community_truth_demo",
+        "runtime-asset:prophet-python-ml:0.1.0",
+        "urn:srcos:evaluation-bundle:community_truth_demo_model_eval",
+        "urn:srcos:publication-artifact:community_truth_demo_report"
+      ]
+    }
+  },
+  "replayArtifact": {
+    "kind": "ReplayArtifact",
+    "bundle": "lattice-data-governai-dry-run",
+    "capturedAt": "2026-05-01T20:55:00Z",
+    "executor": "agentplane-dry-run",
+    "backendIntent": "fleet",
+    "inputs": {
+      "bundlePath": "fixtures/lattice-data-governai/execution-refs.v0.1.json",
+      "bundleRev": null,
+      "artifactDir": "artifacts/lattice-data-governai",
+      "policyPackRef": "SocioProphet/policy-fabric#39",
+      "policyPackHash": null,
+      "secretsRequired": [],
+      "upstreamArtifacts": {
+        "workspaceInventoryRef": "SocioProphet/sociosphere#238",
+        "lockVerificationRef": null,
+        "protocolCompatibilityRef": "SocioProphet/slash-topics#23",
+        "taskRunRefs": [
+          "rayjob:community-truth-demo-train:0001",
+          "beam:community-truth-demo-quality:0001"
+        ]
+      },
+      "sourceosBindings": {
+        "role": "lattice-ref-consumer",
+        "mustNotOwnCanonicalSchemas": true,
+        "runtimeAssetRef": "runtime-asset:prophet-python-ml:0.1.0",
+        "dataProductRef": "urn:srcos:data-product:community_truth_demo",
+        "dataContractRef": "urn:srcos:data-contract:community_truth_demo",
+        "notebookSessionRef": "notebook-session:community-truth-demo",
+        "queryRunRef": "query-run:community-truth-demo:001",
+        "modelAssetRef": "urn:srcos:model:community_truth_demo_candidate",
+        "evaluationBundleRef": "urn:srcos:evaluation-bundle:community_truth_demo_model_eval",
+        "factsheetRef": "urn:srcos:factsheet:community_truth_demo_model",
+        "publicationArtifactRef": "urn:srcos:publication-artifact:community_truth_demo_report",
+        "policyBundleRef": "urn:srcos:policy:mlops-governed-execution-demo",
+        "topicScopeRef": "slash-topic://lattice/data-governai",
+        "topicPackRef": "slash-topics://packs/lattice-data-governai@0.1.0",
+        "semanticMembraneRef": "newhope://membranes/lattice-data-governai-admission@0.1.0",
+        "platformAssetRecordRefs": [
+          "urn:srcos:data-product:community_truth_demo",
+          "runtime-asset:prophet-python-ml:0.1.0",
+          "urn:srcos:evaluation-bundle:community_truth_demo_model_eval",
+          "urn:srcos:publication-artifact:community_truth_demo_report"
+        ]
+      }
+    }
+  },
+  "safety": {
+    "dryRunOnly": true,
+    "hostMutation": false,
+    "network": "none",
+    "secrets": "none"
+  }
+}
