@@ -1,0 +1,28 @@
+name: lattice-data-governai-execution-refs
+
+on:
+  pull_request:
+    paths:
+      - "fixtures/lattice-data-governai/**"
+      - "tools/validate_lattice_data_governai_execution_refs.py"
+      - ".github/workflows/lattice-data-governai-execution-refs.yml"
+      - "Makefile"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-lattice-data-governai-execution-refs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Validate Lattice Data/GovernAI execution refs
+        run: python tools/validate_lattice_data_governai_execution_refs.py
