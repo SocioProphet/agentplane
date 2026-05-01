@@ -1,0 +1,55 @@
+{
+  "apiVersion": "agentplane.socioprophet.dev/v0",
+  "kind": "LatticeRuntimeProfileRefsFixture",
+  "metadata": {
+    "name": "lattice-runtime-profile-refs",
+    "version": "0.1.0",
+    "description": "AgentPlane runtime role bindings for Lattice Forge notebook, Ray, and Beam RuntimeAssets."
+  },
+  "sourceRefs": {
+    "umbrellaIssue": "SocioProphet/prophet-platform#291",
+    "runtimeProfilesPr": "SocioProphet/lattice-forge#11",
+    "platformRuntimeCatalogPr": "SocioProphet/prophet-platform#306"
+  },
+  "runtimeRefs": {
+    "notebookRuntimeRef": "runtime-asset:prophet-python-ml:0.1.0",
+    "rayRuntimeRef": "runtime-asset:prophet-ray-ml:0.1.0",
+    "beamRuntimeRef": "runtime-asset:prophet-beam-dataops:0.1.0"
+  },
+  "roleBindings": {
+    "NotebookSession": "runtime-asset:prophet-python-ml:0.1.0",
+    "QueryRun": "runtime-asset:prophet-python-ml:0.1.0",
+    "PublicationArtifact": "runtime-asset:prophet-python-ml:0.1.0",
+    "ModelZooEntry": "runtime-asset:prophet-ray-ml:0.1.0",
+    "ModelRuntimeProfile": "runtime-asset:prophet-ray-ml:0.1.0",
+    "ModelEndpoint": "runtime-asset:prophet-ray-ml:0.1.0",
+    "RayJobDryRunPlan": "runtime-asset:prophet-ray-ml:0.1.0",
+    "RAGPipeline": "runtime-asset:prophet-ray-ml:0.1.0",
+    "EvaluationBundle": "runtime-asset:prophet-ray-ml:0.1.0",
+    "BeamPipelineDryRunPlan": "runtime-asset:prophet-beam-dataops:0.1.0",
+    "TrainingDatasetRecipe": "runtime-asset:prophet-beam-dataops:0.1.0",
+    "QualityProfile": "runtime-asset:prophet-beam-dataops:0.1.0",
+    "VectorIndex": "runtime-asset:prophet-beam-dataops:0.1.0"
+  },
+  "runArtifactBindingOverlay": {
+    "kind": "RunArtifactRuntimeBindingOverlay",
+    "bundle": "lattice-data-governai-dry-run",
+    "sourceosBindings": {
+      "role": "lattice-runtime-profile-consumer",
+      "mustNotOwnCanonicalSchemas": true,
+      "notebookRuntimeRef": "runtime-asset:prophet-python-ml:0.1.0",
+      "rayRuntimeRef": "runtime-asset:prophet-ray-ml:0.1.0",
+      "beamRuntimeRef": "runtime-asset:prophet-beam-dataops:0.1.0",
+      "taskRuntimeRefs": {
+        "rayjob:community-truth-demo-train:0001": "runtime-asset:prophet-ray-ml:0.1.0",
+        "beam:community-truth-demo-quality:0001": "runtime-asset:prophet-beam-dataops:0.1.0"
+      }
+    }
+  },
+  "safety": {
+    "dryRunOnly": true,
+    "hostMutation": false,
+    "network": "none",
+    "secrets": "none"
+  }
+}
