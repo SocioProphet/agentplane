@@ -1,0 +1,91 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Agentplane Native Assistant Bridge Evidence v0.1",
+  "description": "Evidence artifact describing a non-mutating SourceOS Native Assistant Door bridge plan for host/device assistant surfaces such as Apple App Intents, Siri/Shortcuts, Android intents, Windows shell integrations, browser extensions, MCP, or other native bridge transports.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "kind",
+    "capturedAt",
+    "workspaceId",
+    "bridgeRef",
+    "platform",
+    "bridgeClass",
+    "operation",
+    "status",
+    "invokesAssistant",
+    "promptStored",
+    "policyHash"
+  ],
+  "properties": {
+    "kind": { "const": "NativeAssistantBridgeEvidence" },
+    "capturedAt": { "type": "string", "format": "date-time" },
+    "workspaceId": { "type": "string" },
+    "bundle": { "type": ["string", "null"] },
+    "agentRunRef": { "type": ["string", "null"] },
+    "executor": { "type": ["string", "null"] },
+    "backendIntent": { "const": "native-assistant" },
+    "bridgeRef": { "type": "string" },
+    "platform": { "type": "string", "enum": ["macos", "ios", "ipados", "watchos", "visionos", "android", "windows", "linux", "browser", "cross-device"] },
+    "bridgeClass": { "type": "string", "enum": ["apple-app-intents", "apple-shortcuts", "apple-foundation-models", "android-intents", "windows-shell", "browser-extension", "native-messaging", "mcp", "other"] },
+    "operation": {
+      "type": "string",
+      "enum": ["open-workroom", "create-office-artifact", "summarize", "route-local-model", "handoff-to-agent-machine", "inspect-evidence", "search-workspace", "create-reminder", "create-note", "share-artifact", "other"]
+    },
+    "status": { "type": "string", "enum": ["planned", "success", "failure", "blocked", "requires-confirmation", "requires-policy"] },
+    "invokesAssistant": { "type": "boolean" },
+    "promptHash": { "type": ["string", "null"] },
+    "promptStored": { "type": "boolean" },
+    "requiresUserConfirmation": { "type": "boolean" },
+    "userConfirmation": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "properties": {
+        "required": { "type": "boolean" },
+        "decision": { "type": ["string", "null"], "enum": ["approved", "rejected", "pending", "not-required", null] },
+        "decisionRef": { "type": ["string", "null"] }
+      }
+    },
+    "networkAccessProfileRef": { "type": ["string", "null"] },
+    "modelRouteBindingRef": { "type": ["string", "null"] },
+    "agentRegistryGrantRef": { "type": ["string", "null"] },
+    "capabilityRefs": { "type": "array", "items": { "type": "string" } },
+    "policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "localOnlyDefault": { "type": "boolean" },
+        "allowPromptEgress": { "type": "boolean" },
+        "allowCrossDeviceHandoff": { "type": "boolean" },
+        "allowPersonalContextRead": { "type": "boolean" },
+        "allowSideEffectsWithoutConfirmation": { "type": "boolean" },
+        "rawAppDatabaseAccessAllowed": { "type": "boolean" },
+        "promptHashOnlyEvidence": { "type": "boolean" }
+      }
+    },
+    "sideEffects": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "invokedNativeAssistant": { "type": "boolean", "default": false },
+        "createdReminder": { "type": "boolean", "default": false },
+        "createdNote": { "type": "boolean", "default": false },
+        "sharedArtifact": { "type": "boolean", "default": false },
+        "readPersonalContext": { "type": "boolean", "default": false },
+        "requiresPolicyApproval": { "type": "boolean", "default": true }
+      }
+    },
+    "policyHash": { "type": "string" },
+    "policyRefs": { "type": "array", "items": { "type": "string" } },
+    "redactionSummary": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "promptTextRedacted": { "type": "boolean" },
+        "personalContextRedacted": { "type": "boolean" },
+        "secretLikeValuesRedacted": { "type": "integer", "minimum": 0 },
+        "notes": { "type": "string" }
+      }
+    }
+  }
+}
