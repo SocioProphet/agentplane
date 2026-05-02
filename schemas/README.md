@@ -21,6 +21,9 @@ All schemas use [JSON Schema Draft 2020-12](https://json-schema.org/specificatio
 | [`placement-decision.schema.v0.1.json`](placement-decision.schema.v0.1.json) | `PlacementDecision` | v0.1 | Executor placement decision and rejection record. |
 | [`agent-machine-mount-evidence.schema.v0.1.json`](agent-machine-mount-evidence.schema.v0.1.json) | `AgentMachineMountEvidence` | v0.1 | Evidence record for SourceOS Agent Machine local data-plane mounts and optional TopoLVM placement metadata. |
 | [`office-artifact-evidence.schema.v0.1.json`](office-artifact-evidence.schema.v0.1.json) | `OfficeArtifactEvidence` | v0.1 | Evidence record for Prophet Workspace OfficeArtifact generation, inspection, conversion, review, or publishing actions. |
+| [`network-door-plan-evidence.schema.v0.1.json`](network-door-plan-evidence.schema.v0.1.json) | `NetworkDoorPlanEvidence` | v0.1 | Evidence record for non-mutating SourceOS Network Door route, firewall, mesh, and BYOM planning. |
+| [`external-model-provider-route-evidence.schema.v0.1.json`](external-model-provider-route-evidence.schema.v0.1.json) | `ExternalModelProviderRouteEvidence` | v0.1 | Evidence record for BYOM or enterprise external model provider route planning under policy. |
+| [`native-assistant-bridge-evidence.schema.v0.1.json`](native-assistant-bridge-evidence.schema.v0.1.json) | `NativeAssistantBridgeEvidence` | v0.1 | Evidence record for native assistant bridge planning across Apple App Intents/Siri/Shortcuts, Android, Windows, browser, MCP, or other host/device bridges. |
 
 ---
 
@@ -143,6 +146,58 @@ It records:
 - policy refs and redaction summary.
 
 Email sending and external publishing should remain explicit policy-gated side effects. Generated mail should normally be represented as a draft artifact before send.
+
+### NetworkDoorPlanEvidence (`network-door-plan-evidence.schema.v0.1.json`)
+
+Emitted by Network Door executor adapters or imported from `sourceosctl network ...` plan records.
+
+It records:
+
+- NetworkAccessProfile references;
+- user and enterprise firewall binding refs;
+- optional mesh binding refs;
+- BYOM/external model provider refs;
+- route decision and scope;
+- hash-only destination evidence;
+- enterprise/user precedence posture;
+- side-effect flags proving the plan did not mutate firewall or mesh state;
+- policy refs and redaction summary.
+
+Mesh binding and firewall binding should be represented as complementary policy layers, not interchangeable controls.
+
+### ExternalModelProviderRouteEvidence (`external-model-provider-route-evidence.schema.v0.1.json`)
+
+Emitted by external model provider route adapters or imported from `sourceosctl network provider ...` plan records.
+
+It records:
+
+- provider refs and provider class;
+- owner (`user`, `enterprise`, `workspace`, `tenant`, or `device`);
+- NetworkAccessProfile, FirewallBindingProfile, and optional MeshBindingProfile refs;
+- Model Router binding refs and route target;
+- auth reference posture without inline credentials;
+- prompt hash-only evidence;
+- prompt egress policy;
+- provider health metadata when explicitly checked;
+- side-effect flags for provider contact and prompt transmission.
+
+Provider credentials must remain references. Do not inline tokens, API keys, base credentials, or secrets in evidence records.
+
+### NativeAssistantBridgeEvidence (`native-assistant-bridge-evidence.schema.v0.1.json`)
+
+Emitted by Native Assistant Door adapters or imported from `sourceosctl native-assistant ...` plan records.
+
+It records:
+
+- native bridge refs for Apple App Intents/Siri/Shortcuts, Android intents, Windows shell integrations, browser extensions, MCP, or other bridge classes;
+- operation (`open-workroom`, `create-office-artifact`, `summarize`, `route-local-model`, `handoff-to-agent-machine`, `inspect-evidence`, `search-workspace`, `create-reminder`, `create-note`, `share-artifact`, or `other`);
+- prompt hash-only evidence;
+- user confirmation posture;
+- network/model-router/agent-registry refs;
+- policy posture for prompt egress, personal context reads, cross-device handoff, side effects, and raw app database access;
+- side-effect flags proving whether any native assistant or app action occurred.
+
+Native assistant bridge evidence should default to non-mutating plans. Real assistant invocation, reminder/note creation, sharing, cross-device handoff, or personal context reads must be explicit policy-gated side effects.
 
 ### ReplayArtifact (`replay-artifact.schema.v0.1.json`)
 
