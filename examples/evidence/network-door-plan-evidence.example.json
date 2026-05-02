@@ -1,0 +1,50 @@
+{
+  "kind": "NetworkDoorPlanEvidence",
+  "capturedAt": "2026-05-02T16:00:00Z",
+  "workspaceId": "urn:socioprophet:workspace:demo-workspace",
+  "bundle": null,
+  "agentRunRef": null,
+  "executor": "sourceosctl-local",
+  "backendIntent": "network-door",
+  "operation": "plan",
+  "status": "planned",
+  "scope": "workspace",
+  "networkAccessProfileRef": "urn:srcos:network-access-profile:enterprise-and-user-default",
+  "firewallBindingRefs": [
+    "urn:srcos:firewall-binding-profile:enterprise-gateway-default",
+    "urn:srcos:firewall-binding-profile:macos-lulu-user-default"
+  ],
+  "meshBindingRef": "urn:srcos:mesh-binding-profile:istio-egress-default",
+  "modelProviderRef": "urn:srcos:external-model-provider-profile:user-openai-compatible",
+  "decision": "allow-with-policy",
+  "destinationHash": "sha256:8b5d4e4bb2dd8a96dbcfcd3f2a8c4a7ca64063d2394103f89021e77e0bcd9adc",
+  "destinationStored": false,
+  "enterpriseProfileEnabled": true,
+  "userProfileEnabled": true,
+  "meshProfileEnabled": true,
+  "policy": {
+    "enterprisePrecedence": true,
+    "userCanBeStricter": true,
+    "defaultEgress": "deny",
+    "promptEgressDefault": "deny",
+    "hostedFallbackRequiresPolicy": true,
+    "meshAndFirewallBothRequired": true
+  },
+  "sideEffects": {
+    "mutatedFirewall": false,
+    "installedMesh": false,
+    "contactedExternalProvider": false,
+    "storedCredentials": false,
+    "requiresPolicyApproval": true
+  },
+  "policyHash": "sha256:network-door-policy-example",
+  "policyRefs": [
+    "urn:srcos:network-access-profile:enterprise-and-user-default"
+  ],
+  "redactionSummary": {
+    "destinationRedacted": true,
+    "promptTextRedacted": true,
+    "secretLikeValuesRedacted": 0,
+    "notes": "example plan evidence; no firewall or mesh mutation"
+  }
+}
