@@ -1,6 +1,6 @@
-.PHONY: validate test validate-lattice-data-governai-execution-refs validate-lattice-runtime-profile-refs
+.PHONY: validate test validate-lattice-data-governai-execution-refs validate-lattice-runtime-profile-refs validate-network-native-assistant-evidence
 
-validate: validate-lattice-data-governai-execution-refs validate-lattice-runtime-profile-refs
+validate: validate-lattice-data-governai-execution-refs validate-lattice-runtime-profile-refs validate-network-native-assistant-evidence
 	python3 tools/validate_execution_timing.py
 
 validate-lattice-data-governai-execution-refs:
@@ -8,6 +8,9 @@ validate-lattice-data-governai-execution-refs:
 
 validate-lattice-runtime-profile-refs:
 	python3 tools/validate_lattice_runtime_profile_refs.py
+
+validate-network-native-assistant-evidence:
+	python3 tools/validate_network_native_assistant_evidence.py
 
 test:
 	python3 -m pytest -q tools/tests

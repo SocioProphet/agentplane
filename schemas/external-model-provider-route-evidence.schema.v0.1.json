@@ -1,0 +1,98 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Agentplane External Model Provider Route Evidence v0.1",
+  "description": "Evidence artifact describing a policy-gated BYOM or enterprise external model provider route plan, including network/firewall/mesh references, auth-reference posture, prompt-egress policy, and provider-health metadata without contacting the provider by default.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "kind",
+    "capturedAt",
+    "workspaceId",
+    "providerRef",
+    "providerClass",
+    "owner",
+    "operation",
+    "status",
+    "networkAccessProfileRef",
+    "promptEgressDefault",
+    "authInline",
+    "policyHash"
+  ],
+  "properties": {
+    "kind": { "const": "ExternalModelProviderRouteEvidence" },
+    "capturedAt": { "type": "string", "format": "date-time" },
+    "workspaceId": { "type": "string" },
+    "bundle": { "type": ["string", "null"] },
+    "agentRunRef": { "type": ["string", "null"] },
+    "executor": { "type": ["string", "null"] },
+    "backendIntent": { "const": "external-model-provider" },
+    "providerRef": { "type": "string" },
+    "providerClass": {
+      "type": "string",
+      "enum": ["openai-compatible", "ollama-remote", "vllm", "tgi", "llama.cpp-server", "mlx-server", "azure-openai", "aws-bedrock", "google-vertex", "anthropic", "enterprise-private", "user-private", "other"]
+    },
+    "owner": { "type": "string", "enum": ["user", "enterprise", "workspace", "tenant", "device"] },
+    "operation": { "type": "string", "enum": ["plan", "route", "health-check", "evidence-inspect"] },
+    "status": { "type": "string", "enum": ["planned", "success", "failure", "blocked", "requires-policy"] },
+    "networkAccessProfileRef": { "type": "string" },
+    "firewallBindingRef": { "type": ["string", "null"] },
+    "meshBindingRef": { "type": ["string", "null"] },
+    "modelRouterBindingRef": { "type": ["string", "null"] },
+    "taskClass": { "type": ["string", "null"] },
+    "routeTarget": { "type": ["string", "null"], "enum": ["base-local", "personal-local", "quality-local", "hosted", "byom", "enterprise-private", "deny", null] },
+    "endpoint": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "baseUrlRef": { "type": ["string", "null"] },
+        "authRef": { "type": ["string", "null"] },
+        "tlsPolicyRef": { "type": ["string", "null"] },
+        "endpointHash": { "type": ["string", "null"] },
+        "endpointStored": { "type": "boolean", "default": false }
+      }
+    },
+    "contactsProvider": { "type": "boolean", "default": false },
+    "providerHealth": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "properties": {
+        "checked": { "type": "boolean" },
+        "status": { "type": ["string", "null"], "enum": ["available", "unavailable", "skipped", "blocked", null] },
+        "latencyMs": { "type": ["integer", "null"], "minimum": 0 },
+        "errorRef": { "type": ["string", "null"] }
+      }
+    },
+    "promptHash": { "type": ["string", "null"] },
+    "promptStored": { "type": "boolean", "default": false },
+    "promptEgressDefault": { "type": "string", "enum": ["deny", "allow-with-policy", "allow"] },
+    "storesPrompt": { "type": "boolean", "default": false },
+    "storesCompletion": { "type": "boolean", "default": false },
+    "allowTrainingUse": { "type": "boolean", "default": false },
+    "requiresDpaOrEnterpriseTerms": { "type": "boolean", "default": true },
+    "requiresUserConsentForPersonalData": { "type": "boolean", "default": true },
+    "authInline": { "type": "boolean" },
+    "authRefRequired": { "type": "boolean", "default": true },
+    "sideEffects": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "contactedExternalProvider": { "type": "boolean", "default": false },
+        "sentPrompt": { "type": "boolean", "default": false },
+        "storedCredentials": { "type": "boolean", "default": false },
+        "requiresPolicyApproval": { "type": "boolean", "default": true }
+      }
+    },
+    "policyHash": { "type": "string" },
+    "policyRefs": { "type": "array", "items": { "type": "string" } },
+    "redactionSummary": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "endpointRedacted": { "type": "boolean" },
+        "promptTextRedacted": { "type": "boolean" },
+        "secretLikeValuesRedacted": { "type": "integer", "minimum": 0 },
+        "notes": { "type": "string" }
+      }
+    }
+  }
+}

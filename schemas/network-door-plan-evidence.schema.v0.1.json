@@ -1,0 +1,75 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Agentplane Network Door Plan Evidence v0.1",
+  "description": "Evidence artifact describing a non-mutating SourceOS Network Door plan, including enterprise/user firewall precedence, optional mesh binding, BYOM provider routing, destination redaction, and policy posture.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "kind",
+    "capturedAt",
+    "workspaceId",
+    "operation",
+    "status",
+    "networkAccessProfileRef",
+    "decision",
+    "destinationStored",
+    "policyHash"
+  ],
+  "properties": {
+    "kind": { "const": "NetworkDoorPlanEvidence" },
+    "capturedAt": { "type": "string", "format": "date-time" },
+    "workspaceId": { "type": "string" },
+    "bundle": { "type": ["string", "null"] },
+    "agentRunRef": { "type": ["string", "null"] },
+    "executor": { "type": ["string", "null"] },
+    "backendIntent": { "const": "network-door" },
+    "operation": { "type": "string", "enum": ["doctor", "plan", "provider", "evidence-inspect"] },
+    "status": { "type": "string", "enum": ["planned", "success", "failure", "blocked", "requires-policy"] },
+    "scope": { "type": "string", "enum": ["user", "enterprise", "device", "workspace", "agent-machine", "cluster"] },
+    "networkAccessProfileRef": { "type": "string" },
+    "firewallBindingRefs": { "type": "array", "items": { "type": "string" } },
+    "meshBindingRef": { "type": ["string", "null"] },
+    "modelProviderRef": { "type": ["string", "null"] },
+    "decision": { "type": "string", "enum": ["deny", "allow-with-policy", "allow-listed", "ask", "blocked"] },
+    "destinationHash": { "type": ["string", "null"] },
+    "destinationStored": { "type": "boolean" },
+    "enterpriseProfileEnabled": { "type": "boolean" },
+    "userProfileEnabled": { "type": "boolean" },
+    "meshProfileEnabled": { "type": "boolean" },
+    "policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "enterprisePrecedence": { "type": "boolean" },
+        "userCanBeStricter": { "type": "boolean" },
+        "defaultEgress": { "type": "string", "enum": ["deny", "allow-with-policy", "allow-listed", "ask"] },
+        "promptEgressDefault": { "type": "string", "enum": ["deny", "allow-with-policy", "allow"] },
+        "hostedFallbackRequiresPolicy": { "type": "boolean" },
+        "meshAndFirewallBothRequired": { "type": "boolean" }
+      }
+    },
+    "sideEffects": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "mutatedFirewall": { "type": "boolean", "default": false },
+        "installedMesh": { "type": "boolean", "default": false },
+        "contactedExternalProvider": { "type": "boolean", "default": false },
+        "storedCredentials": { "type": "boolean", "default": false },
+        "requiresPolicyApproval": { "type": "boolean", "default": true }
+      }
+    },
+    "policyHash": { "type": "string" },
+    "policyRefs": { "type": "array", "items": { "type": "string" } },
+    "redactionSummary": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "destinationRedacted": { "type": "boolean" },
+        "promptTextRedacted": { "type": "boolean" },
+        "secretLikeValuesRedacted": { "type": "integer", "minimum": 0 },
+        "notes": { "type": "string" }
+      }
+    }
+  }
+}

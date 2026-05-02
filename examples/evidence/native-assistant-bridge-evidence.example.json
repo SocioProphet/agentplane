@@ -1,0 +1,56 @@
+{
+  "kind": "NativeAssistantBridgeEvidence",
+  "capturedAt": "2026-05-02T16:00:00Z",
+  "workspaceId": "urn:socioprophet:workspace:demo-workspace",
+  "bundle": null,
+  "agentRunRef": null,
+  "executor": "sourceosctl-local",
+  "backendIntent": "native-assistant",
+  "bridgeRef": "urn:srcos:native-assistant-bridge-profile:apple-app-intents-default",
+  "platform": "macos",
+  "bridgeClass": "apple-app-intents",
+  "operation": "create-office-artifact",
+  "status": "requires-confirmation",
+  "invokesAssistant": false,
+  "promptHash": "sha256:prompt-hash-example",
+  "promptStored": false,
+  "requiresUserConfirmation": true,
+  "userConfirmation": {
+    "required": true,
+    "decision": "pending",
+    "decisionRef": null
+  },
+  "networkAccessProfileRef": "urn:srcos:network-access-profile:enterprise-and-user-default",
+  "modelRouteBindingRef": "urn:socioprophet:model-router-binding:demo-user-local-llama32",
+  "agentRegistryGrantRef": null,
+  "capabilityRefs": [
+    "urn:srcos:native-assistant-capability:create-office-artifact"
+  ],
+  "policy": {
+    "localOnlyDefault": true,
+    "allowPromptEgress": false,
+    "allowCrossDeviceHandoff": false,
+    "allowPersonalContextRead": false,
+    "allowSideEffectsWithoutConfirmation": false,
+    "rawAppDatabaseAccessAllowed": false,
+    "promptHashOnlyEvidence": true
+  },
+  "sideEffects": {
+    "invokedNativeAssistant": false,
+    "createdReminder": false,
+    "createdNote": false,
+    "sharedArtifact": false,
+    "readPersonalContext": false,
+    "requiresPolicyApproval": true
+  },
+  "policyHash": "sha256:native-assistant-policy-example",
+  "policyRefs": [
+    "urn:srcos:native-assistant-bridge-profile:apple-app-intents-default"
+  ],
+  "redactionSummary": {
+    "promptTextRedacted": true,
+    "personalContextRedacted": true,
+    "secretLikeValuesRedacted": 0,
+    "notes": "example native assistant bridge plan evidence; no native invocation"
+  }
+}
