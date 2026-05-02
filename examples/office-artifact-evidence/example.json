@@ -1,0 +1,61 @@
+{
+  "kind": "OfficeArtifactEvidence",
+  "capturedAt": "2026-05-02T13:50:00Z",
+  "workroomId": "workroom-demo-0001",
+  "artifactId": "office-artifact-demo-0001",
+  "artifactType": "slide-deck",
+  "format": "pptx",
+  "operation": "generate",
+  "status": "requires-review",
+  "storageRef": "sourceos-office://workroom-demo-0001/output/professional-intelligence-demo-briefing.pptx",
+  "sourceRefs": [
+    "context-pack://pi-demo-0001",
+    "agentplane://runs/pi-demo-0001"
+  ],
+  "derivedRefs": [
+    "sourceos-office://workroom-demo-0001/output/professional-intelligence-demo-briefing.pdf"
+  ],
+  "agentRunRef": "agentplane://runs/pi-demo-0001",
+  "mountEvidenceRef": "agentplane://evidence/agent-machine-mounts/m2-demo",
+  "officeArtifactContractRef": "https://socioprophet.io/schemas/workspace/office-artifact.schema.json",
+  "backend": {
+    "engine": "libreoffice",
+    "mode": "local-headless",
+    "versionRef": "urn:srcos:office-backend:libreoffice-local-default"
+  },
+  "artifactHashes": [
+    {
+      "ref": "sourceos-office://workroom-demo-0001/output/professional-intelligence-demo-briefing.pptx",
+      "sha256": "sha256:example-pptx-hash",
+      "mimeType": "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+      "sizeBytes": 123456
+    }
+  ],
+  "conversion": {
+    "fromFormat": null,
+    "toFormat": null,
+    "commandRef": null,
+    "executed": false
+  },
+  "review": {
+    "required": true,
+    "decision": "pending",
+    "decisionRef": "policy-decision://office-review/demo-0001",
+    "reviewer": "policy-reviewer"
+  },
+  "sideEffects": {
+    "emailSent": false,
+    "externalPublished": false,
+    "calendarModified": false,
+    "requiresPolicyApproval": true
+  },
+  "policyHash": "sha256:example-policy-hash",
+  "policyRefs": [
+    "policy-decision://policy-demo-ai-use/decision-0001"
+  ],
+  "redactionSummary": {
+    "hostUserRedacted": true,
+    "secretLikeValuesRedacted": 0,
+    "notes": "Example uses fake hashes and SourceOS refs."
+  }
+}

@@ -20,6 +20,7 @@ All schemas use [JSON Schema Draft 2020-12](https://json-schema.org/specificatio
 | [`reversal-artifact.schema.v0.1.json`](reversal-artifact.schema.v0.1.json) | `ReversalArtifact` | v0.1 | Evidence record of a rollback/reversal event. |
 | [`placement-decision.schema.v0.1.json`](placement-decision.schema.v0.1.json) | `PlacementDecision` | v0.1 | Executor placement decision and rejection record. |
 | [`agent-machine-mount-evidence.schema.v0.1.json`](agent-machine-mount-evidence.schema.v0.1.json) | `AgentMachineMountEvidence` | v0.1 | Evidence record for SourceOS Agent Machine local data-plane mounts and optional TopoLVM placement metadata. |
+| [`office-artifact-evidence.schema.v0.1.json`](office-artifact-evidence.schema.v0.1.json) | `OfficeArtifactEvidence` | v0.1 | Evidence record for Prophet Workspace OfficeArtifact generation, inspection, conversion, review, or publishing actions. |
 
 ---
 
@@ -124,6 +125,24 @@ It records:
 - redaction summary.
 
 Browser downloads are intentionally represented as a distinct path class. Downloaded artifacts should be hashed, and promotion into code or document-output space should emit separate evidence.
+
+### OfficeArtifactEvidence (`office-artifact-evidence.schema.v0.1.json`)
+
+Emitted by Office Plane executor adapters or imported from `sourceosctl office ...` evidence records.
+
+It records:
+
+- `workroomId` and `artifactId` from `SocioProphet/prophet-workspace` OfficeArtifact contracts;
+- artifact type and format for documents, sheets, slide decks, PDFs, mail drafts, calendar items, task lists, notes, and media assets;
+- operation (`plan`, `generate`, `inspect`, `convert`, `render`, `analyze`, `review`, `promote`, `publish`, or `send-draft`);
+- backend (`libreoffice`, `collabora`, `onlyoffice`, `microsoft-graph`, `google-workspace`, `sourceos-native`, or `manual`);
+- artifact hashes and derived artifact refs;
+- conversion metadata;
+- review state;
+- side-effect flags for email, external publish, and calendar modification;
+- policy refs and redaction summary.
+
+Email sending and external publishing should remain explicit policy-gated side effects. Generated mail should normally be represented as a draft artifact before send.
 
 ### ReplayArtifact (`replay-artifact.schema.v0.1.json`)
 
