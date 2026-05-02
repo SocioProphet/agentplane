@@ -251,6 +251,22 @@
           },
           "type": "object"
         },
+        "agentMachine": {
+          "description": "Optional SourceOS Agent Machine binding for local Mac/Windows/Linux Podman workspaces and cluster-local TopoLVM placement.",
+          "properties": {
+            "profileRef": { "type": "string" },
+            "localDataPlaneRef": { "type": "string" },
+            "mountPolicyRef": { "type": "string" },
+            "secureHostInterfaceRef": { "type": "string" },
+            "topolvmPlacementProfileRef": { "type": "string" },
+            "workspaceId": { "type": "string" },
+            "toolSurfaceRefs": {
+              "type": "array",
+              "items": { "type": "string" }
+            }
+          },
+          "type": "object"
+        },
         "vm": {
           "properties": {
             "backendIntent": {
@@ -258,12 +274,13 @@
                 "qemu",
                 "microvm",
                 "lima-process",
-                "fleet"
+                "fleet",
+                "agent-machine"
               ],
               "type": "string"
             },
             "modulePath": {
-              "description": "Path to NixOS module entry (e.g., vm.nix)",
+              "description": "Path to NixOS module entry (e.g., vm.nix). Agent Machine bundles may use an adapter module path rather than a NixOS VM module.",
               "type": "string"
             },
             "mounts": {
@@ -282,6 +299,9 @@
                     "enum": [
                       "virtiofs",
                       "9p",
+                      "podman-bind",
+                      "wsl-bind",
+                      "topolvm-local-pv",
                       "none"
                     ],
                     "type": "string"

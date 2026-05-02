@@ -18,6 +18,8 @@ All schemas use [JSON Schema Draft 2020-12](https://json-schema.org/specificatio
 | [`session-artifact.schema.v0.1.json`](session-artifact.schema.v0.1.json) | `SessionArtifact` | v0.1 | Session-level lifecycle record (status, receipt/run/replay refs). |
 | [`promotion-artifact.schema.v0.1.json`](promotion-artifact.schema.v0.1.json) | `PromotionArtifact` | v0.1 | Evidence record of a bundle promotion event. |
 | [`reversal-artifact.schema.v0.1.json`](reversal-artifact.schema.v0.1.json) | `ReversalArtifact` | v0.1 | Evidence record of a rollback/reversal event. |
+| [`placement-decision.schema.v0.1.json`](placement-decision.schema.v0.1.json) | `PlacementDecision` | v0.1 | Executor placement decision and rejection record. |
+| [`agent-machine-mount-evidence.schema.v0.1.json`](agent-machine-mount-evidence.schema.v0.1.json) | `AgentMachineMountEvidence` | v0.1 | Evidence record for SourceOS Agent Machine local data-plane mounts and optional TopoLVM placement metadata. |
 
 ---
 
@@ -35,8 +37,8 @@ The bundle schema defines the contract for `bundle.json` files. Validated by
 | `metadata.name` | string | Pattern: `^[a-z0-9][a-z0-9-]{1,62}$` |
 | `metadata.version` | string | Semver recommended |
 | `metadata.createdAt` | string | ISO 8601 datetime |
-| `spec.vm.modulePath` | string | Path to NixOS module entry (e.g., `vm.nix`) |
-| `spec.vm.backendIntent` | enum | One of: `qemu`, `microvm`, `lima-process`, `fleet` |
+| `spec.vm.modulePath` | string | Path to NixOS module entry or adapter module path |
+| `spec.vm.backendIntent` | enum | One of: `qemu`, `microvm`, `lima-process`, `fleet`, `agent-machine` |
 | `spec.policy.maxRunSeconds` | integer | 5–3600 |
 | `spec.secrets` | object | Secret refs only — never inline values |
 | `spec.artifacts.outDir` | string | Directory where evidence artifacts are written |
@@ -46,6 +48,22 @@ The bundle schema defines the contract for `bundle.json` files. Validated by
 
 `metadata.licensePolicy.allowAGPL` must be `false`. This is validated at bundle
 validation time and cannot be overridden. See [ADR-0001](../docs/adr/0001-no-agpl-dependencies.md).
+
+### Agent Machine binding
+
+`spec.agentMachine` is an optional SourceOS Agent Machine binding. It references canonical contracts in `SourceOS-Linux/sourceos-spec` rather than redefining local mount policy inside AgentPlane.
+
+Key fields:
+
+| Field | Purpose |
+|---|---|
+| `profileRef` | Agent Machine profile reference. |
+| `localDataPlaneRef` | `AgentMachineLocalDataPlane` reference. |
+| `mountPolicyRef` | `AgentMachineMountPolicy` reference. |
+| `secureHostInterfaceRef` | Secure Host Interface profile/grant reference. |
+| `topolvmPlacementProfileRef` | Optional `TopoLVMPlacementProfile` reference for cluster-local mode. |
+| `workspaceId` | Local/cluster workspace identity. |
+| `toolSurfaceRefs` | Agent tool surfaces such as OpenCLAW/OpenClaw, Hermes, Codex, Claude Code, local shell, GitHub bot, or CI bot. |
 
 ---
 
@@ -90,6 +108,22 @@ Written by `scripts/emit_run_artifact.py` and by `runners/qemu-local.sh`.
 | `exitCode` | integer | Process exit code |
 
 Optional: `bundlePath`, `stdoutRef`, `stderrRef`, `upstreamArtifacts.*`.
+
+### AgentMachineMountEvidence (`agent-machine-mount-evidence.schema.v0.1.json`)
+
+Emitted by Agent Machine executor adapters or imported from `sourceosctl agent-machine mounts ...` evidence records.
+
+It records:
+
+- `localDataPlaneRef` and `mountPolicyRef` from SourceOS contracts;
+- storage backend (`podman-machine-bind`, `native-bind`, `wsl-bind`, `topolvm-local-pv`, etc.);
+- mount path classes (`code`, `documents`, `downloads`, `cache`, `artifacts`, `media`, `app-bridge`);
+- scoped browser download evidence;
+- denied mount attempts;
+- optional TopoLVM node/PVC/PV metadata;
+- redaction summary.
+
+Browser downloads are intentionally represented as a distinct path class. Downloaded artifacts should be hashed, and promotion into code or document-output space should emit separate evidence.
 
 ### ReplayArtifact (`replay-artifact.schema.v0.1.json`)
 
