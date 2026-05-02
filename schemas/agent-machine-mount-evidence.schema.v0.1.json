@@ -1,0 +1,127 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Agentplane Agent Machine Mount Evidence v0.1",
+  "description": "Evidence artifact describing the local data-plane mounts available to a SourceOS Agent Machine run, including scoped code, document output, browser downloads, and optional TopoLVM placement metadata.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "kind",
+    "capturedAt",
+    "workspaceId",
+    "executor",
+    "backendIntent",
+    "localDataPlaneRef",
+    "mountPolicyRef",
+    "storageBackend",
+    "policyHash",
+    "mounts"
+  ],
+  "properties": {
+    "kind": { "const": "AgentMachineMountEvidence" },
+    "capturedAt": { "type": "string", "format": "date-time" },
+    "workspaceId": { "type": "string" },
+    "bundle": { "type": ["string", "null"] },
+    "executor": { "type": "string" },
+    "backendIntent": { "const": "agent-machine" },
+    "localDataPlaneRef": { "type": "string" },
+    "mountPolicyRef": { "type": "string" },
+    "secureHostInterfaceRef": { "type": ["string", "null"] },
+    "topolvmPlacementProfileRef": { "type": ["string", "null"] },
+    "storageBackend": {
+      "type": "string",
+      "enum": ["podman-bind", "podman-machine-bind", "wsl-bind", "native-bind", "topolvm-local-pv", "other"]
+    },
+    "policyHash": { "type": "string" },
+    "gitRef": { "type": ["string", "null"] },
+    "mounts": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/mountEvidence" }
+    },
+    "deniedAttempts": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/deniedAttempt" }
+    },
+    "downloadArtifacts": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/downloadArtifact" }
+    },
+    "topolvmPlacement": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "properties": {
+        "nodeName": { "type": ["string", "null"] },
+        "storageClassName": { "type": ["string", "null"] },
+        "pvRefs": { "type": "array", "items": { "type": "string" } },
+        "pvcRefs": { "type": "array", "items": { "type": "string" } },
+        "sharedStorageSemantics": {
+          "type": ["string", "null"],
+          "enum": ["node-local", "replicated-by-higher-layer", "external-shared-storage", null]
+        }
+      }
+    },
+    "redactionSummary": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "hostUserRedacted": { "type": "boolean" },
+        "secretLikeValuesRedacted": { "type": "integer", "minimum": 0 },
+        "notes": { "type": "string" }
+      }
+    }
+  },
+  "$defs": {
+    "mountEvidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mountId", "pathClass", "agentPath", "accessMode", "secretsProhibited"],
+      "properties": {
+        "mountId": { "type": "string" },
+        "pathClass": {
+          "type": "string",
+          "enum": ["code", "documents", "downloads", "cache", "artifacts", "media", "app-bridge"]
+        },
+        "hostPathRef": {
+          "type": ["string", "null"],
+          "description": "Redacted host path or policy reference. Do not store unredacted personal paths when redaction policy requires masking."
+        },
+        "agentPath": { "type": "string" },
+        "accessMode": {
+          "type": "string",
+          "enum": ["read-only", "read-write", "browser-read-write-agent-read-only", "write-only-artifacts"]
+        },
+        "storageBackend": { "type": ["string", "null"] },
+        "gitRef": { "type": ["string", "null"] },
+        "contentHash": { "type": ["string", "null"] },
+        "secretsProhibited": { "type": "boolean" },
+        "directExecutionAllowed": { "type": "boolean" },
+        "existsAtRunStart": { "type": ["boolean", "null"] }
+      }
+    },
+    "deniedAttempt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["pathRef", "reason"],
+      "properties": {
+        "pathRef": { "type": "string" },
+        "reason": { "type": "string" },
+        "severity": { "type": "string", "enum": ["warn", "deny"] }
+      }
+    },
+    "downloadArtifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["artifactRef", "pathRef", "sha256"],
+      "properties": {
+        "artifactRef": { "type": "string" },
+        "pathRef": { "type": "string" },
+        "sha256": { "type": "string" },
+        "mimeType": { "type": ["string", "null"] },
+        "sourceDomain": { "type": ["string", "null"] },
+        "sourceUrlRedacted": { "type": ["string", "null"] },
+        "promotedTo": { "type": ["string", "null"] },
+        "promotionEvidenceRef": { "type": ["string", "null"] }
+      }
+    }
+  }
+}
