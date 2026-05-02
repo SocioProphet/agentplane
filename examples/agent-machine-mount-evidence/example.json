@@ -1,0 +1,81 @@
+{
+  "kind": "AgentMachineMountEvidence",
+  "capturedAt": "2026-05-02T13:15:00Z",
+  "workspaceId": "urn:srcos:agent-machine-workspace:m2-demo",
+  "bundle": "agent-machine-smoke@0.1.0",
+  "executor": "local-macos-podman",
+  "backendIntent": "agent-machine",
+  "localDataPlaneRef": "urn:srcos:agent-machine-local-data-plane:macos-default",
+  "mountPolicyRef": "urn:srcos:agent-machine-mount-policy:default-deny-scoped-roots",
+  "secureHostInterfaceRef": "urn:srcos:secure-host-interface:macos-default",
+  "topolvmPlacementProfileRef": null,
+  "storageBackend": "podman-machine-bind",
+  "policyHash": "sha256:example-policy-hash",
+  "gitRef": "refs/heads/main",
+  "mounts": [
+    {
+      "mountId": "dev-root",
+      "pathClass": "code",
+      "hostPathRef": "$HOME/dev",
+      "agentPath": "/workspace/dev",
+      "accessMode": "read-write",
+      "storageBackend": "podman-machine-bind",
+      "gitRef": "refs/heads/main",
+      "contentHash": null,
+      "secretsProhibited": true,
+      "directExecutionAllowed": true,
+      "existsAtRunStart": true
+    },
+    {
+      "mountId": "docs-output",
+      "pathClass": "documents",
+      "hostPathRef": "$HOME/Documents/SourceOS/agent-output",
+      "agentPath": "/workspace/output",
+      "accessMode": "read-write",
+      "storageBackend": "podman-machine-bind",
+      "gitRef": null,
+      "contentHash": null,
+      "secretsProhibited": true,
+      "directExecutionAllowed": false,
+      "existsAtRunStart": true
+    },
+    {
+      "mountId": "browser-downloads",
+      "pathClass": "downloads",
+      "hostPathRef": "$HOME/Downloads/SourceOS/agent-downloads",
+      "agentPath": "/workspace/downloads",
+      "accessMode": "browser-read-write-agent-read-only",
+      "storageBackend": "podman-machine-bind",
+      "gitRef": null,
+      "contentHash": null,
+      "secretsProhibited": true,
+      "directExecutionAllowed": false,
+      "existsAtRunStart": true
+    }
+  ],
+  "deniedAttempts": [
+    {
+      "pathRef": "$HOME/.ssh",
+      "reason": "SSH keys are denied by the default mount policy.",
+      "severity": "deny"
+    }
+  ],
+  "downloadArtifacts": [
+    {
+      "artifactRef": "urn:srcos:artifact:download:example-readme",
+      "pathRef": "$HOME/Downloads/SourceOS/agent-downloads/example-readme.txt",
+      "sha256": "sha256:example-download-hash",
+      "mimeType": "text/plain",
+      "sourceDomain": "example.com",
+      "sourceUrlRedacted": "https://example.com/redacted",
+      "promotedTo": null,
+      "promotionEvidenceRef": null
+    }
+  ],
+  "topolvmPlacement": null,
+  "redactionSummary": {
+    "hostUserRedacted": true,
+    "secretLikeValuesRedacted": 0,
+    "notes": "Example uses redacted host paths and fake hashes."
+  }
+}
