@@ -1,0 +1,106 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.socioprophet.org/agentplane/agentic-pr-work-order.schema.v0.1.json",
+  "title": "Agentic PR Work Order",
+  "description": "Issue-scoped work-order contract for AgentPlane agentic PR execution.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["apiVersion", "kind", "metadata", "spec"],
+  "properties": {
+    "apiVersion": {"const": "agentplane.socioprophet.org/v0.1"},
+    "kind": {"const": "AgenticPRWorkOrder"},
+    "metadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "repository", "issueRef", "createdAt"],
+      "properties": {
+        "name": {"type": "string", "minLength": 1},
+        "repository": {"type": "string", "minLength": 1},
+        "issueRef": {"type": "string", "minLength": 1},
+        "createdAt": {"type": "string", "format": "date-time"},
+        "ownerRef": {"type": "string", "minLength": 1},
+        "labels": {"type": "array", "items": {"type": "string"}, "uniqueItems": true}
+      }
+    },
+    "spec": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["objective", "authority", "scope", "nonGoals", "allowedSideEffects", "validation", "review", "output", "policyRefs", "ledger"],
+      "properties": {
+        "objective": {"type": "string", "minLength": 20},
+        "authority": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["implementationAgent", "reviewAgent", "mergeGate", "separationOfDuties"],
+          "properties": {
+            "implementationAgent": {"type": "string", "minLength": 1},
+            "reviewAgent": {"type": "string", "minLength": 1},
+            "mergeGate": {"type": "string", "minLength": 1},
+            "separationOfDuties": {"const": true}
+          }
+        },
+        "scope": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["summary", "expectedFiles", "maxChangedFiles", "changedFileAllowance", "allowedPaths", "deniedPaths"],
+          "properties": {
+            "summary": {"type": "string", "minLength": 20},
+            "expectedFiles": {"type": "array", "minItems": 1, "items": {"type": "string"}, "uniqueItems": true},
+            "maxChangedFiles": {"type": "integer", "minimum": 1, "maximum": 25},
+            "changedFileAllowance": {"type": "integer", "minimum": 0, "maximum": 10},
+            "allowedPaths": {"type": "array", "minItems": 1, "items": {"type": "string"}, "uniqueItems": true},
+            "deniedPaths": {"type": "array", "minItems": 1, "items": {"type": "string"}, "uniqueItems": true}
+          }
+        },
+        "nonGoals": {"type": "array", "minItems": 1, "items": {"type": "string"}, "uniqueItems": true},
+        "allowedSideEffects": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+        "validation": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["requiredCommands", "evidenceRequired"],
+          "properties": {
+            "requiredCommands": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+            "evidenceRequired": {"type": "boolean"}
+          }
+        },
+        "review": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["reviewerMode", "checklist"],
+          "properties": {
+            "reviewerMode": {"type": "string", "enum": ["adversarial", "maintainer", "policy-only"]},
+            "checklist": {"type": "array", "minItems": 1, "items": {"type": "string"}}
+          }
+        },
+        "output": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["draftPrRequired", "requiredPrSections"],
+          "properties": {
+            "draftPrRequired": {"const": true},
+            "requiredPrSections": {"type": "array", "minItems": 4, "items": {"type": "string"}, "uniqueItems": true}
+          }
+        },
+        "policyRefs": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["diffHygieneGate", "mergeGatePolicy"],
+          "properties": {
+            "diffHygieneGate": {"type": "string", "minLength": 1},
+            "mergeGatePolicy": {"type": "string", "minLength": 1},
+            "pairedIssueRef": {"type": "string", "minLength": 1}
+          }
+        },
+        "ledger": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["required", "fields"],
+          "properties": {
+            "required": {"const": true},
+            "fields": {"type": "array", "minItems": 1, "items": {"type": "string"}, "uniqueItems": true}
+          }
+        }
+      }
+    }
+  }
+}
