@@ -1,0 +1,111 @@
+{
+  "apiVersion": "agentplane.socioprophet.org/v0.1",
+  "kind": "AgenticPRWorkOrder",
+  "metadata": {
+    "name": "agentic-pr-control-plane-v0",
+    "repository": "SocioProphet/agentplane",
+    "issueRef": "https://github.com/SocioProphet/agentplane/issues/82",
+    "createdAt": "2026-05-03T15:20:00Z",
+    "ownerRef": "SocioProphet/agentplane-maintainers",
+    "labels": [
+      "agentic-devops",
+      "control-plane",
+      "specification"
+    ]
+  },
+  "spec": {
+    "objective": "Define the v0 Agentic PR Control Plane for issue-scoped implementation agents, adversarial review agents, and policy-owned merge gates.",
+    "authority": {
+      "implementationAgent": "implementation-agent",
+      "reviewAgent": "review-agent",
+      "mergeGate": "policy-gate",
+      "separationOfDuties": true
+    },
+    "scope": {
+      "summary": "Add a narrow specification, schema, and fixture for the AgentPlane issue-to-draft-PR control-plane lifecycle.",
+      "expectedFiles": [
+        "docs/agentic-pr-control-plane-v0.md",
+        "schemas/agentic-pr-work-order.schema.v0.1.json",
+        "examples/agentic-pr-work-order.example.json",
+        "schemas/README.md"
+      ],
+      "maxChangedFiles": 6,
+      "changedFileAllowance": 2,
+      "allowedPaths": [
+        "docs/",
+        "schemas/",
+        "examples/"
+      ],
+      "deniedPaths": [
+        ".venv/",
+        ".venv-tools/",
+        "venv/",
+        "node_modules/",
+        ".mypy_cache/",
+        ".pytest_cache/",
+        "__pycache__/",
+        "dist/",
+        "build/"
+      ]
+    },
+    "nonGoals": [
+      "Do not implement a production service.",
+      "Do not add vendored dependencies or generated dependency trees.",
+      "Do not grant merge authority to the implementation agent."
+    ],
+    "allowedSideEffects": [
+      "create-branch",
+      "commit-files",
+      "open-draft-pr",
+      "comment-on-issue",
+      "read-ci-status",
+      "request-review"
+    ],
+    "validation": {
+      "requiredCommands": [
+        "git status --short",
+        "git diff --stat",
+        "scripts/doctor.sh"
+      ],
+      "evidenceRequired": true
+    },
+    "review": {
+      "reviewerMode": "adversarial",
+      "checklist": [
+        "Scope matches the issue contract.",
+        "No virtual environment or generated dependency tree is committed.",
+        "Implementation, review, and merge authority remain separated.",
+        "The PR includes validation evidence, known gaps, and self-critique."
+      ]
+    },
+    "output": {
+      "draftPrRequired": true,
+      "requiredPrSections": [
+        "summary",
+        "changed-files",
+        "validation",
+        "known-gaps",
+        "self-critique",
+        "linked-issue",
+        "policy-evidence"
+      ]
+    },
+    "policyRefs": {
+      "diffHygieneGate": "SocioProphet/policy-fabric#44",
+      "mergeGatePolicy": "policy-fabric.diff-hygiene-gate.v0",
+      "pairedIssueRef": "https://github.com/SocioProphet/policy-fabric/issues/44"
+    },
+    "ledger": {
+      "required": true,
+      "fields": [
+        "issueRef",
+        "branch",
+        "headSha",
+        "changedFiles",
+        "validationCommands",
+        "reviewDecision",
+        "mergeDecision"
+      ]
+    }
+  }
+}
