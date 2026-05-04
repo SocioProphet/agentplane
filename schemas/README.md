@@ -13,6 +13,7 @@ All schemas use [JSON Schema Draft 2020-12](https://json-schema.org/specificatio
 | [`bundle.schema.v0.1.json`](bundle.schema.v0.1.json) | `Bundle` | v0.1 | Bundle manifest schema. Defines the structure of `bundle.json`. |
 | [`bundle.schema.patch.json`](bundle.schema.patch.json) | patch fragment | — | Staged future fields for agent-runtime bundles (not yet enforced). |
 | [`broker-execution-bundle.schema.v0.1.json`](broker-execution-bundle.schema.v0.1.json) | `BrokerExecutionBundle` | v0.1 | Broker validation/smoke/continuity/exit/cost-meter execution bundle contract. |
+| [`agentic-pr-work-order.schema.v0.1.json`](agentic-pr-work-order.schema.v0.1.json) | `AgenticPRWorkOrder` | v0.1 | Issue-scoped work-order contract for agentic PR execution, review separation, policy refs, and ledger requirements. |
 | [`run-artifact.schema.v0.1.json`](run-artifact.schema.v0.1.json) | `RunArtifact` | v0.1 | Evidence record of a completed run. |
 | [`replay-artifact.schema.v0.1.json`](replay-artifact.schema.v0.1.json) | `ReplayArtifact` | v0.1 | Inputs needed for deterministic replay. |
 | [`session-artifact.schema.v0.1.json`](session-artifact.schema.v0.1.json) | `SessionArtifact` | v0.1 | Session-level lifecycle record (status, receipt/run/replay refs). |
@@ -68,6 +69,31 @@ Key fields:
 | `topolvmPlacementProfileRef` | Optional `TopoLVMPlacementProfile` reference for cluster-local mode. |
 | `workspaceId` | Local/cluster workspace identity. |
 | `toolSurfaceRefs` | Agent tool surfaces such as OpenCLAW/OpenClaw, Hermes, Codex, Claude Code, local shell, GitHub bot, or CI bot. |
+
+---
+
+## Agentic PR Work Order (`agentic-pr-work-order.schema.v0.1.json`)
+
+`AgenticPRWorkOrder` is the issue-scoped contract for agent-produced pull requests. It records the objective, authority split, expected files, denied paths, validation requirements, review checklist, PR output requirements, policy references, and ledger fields for an implementation tranche.
+
+The contract exists to keep implementation agents bounded. An implementation agent may propose a draft PR, but the work order requires separate review and merge-gate authority.
+
+Key fields:
+
+| Field | Purpose |
+|---|---|
+| `spec.authority.implementationAgent` | Actor allowed to produce a bounded patch. |
+| `spec.authority.reviewAgent` | Actor or role responsible for adversarial review. |
+| `spec.authority.mergeGate` | Policy gate responsible for merge decision. |
+| `spec.authority.separationOfDuties` | Must be `true`; implementation, review, and merge authority stay separate. |
+| `spec.scope.expectedFiles` | File set expected from the issue-scoped tranche. |
+| `spec.scope.deniedPaths` | Generated dependency trees, virtual environments, caches, and build outputs that must not appear in a PR. |
+| `spec.validation.requiredCommands` | Commands or checks the PR must report. |
+| `spec.output.requiredPrSections` | Required PR body sections such as validation, known gaps, self-critique, and policy evidence. |
+| `spec.policyRefs.diffHygieneGate` | Policy Fabric gate or issue that evaluates pre-review diff hygiene. |
+| `spec.ledger.fields` | Minimal fields needed for post-run or post-merge ledger evidence. |
+
+Validated by `tools/validate_agentic_pr_work_order.py`.
 
 ---
 
@@ -211,7 +237,7 @@ Written by `scripts/emit_replay_artifact.py`.
 | `executor` | string | Chosen executor name |
 | `backendIntent` | enum | `qemu`, `microvm`, `lima-process`, `fleet` |
 | `inputs.bundlePath` | string | Path to the bundle directory |
-| `inputs.bundleRev` | string\|null | Git commit SHA of the bundle |
+| `inputs.bundleRev` | string or null | Git commit SHA of the bundle |
 | `inputs.artifactDir` | string | Absolute path to the artifact output directory |
 
 Optional inputs: `policyPackRef`, `policyPackHash`, `secretsRequired`, `upstreamArtifacts.*`.
