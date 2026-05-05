@@ -12,7 +12,6 @@ from __future__ import annotations
 import argparse
 import json
 import subprocess
-import sys
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
@@ -86,11 +85,9 @@ def artifact_result(plan: WorkcellPlan) -> str:
     return "planned"
 
 
-def worktree_status(strategy: str, workspace_path: str | None, allow_side_effects: bool) -> str:
+def worktree_status(strategy: str, workspace_path: str | None) -> str:
     if strategy == "existing":
         return "existing" if workspace_path else "not_created"
-    if allow_side_effects and strategy in {"named", "create-temp"}:
-        return "created"
     return "planned"
 
 
@@ -113,7 +110,7 @@ def build_artifact(plan: WorkcellPlan) -> dict[str, Any]:
             "strategy": plan.strategy,
             "branch": plan.branch,
             "workspacePath": plan.workspace_path,
-            "status": worktree_status(plan.strategy, plan.workspace_path, plan.allow_side_effects),
+            "status": worktree_status(plan.strategy, plan.workspace_path),
             "baseCommit": base_commit,
             "remote": remote,
         },
