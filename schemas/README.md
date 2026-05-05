@@ -24,6 +24,7 @@ All schemas use [JSON Schema Draft 2020-12](https://json-schema.org/specificatio
 | [`network-door-plan-evidence.schema.v0.1.json`](network-door-plan-evidence.schema.v0.1.json) | `NetworkDoorPlanEvidence` | v0.1 | Evidence record for non-mutating SourceOS Network Door route, firewall, mesh, and BYOM planning. |
 | [`external-model-provider-route-evidence.schema.v0.1.json`](external-model-provider-route-evidence.schema.v0.1.json) | `ExternalModelProviderRouteEvidence` | v0.1 | Evidence record for BYOM or enterprise external model provider route planning under policy. |
 | [`native-assistant-bridge-evidence.schema.v0.1.json`](native-assistant-bridge-evidence.schema.v0.1.json) | `NativeAssistantBridgeEvidence` | v0.1 | Evidence record for native assistant bridge planning across Apple App Intents/Siri/Shortcuts, Android, Windows, browser, MCP, or other host/device bridges. |
+| [`policy-fabric-verdict-envelope.schema.v0.1.json`](policy-fabric-verdict-envelope.schema.v0.1.json) | `PolicyFabricVerdictEnvelope` | v0.1 | Execution-side envelope for consuming governed Policy Fabric promotion verdicts. |
 
 ---
 
@@ -198,6 +199,20 @@ It records:
 - side-effect flags proving whether any native assistant or app action occurred.
 
 Native assistant bridge evidence should default to non-mutating plans. Real assistant invocation, reminder/note creation, sharing, cross-device handoff, or personal context reads must be explicit policy-gated side effects.
+
+### PolicyFabricVerdictEnvelope (`policy-fabric-verdict-envelope.schema.v0.1.json`)
+
+Consumed by the interim `scripts/validate_bundle_with_policy_fabric_gate.py` wrapper.
+
+It records the upstream Policy Fabric promotion verdict needed by AgentPlane execution admission:
+
+- policy bundle identity;
+- target domain and optional bundle/lane context;
+- promote or block result;
+- fit classification;
+- failed predicates and reason strings;
+- threshold context;
+- upstream verdict artifact references.
 
 ### ReplayArtifact (`replay-artifact.schema.v0.1.json`)
 
