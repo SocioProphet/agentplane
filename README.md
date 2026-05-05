@@ -129,6 +129,7 @@ agentplane/
 | Executor selection | [docs/executors.md](docs/executors.md) |
 | System space / deployment topology | [docs/system-space.md](docs/system-space.md) |
 | Receipt lifecycle | [docs/receipt-lifecycle.md](docs/receipt-lifecycle.md) |
+| Agent harness runtime contracts | [docs/integration/agent-harness-runtime-contracts.md](docs/integration/agent-harness-runtime-contracts.md) |
 | Sociosphere integration | [docs/integration/sociosphere.md](docs/integration/sociosphere.md) |
 | Network/BYOM/native assistant evidence | [docs/integration/network-native-assistant-evidence.md](docs/integration/network-native-assistant-evidence.md) |
 | State pointer model | [docs/state-pointers.md](docs/state-pointers.md) |
