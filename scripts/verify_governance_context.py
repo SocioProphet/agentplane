@@ -16,11 +16,18 @@ def main() -> int:
     gc_schema = load(schema_root / 'governance-context.schema.v0.1.json')
     bundle = load(root / 'bundles' / 'example-agent' / 'bundle.json')
     gc = load(root / 'examples' / 'governance' / 'governance-context.example.json')
+
+    spec = bundle.get('spec') or {}
+    bundle_gc = spec.get('governanceContext')
+    if not isinstance(bundle_gc, dict):
+        raise SystemExit('[verify-governance] ERROR: bundles/example-agent/bundle.json must define spec.governanceContext')
+
     resolver_store = {
         'governance-context.schema.v0.1.json': gc_schema,
         (schema_root / 'governance-context.schema.v0.1.json').as_uri(): gc_schema,
     }
     jsonschema.validate(gc, gc_schema)
+    jsonschema.validate(bundle_gc, gc_schema)
     jsonschema.Draft202012Validator(
         bundle_schema,
         resolver=jsonschema.RefResolver.from_schema(bundle_schema, store=resolver_store),
