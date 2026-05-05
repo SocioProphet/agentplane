@@ -1,0 +1,104 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Agentplane GuardedWorkcellArtifact v0.1",
+  "type": "object",
+  "required": [
+    "kind",
+    "bundle",
+    "capturedAt",
+    "sessionRef",
+    "taskRef",
+    "repo",
+    "baseRef",
+    "worktree",
+    "guardrail",
+    "stopGate",
+    "runtime",
+    "result",
+    "sideEffects"
+  ],
+  "properties": {
+    "kind": { "const": "GuardedWorkcellArtifact" },
+    "bundle": { "type": "string" },
+    "capturedAt": { "type": "string", "format": "date-time" },
+    "sessionRef": { "type": "string" },
+    "taskRef": { "type": "string" },
+    "repo": { "type": "string" },
+    "baseRef": { "type": "string" },
+    "worktree": {
+      "type": "object",
+      "required": ["strategy", "branch", "workspacePath", "status"],
+      "properties": {
+        "strategy": { "enum": ["plan-only", "existing", "named", "create-temp"] },
+        "branch": { "type": "string" },
+        "workspacePath": { "type": ["string", "null"] },
+        "status": { "enum": ["planned", "existing", "created", "not_created"] },
+        "baseCommit": { "type": ["string", "null"] },
+        "remote": { "type": ["string", "null"] }
+      },
+      "additionalProperties": false
+    },
+    "guardrail": {
+      "type": "object",
+      "required": ["enabled", "adapter", "hookCommand", "decisionLogRef"],
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "adapter": { "type": "string" },
+        "hookCommand": { "type": ["string", "null"] },
+        "decisionLogRef": { "type": ["string", "null"] },
+        "policyPackRef": { "type": ["string", "null"] },
+        "policyDecisionArtifactSchemaRef": { "type": ["string", "null"] }
+      },
+      "additionalProperties": false
+    },
+    "stopGate": {
+      "type": "object",
+      "required": ["enabled", "evaluatorCommand", "artifactRef"],
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "evaluatorCommand": { "type": ["string", "null"] },
+        "artifactRef": { "type": ["string", "null"] },
+        "schemaRef": { "type": ["string", "null"] }
+      },
+      "additionalProperties": false
+    },
+    "runtime": {
+      "type": "object",
+      "required": ["executor", "profileRef"],
+      "properties": {
+        "executor": { "type": "string" },
+        "profileRef": { "type": ["string", "null"] },
+        "environmentRef": { "type": ["string", "null"] },
+        "agentCommand": { "type": ["string", "null"] }
+      },
+      "additionalProperties": false
+    },
+    "result": { "enum": ["planned", "ready", "blocked", "needs_human"] },
+    "sideEffects": {
+      "type": "object",
+      "required": ["gitWorktreeCreated", "branchCreated", "externalMutationPerformed", "agentInvoked"],
+      "properties": {
+        "gitWorktreeCreated": { "type": "boolean" },
+        "branchCreated": { "type": "boolean" },
+        "externalMutationPerformed": { "type": "boolean" },
+        "agentInvoked": { "type": "boolean" }
+      },
+      "additionalProperties": false
+    },
+    "artifactRefs": {
+      "type": "object",
+      "properties": {
+        "policyDecisionArtifactRef": { "type": ["string", "null"] },
+        "stopGateArtifactRef": { "type": ["string", "null"] },
+        "sessionArtifactRef": { "type": ["string", "null"] },
+        "replayArtifactRef": { "type": ["string", "null"] }
+      },
+      "additionalProperties": false
+    },
+    "governanceContext": {
+      "type": ["object", "null"],
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": false
+}
