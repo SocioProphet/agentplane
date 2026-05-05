@@ -1,6 +1,6 @@
-.PHONY: validate test validate-governance-context validate-lattice-data-governai-execution-refs validate-lattice-runtime-profile-refs validate-network-native-assistant-evidence validate-guardrail-evidence-artifacts
+.PHONY: validate test validate-governance-context validate-lattice-data-governai-execution-refs validate-lattice-runtime-profile-refs validate-network-native-assistant-evidence validate-guardrail-evidence-artifacts validate-stop-gate-evaluator
 
-validate: validate-governance-context validate-lattice-data-governai-execution-refs validate-lattice-runtime-profile-refs validate-network-native-assistant-evidence validate-guardrail-evidence-artifacts
+validate: validate-governance-context validate-lattice-data-governai-execution-refs validate-lattice-runtime-profile-refs validate-network-native-assistant-evidence validate-guardrail-evidence-artifacts validate-stop-gate-evaluator
 	python3 tools/validate_execution_timing.py
 
 validate-governance-context:
@@ -17,6 +17,9 @@ validate-network-native-assistant-evidence:
 
 validate-guardrail-evidence-artifacts:
 	python3 tools/validate_guardrail_evidence_artifacts.py
+
+validate-stop-gate-evaluator:
+	python3 tools/validate_stop_gate_evaluator.py
 
 test:
 	python3 -m pytest -q tools/tests
