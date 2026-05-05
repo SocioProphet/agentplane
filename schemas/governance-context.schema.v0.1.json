@@ -5,114 +5,69 @@
   "properties": {
     "principal": {
       "type": "object",
-      "required": [
-        "spiffe_id",
-        "aum_digest"
-      ],
+      "required": ["spiffe_id", "aum_digest"],
       "properties": {
-        "spiffe_id": {
-          "type": "string",
-          "minLength": 1
-        },
-        "aum_digest": {
-          "type": "string",
-          "pattern": "^sha256:[a-f0-9]{64}$"
-        },
-        "session_id": {
-          "type": [
-            "string",
-            "null"
-          ],
-          "minLength": 6
-        }
+        "spiffe_id": { "type": "string", "minLength": 1 },
+        "aum_digest": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+        "session_id": { "type": ["string", "null"], "minLength": 6 }
       },
       "additionalProperties": false
     },
-    "grantRef": {
-      "type": [
-        "string",
-        "null"
-      ]
+    "protocolIdentityAliases": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "a2a_agent_card_ref": { "type": ["string", "null"], "minLength": 1 },
+        "a2a_task_ref": { "type": ["string", "null"], "minLength": 1 },
+        "mcp_server_ref": { "type": ["string", "null"], "minLength": 1 },
+        "mcp_tool_ref": { "type": ["string", "null"], "minLength": 1 },
+        "mcp_resource_ref": { "type": ["string", "null"], "minLength": 1 },
+        "anp_agent_ref": { "type": ["string", "null"], "minLength": 1 },
+        "anp_service_ref": { "type": ["string", "null"], "minLength": 1 },
+        "agui_session_ref": { "type": ["string", "null"], "minLength": 1 },
+        "agui_component_ref": { "type": ["string", "null"], "minLength": 1 },
+        "agui_event_ref": { "type": ["string", "null"], "minLength": 1 },
+        "aliases": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["protocol", "ref"],
+            "properties": {
+              "protocol": { "type": "string", "enum": ["A2A", "MCP", "ANP", "AG_UI", "OTHER"] },
+              "kind": { "type": ["string", "null"], "minLength": 1 },
+              "ref": { "type": "string", "minLength": 1 },
+              "hash": { "type": ["string", "null"], "pattern": "^sha256:[a-f0-9]{64}$" }
+            }
+          },
+          "default": []
+        }
+      }
     },
-    "policyDecisionRef": {
-      "type": [
-        "string",
-        "null"
-      ]
-    },
-    "policyHash": {
-      "type": [
-        "string",
-        "null"
-      ],
-      "pattern": "^sha256:[a-f0-9]{64}$"
-    },
+    "grantRef": { "type": ["string", "null"] },
+    "policyDecisionRef": { "type": ["string", "null"] },
+    "policyHash": { "type": ["string", "null"], "pattern": "^sha256:[a-f0-9]{64}$" },
     "runtimeEvidence": {
       "type": "object",
       "properties": {
-        "eventIrRef": {
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "proofArtifactRef": {
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "hdtDecisionSummaryRef": {
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "attestationBundleRef": {
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "transportReceiptRef": {
-          "type": [
-            "string",
-            "null"
-          ]
-        }
+        "eventIrRef": { "type": ["string", "null"] },
+        "proofArtifactRef": { "type": ["string", "null"] },
+        "hdtDecisionSummaryRef": { "type": ["string", "null"] },
+        "attestationBundleRef": { "type": ["string", "null"] },
+        "transportReceiptRef": { "type": ["string", "null"] }
       },
       "additionalProperties": false
     },
     "controlMatrix": {
       "type": "object",
       "properties": {
-        "rowIds": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "default": []
-        },
-        "exceptionRefs": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "default": []
-        },
-        "incidentRefs": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "default": []
-        }
+        "rowIds": { "type": "array", "items": { "type": "string" }, "default": [] },
+        "exceptionRefs": { "type": "array", "items": { "type": "string" }, "default": [] },
+        "incidentRefs": { "type": "array", "items": { "type": "string" }, "default": [] }
       },
       "additionalProperties": false
     }
   },
-  "required": [
-    "principal"
-  ],
+  "required": ["principal"],
   "additionalProperties": false
 }
