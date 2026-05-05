@@ -1,0 +1,85 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Agentplane PolicyDecisionArtifact v0.1",
+  "type": "object",
+  "required": [
+    "kind",
+    "bundle",
+    "capturedAt",
+    "sessionRef",
+    "source",
+    "decision",
+    "result"
+  ],
+  "properties": {
+    "kind": { "const": "PolicyDecisionArtifact" },
+    "bundle": { "type": "string" },
+    "capturedAt": { "type": "string", "format": "date-time" },
+    "sessionRef": { "type": "string" },
+    "taskRef": { "type": ["string", "null"] },
+    "source": {
+      "type": "object",
+      "required": ["system", "adapter"],
+      "properties": {
+        "system": { "const": "guardrail-fabric" },
+        "adapter": { "type": "string" },
+        "version": { "type": ["string", "null"] },
+        "repoRef": { "type": ["string", "null"] },
+        "commit": { "type": ["string", "null"] }
+      },
+      "additionalProperties": false
+    },
+    "decision": {
+      "type": "object",
+      "required": [
+        "schema",
+        "decisionId",
+        "timestamp",
+        "policyId",
+        "policyVersion",
+        "scope",
+        "severity",
+        "decision",
+        "reason",
+        "remediation",
+        "evidence",
+        "effects"
+      ],
+      "properties": {
+        "schema": { "const": "sourceos.guardrail.decision.v0.1" },
+        "decisionId": { "type": "string" },
+        "timestamp": { "type": "string", "format": "date-time" },
+        "policyId": { "type": "string" },
+        "policyVersion": { "type": "string" },
+        "policyHash": { "type": ["string", "null"] },
+        "scope": { "enum": ["user", "local", "repo", "org", "enterprise", "runtime"] },
+        "severity": { "enum": ["info", "low", "medium", "high", "critical"] },
+        "decision": { "enum": ["allow", "allow_with_context", "instruct", "deny", "redact", "escalate", "quarantine", "defer"] },
+        "reason": { "type": "string" },
+        "remediation": { "type": "string" },
+        "evidence": { "type": "object", "additionalProperties": true },
+        "effects": { "type": "object", "additionalProperties": true }
+      },
+      "additionalProperties": true
+    },
+    "result": {
+      "description": "AgentPlane-level interpretation of the guardrail decision.",
+      "enum": ["allow", "blocked", "needs_human", "redacted", "quarantined", "deferred"]
+    },
+    "artifactRefs": {
+      "type": "object",
+      "properties": {
+        "decisionLogRef": { "type": ["string", "null"] },
+        "toolEventRef": { "type": ["string", "null"] },
+        "redactionRef": { "type": ["string", "null"] },
+        "humanOverrideRef": { "type": ["string", "null"] }
+      },
+      "additionalProperties": false
+    },
+    "governanceContext": {
+      "type": ["object", "null"],
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": false
+}

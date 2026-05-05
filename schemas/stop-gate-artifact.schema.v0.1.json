@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Agentplane StopGateArtifact v0.1",
+  "type": "object",
+  "required": [
+    "kind",
+    "bundle",
+    "capturedAt",
+    "sessionRef",
+    "gateId",
+    "gateName",
+    "result",
+    "checks"
+  ],
+  "properties": {
+    "kind": { "const": "StopGateArtifact" },
+    "bundle": { "type": "string" },
+    "capturedAt": { "type": "string", "format": "date-time" },
+    "sessionRef": { "type": "string" },
+    "taskRef": { "type": ["string", "null"] },
+    "gateId": { "type": "string" },
+    "gateName": { "type": "string" },
+    "gatePolicyRef": { "type": ["string", "null"] },
+    "result": {
+      "description": "Final AgentPlane interpretation of the stop gate.",
+      "enum": ["pass", "fail", "needs_human", "waived", "not_applicable"]
+    },
+    "summary": { "type": ["string", "null"] },
+    "checks": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["checkId", "name", "result", "required"],
+        "properties": {
+          "checkId": { "type": "string" },
+          "name": { "type": "string" },
+          "result": { "enum": ["pass", "fail", "needs_human", "waived", "not_applicable"] },
+          "required": { "type": "boolean" },
+          "reason": { "type": ["string", "null"] },
+          "remediation": { "type": ["string", "null"] },
+          "evidenceRefs": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "relatedPolicyDecisionRefs": {
+            "type": "array",
+            "items": { "type": "string" }
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "humanOverrideRef": { "type": ["string", "null"] },
+    "artifactRefs": {
+      "type": "object",
+      "properties": {
+        "policyDecisionArtifactRefs": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "runArtifactRef": { "type": ["string", "null"] },
+        "replayArtifactRef": { "type": ["string", "null"] },
+        "pullRequestRef": { "type": ["string", "null"] },
+        "ciStatusRef": { "type": ["string", "null"] },
+        "summaryRef": { "type": ["string", "null"] }
+      },
+      "additionalProperties": false
+    },
+    "governanceContext": {
+      "type": ["object", "null"],
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": false
+}
