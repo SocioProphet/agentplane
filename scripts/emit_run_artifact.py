@@ -201,6 +201,8 @@ def main() -> int:
     md = b.get("metadata") or {}
     spec = b.get("spec") or {}
 
+    governance_context = spec.get("governanceContext") if isinstance(spec.get("governanceContext"), dict) else None
+
     name = md.get("name")
     ver = md.get("version")
     if not name or not ver:
@@ -240,6 +242,9 @@ def main() -> int:
         "sourceosBindings": extract_sourceos_bindings(spec),
         "sourceosImageProduction": extract_sourceos_image_production(spec),
     }
+
+    if governance_context is not None:
+        artifact["governanceContext"] = governance_context
 
     out = Path(out_dir)
     out.mkdir(parents=True, exist_ok=True)
