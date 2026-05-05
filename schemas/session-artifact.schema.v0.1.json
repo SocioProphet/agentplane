@@ -51,6 +51,14 @@
         "string",
         "null"
       ]
+    },
+    "governanceContext": {
+      "description": "Governance context copied from Bundle.spec.governanceContext when present.",
+      "type": [
+        "object",
+        "null"
+      ],
+      "additionalProperties": true
     }
   },
   "additionalProperties": false

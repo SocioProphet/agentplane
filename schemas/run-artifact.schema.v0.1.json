@@ -15,6 +15,11 @@
     "exitCode": { "type": "integer" },
     "stdoutRef": { "type": ["string", "null"] },
     "stderrRef": { "type": ["string", "null"] },
+    "governanceContext": {
+      "description": "Governance context copied from Bundle.spec.governanceContext when present.",
+      "type": "object",
+      "additionalProperties": true
+    },
     "upstreamArtifacts": {
       "type": "object",
       "properties": {

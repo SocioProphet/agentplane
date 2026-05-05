@@ -190,6 +190,8 @@ def main() -> int:
     md = b.get("metadata") or {}
     spec = b.get("spec") or {}
 
+    governance_context = spec.get("governanceContext") if isinstance(spec.get("governanceContext"), dict) else None
+
     name = md.get("name")
     ver = md.get("version")
     if not name or not ver:
@@ -213,23 +215,27 @@ def main() -> int:
         "taskRunRefs": [p for p in (os.getenv("SOCIOSPHERE_TASK_RUN_REFS") or "").split(",") if p],
     }
 
+    inputs = {
+        "bundlePath": args.bundle_path or str(bundle_path),
+        "bundleRev": args.bundle_rev,
+        "artifactDir": str(Path(out_dir).resolve()),
+        "policyPackRef": pol.get("policyPackRef"),
+        "policyPackHash": pol.get("policyPackHash"),
+        "secretsRequired": secrets.get("required") or [],
+        "upstreamArtifacts": upstream,
+        "sourceosBindings": extract_sourceos_bindings(spec),
+        "sourceosImageProduction": extract_sourceos_image_production(spec),
+    }
+    if governance_context is not None:
+        inputs["governanceContext"] = governance_context
+
     artifact = {
         "kind": "ReplayArtifact",
         "bundle": f"{name}@{ver}",
         "capturedAt": now_iso(),
         "executor": args.executor,
         "backendIntent": backend,
-        "inputs": {
-            "bundlePath": args.bundle_path or str(bundle_path),
-            "bundleRev": args.bundle_rev,
-            "artifactDir": str(Path(out_dir).resolve()),
-            "policyPackRef": pol.get("policyPackRef"),
-            "policyPackHash": pol.get("policyPackHash"),
-            "secretsRequired": secrets.get("required") or [],
-            "upstreamArtifacts": upstream,
-            "sourceosBindings": extract_sourceos_bindings(spec),
-            "sourceosImageProduction": extract_sourceos_image_production(spec),
-        },
+        "inputs": inputs,
     }
 
     out = Path(out_dir)

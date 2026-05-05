@@ -165,6 +165,7 @@ def main() -> int:
 
     md = b.get("metadata") or {}
     spec = b.get("spec") or {}
+    governance_context = spec.get("governanceContext") if isinstance(spec.get("governanceContext"), dict) else None
 
     for k in ("name", "version", "createdAt"):
         if k not in md:
@@ -270,6 +271,8 @@ def main() -> int:
             "requiresBacktrackingCapability": gate_artifact["gateContext"].get("requires_backtracking_capability"),
         },
     }
+    if governance_context is not None:
+        report["governanceContext"] = governance_context
     report_path = os.path.join(out_dir, "validation-artifact.json")
     with open(report_path, "w", encoding="utf-8") as f:
         json.dump(report, f, indent=2, sort_keys=True)
