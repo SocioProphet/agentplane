@@ -1,0 +1,9 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "Patch fragment documenting the governanceContext property to add under Bundle.spec in schemas/bundle.schema.v0.1.json.",
+  "spec": {
+    "governanceContext": {
+      "$ref": "governance-context.schema.v0.1.json"
+    }
+  }
+}
