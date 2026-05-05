@@ -2,12 +2,14 @@ from __future__ import annotations
 
 import importlib.util
 import json
+import sys
 from pathlib import Path
 
 MODULE_PATH = Path(__file__).resolve().parents[1] / "evaluate_stop_gate.py"
 spec = importlib.util.spec_from_file_location("evaluate_stop_gate", MODULE_PATH)
 assert spec is not None and spec.loader is not None
 module = importlib.util.module_from_spec(spec)
+sys.modules["evaluate_stop_gate"] = module
 spec.loader.exec_module(module)
 
 RepoState = module.RepoState
