@@ -1,0 +1,120 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://socioprophet.io/schemas/agentplane/agent-harness-runtime-contracts.schema.v0.1.json",
+  "title": "AgentHarnessRuntimeContracts",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "kind",
+    "outcomeSpec",
+    "graphSpec",
+    "sessionEnvelope",
+    "evidencePack",
+    "promotionGate"
+  ],
+  "properties": {
+    "schemaVersion": { "const": "v0.1" },
+    "kind": { "const": "AgentHarnessRuntimeContracts" },
+    "outcomeSpec": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["outcomeId", "title", "riskTier", "successCriteria", "evidenceRequirements"],
+      "properties": {
+        "outcomeId": { "type": "string" },
+        "title": { "type": "string" },
+        "riskTier": { "type": "string", "enum": ["low", "medium", "high", "critical"] },
+        "budgetRef": { "type": "string" },
+        "successCriteria": { "type": "array", "items": { "type": "string" } },
+        "hardConstraints": { "type": "array", "items": { "type": "string" } },
+        "evidenceRequirements": { "type": "array", "items": { "type": "string" } },
+        "deliveryExcellenceRef": { "type": "string" }
+      }
+    },
+    "graphSpec": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["graphId", "outcomeRef", "nodes", "edges"],
+      "properties": {
+        "graphId": { "type": "string" },
+        "outcomeRef": { "type": "string" },
+        "nodes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["nodeId", "nodeType", "purpose"],
+            "properties": {
+              "nodeId": { "type": "string" },
+              "nodeType": {
+                "type": "string",
+                "enum": ["deterministic-task", "llm-loop", "router", "tool-call", "browser-worker", "terminal-worker", "connector-action", "policy-check", "judge-eval", "human-approval", "artifact-transform", "replay", "promotion-gate"]
+              },
+              "purpose": { "type": "string" },
+              "policyGateRef": { "type": "string" },
+              "evidenceRequirementRef": { "type": "string" }
+            }
+          }
+        },
+        "edges": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["from", "to", "edgeType"],
+            "properties": {
+              "from": { "type": "string" },
+              "to": { "type": "string" },
+              "edgeType": { "type": "string", "enum": ["always", "on-success", "on-failure", "conditional", "policy-decision", "human-decision", "judge-decision", "retry-backoff", "abort-escalate"] }
+            }
+          }
+        }
+      }
+    },
+    "sessionEnvelope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sessionId", "runId", "workspaceRef", "graphRef", "policyVersionRef", "eventStreamRef"],
+      "properties": {
+        "sessionId": { "type": "string" },
+        "runId": { "type": "string" },
+        "workspaceRef": { "type": "string" },
+        "graphRef": { "type": "string" },
+        "policyVersionRef": { "type": "string" },
+        "memorySnapshotRef": { "type": "string" },
+        "eventStreamRef": { "type": "string" },
+        "state": { "type": "string", "enum": ["planned", "running", "paused", "completed", "failed", "cancelled"] }
+      }
+    },
+    "evidencePack": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["evidencePackId", "runRef", "artifactRefs", "policyDecisionRefs", "deliveryMetricRefs"],
+      "properties": {
+        "evidencePackId": { "type": "string" },
+        "runRef": { "type": "string" },
+        "artifactRefs": { "type": "array", "items": { "type": "string" } },
+        "policyDecisionRefs": { "type": "array", "items": { "type": "string" } },
+        "humanControlEventRefs": { "type": "array", "items": { "type": "string" } },
+        "deliveryMetricRefs": { "type": "array", "items": { "type": "string" } },
+        "knownGaps": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "promotionGate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["promotionId", "subjectRef", "evidencePackRef", "decision"],
+      "properties": {
+        "promotionId": { "type": "string" },
+        "subjectRef": { "type": "string" },
+        "evidencePackRef": { "type": "string" },
+        "validationResult": { "type": "string", "enum": ["pass", "fail", "not-run"] },
+        "replayResult": { "type": "string", "enum": ["pass", "fail", "not-run"] },
+        "policyResult": { "type": "string", "enum": ["pass", "fail", "not-run"] },
+        "securityResult": { "type": "string", "enum": ["pass", "fail", "not-run"] },
+        "decision": { "type": "string", "enum": ["promote", "hold", "reject", "rework"] },
+        "decisionActorRef": { "type": "string" }
+      }
+    }
+  }
+}
