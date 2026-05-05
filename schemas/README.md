@@ -16,6 +16,8 @@ All schemas use [JSON Schema Draft 2020-12](https://json-schema.org/specificatio
 | [`run-artifact.schema.v0.1.json`](run-artifact.schema.v0.1.json) | `RunArtifact` | v0.1 | Evidence record of a completed run. |
 | [`replay-artifact.schema.v0.1.json`](replay-artifact.schema.v0.1.json) | `ReplayArtifact` | v0.1 | Inputs needed for deterministic replay. |
 | [`session-artifact.schema.v0.1.json`](session-artifact.schema.v0.1.json) | `SessionArtifact` | v0.1 | Session-level lifecycle record (status, receipt/run/replay refs). |
+| [`policy-decision-artifact.schema.v0.1.json`](policy-decision-artifact.schema.v0.1.json) | `PolicyDecisionArtifact` | v0.1 | AgentPlane evidence wrapper for SourceOS guardrail-fabric policy decisions. |
+| [`stop-gate-artifact.schema.v0.1.json`](stop-gate-artifact.schema.v0.1.json) | `StopGateArtifact` | v0.1 | Evidence record for agent completion gates, false-done prevention, and human override posture. |
 | [`promotion-artifact.schema.v0.1.json`](promotion-artifact.schema.v0.1.json) | `PromotionArtifact` | v0.1 | Evidence record of a bundle promotion event. |
 | [`reversal-artifact.schema.v0.1.json`](reversal-artifact.schema.v0.1.json) | `ReversalArtifact` | v0.1 | Evidence record of a rollback/reversal event. |
 | [`placement-decision.schema.v0.1.json`](placement-decision.schema.v0.1.json) | `PlacementDecision` | v0.1 | Executor placement decision and rejection record. |
@@ -112,6 +114,36 @@ Written by `scripts/emit_run_artifact.py` and by `runners/qemu-local.sh`.
 | `exitCode` | integer | Process exit code |
 
 Optional: `bundlePath`, `stdoutRef`, `stderrRef`, `upstreamArtifacts.*`.
+
+### PolicyDecisionArtifact (`policy-decision-artifact.schema.v0.1.json`)
+
+Wraps a `sourceos.guardrail.decision.v0.1` decision emitted by `SocioProphet/guardrail-fabric` so AgentPlane can treat policy decisions as first-class evidence.
+
+It records:
+
+- AgentPlane session/task refs;
+- guardrail source system, adapter, version, repo, and commit;
+- embedded SourceOS policy decision artifact;
+- AgentPlane result interpretation (`allow`, `blocked`, `needs_human`, `redacted`, `quarantined`, or `deferred`);
+- decision log, tool event, redaction, and human override refs;
+- optional governance context.
+
+AgentPlane should not reimplement guardrail policy logic. It should ingest and preserve the decision, then use the interpreted result for stop gates and runtime transitions.
+
+### StopGateArtifact (`stop-gate-artifact.schema.v0.1.json`)
+
+Records the evidence behind an agent completion gate. Stop gates prevent false-done completion by requiring branch, commit, push, PR, CI, policy, summary, and human-review evidence where applicable.
+
+It records:
+
+- session/task refs;
+- gate identity and policy ref;
+- final result (`pass`, `fail`, `needs_human`, `waived`, or `not_applicable`);
+- per-check result, reason, remediation, evidence refs, and related policy decision refs;
+- optional human override ref;
+- related policy decision, run, replay, PR, CI, and summary artifact refs.
+
+A stop gate that fails should produce actionable remediation rather than a generic blocked state.
 
 ### AgentMachineMountEvidence (`agent-machine-mount-evidence.schema.v0.1.json`)
 
