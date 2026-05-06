@@ -20,6 +20,7 @@ All schemas use [JSON Schema Draft 2020-12](https://json-schema.org/specificatio
 | [`reversal-artifact.schema.v0.1.json`](reversal-artifact.schema.v0.1.json) | `ReversalArtifact` | v0.1 | Evidence record of a rollback/reversal event. |
 | [`placement-decision.schema.v0.1.json`](placement-decision.schema.v0.1.json) | `PlacementDecision` | v0.1 | Executor placement decision and rejection record. |
 | [`agent-machine-mount-evidence.schema.v0.1.json`](agent-machine-mount-evidence.schema.v0.1.json) | `AgentMachineMountEvidence` | v0.1 | Evidence record for SourceOS Agent Machine local data-plane mounts and optional TopoLVM placement metadata. |
+| [`sourceos-context-tool-provider-evidence.schema.v0.1.json`](sourceos-context-tool-provider-evidence.schema.v0.1.json) | `SourceOSContextToolProviderEvidence` | v0.1 | Evidence record registering `sourceos-context` as a constrained, non-mutating local tool provider. |
 | [`office-artifact-evidence.schema.v0.1.json`](office-artifact-evidence.schema.v0.1.json) | `OfficeArtifactEvidence` | v0.1 | Evidence record for Prophet Workspace OfficeArtifact generation, inspection, conversion, review, or publishing actions. |
 | [`network-door-plan-evidence.schema.v0.1.json`](network-door-plan-evidence.schema.v0.1.json) | `NetworkDoorPlanEvidence` | v0.1 | Evidence record for non-mutating SourceOS Network Door route, firewall, mesh, and BYOM planning. |
 | [`external-model-provider-route-evidence.schema.v0.1.json`](external-model-provider-route-evidence.schema.v0.1.json) | `ExternalModelProviderRouteEvidence` | v0.1 | Evidence record for BYOM or enterprise external model provider route planning under policy. |
@@ -129,6 +130,21 @@ It records:
 - redaction summary.
 
 Browser downloads are intentionally represented as a distinct path class. Downloaded artifacts should be hashed, and promotion into code or document-output space should emit separate evidence.
+
+### SourceOSContextToolProviderEvidence (`sourceos-context-tool-provider-evidence.schema.v0.1.json`)
+
+Registers `sourceos-context` as a constrained local tool provider.
+
+It records:
+
+- provider identity (`smart-tree-context-provider`);
+- policy profile (`sourceos.repo_context.read_only`);
+- allowed and denied capabilities;
+- integration targets: Lampstand, Sherlock, Memory Mesh, and Policy Fabric;
+- side-effect flags proving the provider is non-mutating by default;
+- the requirement that Lampstand publishing needs an explicit flag.
+
+This evidence does not dispatch a run. It is a registration/control-plane artifact for later AgentPlane routing.
 
 ### OfficeArtifactEvidence (`office-artifact-evidence.schema.v0.1.json`)
 
