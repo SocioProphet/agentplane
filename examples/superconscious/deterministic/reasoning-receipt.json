@@ -1,0 +1,17 @@
+{
+  "id": "urn:srcos:receipt:reasoning:agentplane-fixture",
+  "type": "ReasoningReceipt",
+  "specVersion": "2.0.0",
+  "runRef": "urn:srcos:reasoning-run:agentplane-fixture",
+  "taskRef": "urn:srcos:reasoning-task:agentplane-fixture",
+  "status": "completed",
+  "traceHash": "sha256:agentplane-fixture-trace",
+  "coordination": {
+    "policy": "allowed-safe-deterministic-mode",
+    "modelRoute": "deterministic-stub-route",
+    "memory": "proposal-only",
+    "approval": "not-required"
+  },
+  "replayClass": "exact",
+  "capturedAt": "2026-05-05T00:00:01Z"
+}
