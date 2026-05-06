@@ -1,0 +1,21 @@
+{
+  "id": "urn:srcos:reasoning-benchmark:agentplane-fixture",
+  "type": "ReasoningBenchmark",
+  "specVersion": "2.0.0",
+  "runRef": "urn:srcos:reasoning-run:agentplane-fixture",
+  "suite": "m1-deterministic-smoke",
+  "passed": true,
+  "assertions": [
+    {
+      "name": "run-completed",
+      "passed": true,
+      "summary": "The reasoning run reached completed status."
+    },
+    {
+      "name": "safe-trace-only",
+      "passed": true,
+      "summary": "The reasoning run emitted safe operational trace metadata only."
+    }
+  ],
+  "capturedAt": "2026-05-05T00:00:01Z"
+}
