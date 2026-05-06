@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.socioprophet.org/agentplane/sourceos-context-tool-provider-evidence.schema.v0.1.json",
+  "title": "SourceOS Context Tool Provider Evidence",
+  "type": "object",
+  "required": [
+    "kind",
+    "apiVersion",
+    "capturedAt",
+    "provider",
+    "trustTier",
+    "policyProfile",
+    "allowedCapabilities",
+    "deniedCapabilities",
+    "integratesWith",
+    "nonMutatingByDefault",
+    "sideEffectFlags",
+    "evidenceRefs"
+  ],
+  "properties": {
+    "kind": { "const": "SourceOSContextToolProviderEvidence" },
+    "apiVersion": { "const": "agentplane.socioprophet.org/v0.1" },
+    "capturedAt": { "type": "string" },
+    "provider": {
+      "type": "object",
+      "required": ["id", "runtime", "sourceRepo"],
+      "properties": {
+        "id": { "const": "smart-tree-context-provider" },
+        "runtime": { "const": "sourceos-context" },
+        "sourceRepo": { "const": "SocioProphet/smart-tree" },
+        "upstreamRepo": { "type": ["string", "null"] }
+      },
+      "additionalProperties": true
+    },
+    "trustTier": { "type": "string", "enum": ["quarantined_read_only", "governed_local_publish", "approved_execution"] },
+    "policyProfile": { "const": "sourceos.repo_context.read_only" },
+    "allowedCapabilities": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+    "deniedCapabilities": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+    "integratesWith": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+    "nonMutatingByDefault": { "const": true },
+    "sideEffectFlags": {
+      "type": "object",
+      "required": ["repoWrites", "hookMutation", "dashboardExposure", "ptySpawn", "externalCallbacks", "nativeMemoryPersistence", "lampstandPublishRequiresExplicitFlag"],
+      "properties": {
+        "repoWrites": { "const": false },
+        "hookMutation": { "const": false },
+        "dashboardExposure": { "const": false },
+        "ptySpawn": { "const": false },
+        "externalCallbacks": { "const": false },
+        "nativeMemoryPersistence": { "const": false },
+        "lampstandPublishRequiresExplicitFlag": { "const": true }
+      },
+      "additionalProperties": true
+    },
+    "evidenceRefs": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+    "notes": { "type": "array", "items": { "type": "string" } }
+  },
+  "additionalProperties": false
+}
