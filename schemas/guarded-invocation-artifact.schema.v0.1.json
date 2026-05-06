@@ -68,6 +68,7 @@
         "required": { "type": "boolean" },
         "evaluated": { "type": "boolean" },
         "artifactRef": { "type": ["string", "null"] },
+        "breakGlassOverrideRef": { "type": ["string", "null"] },
         "result": { "type": ["string", "null"], "enum": ["pass", "fail", "needs_human", "waived", "not_applicable", null] }
       },
       "additionalProperties": false
@@ -92,6 +93,7 @@
         "stdoutRef": { "type": ["string", "null"] },
         "stderrRef": { "type": ["string", "null"] },
         "stopGateArtifactRef": { "type": ["string", "null"] },
+        "breakGlassOverrideRef": { "type": ["string", "null"] },
         "runArtifactRef": { "type": ["string", "null"] },
         "replayArtifactRef": { "type": ["string", "null"] }
       },
