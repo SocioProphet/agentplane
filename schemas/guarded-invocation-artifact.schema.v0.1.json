@@ -1,0 +1,106 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Agentplane GuardedInvocationArtifact v0.1",
+  "type": "object",
+  "required": [
+    "kind",
+    "bundle",
+    "capturedAt",
+    "sessionRef",
+    "taskRef",
+    "workcellArtifactRef",
+    "workspacePath",
+    "command",
+    "invocation",
+    "guardrail",
+    "stopGate",
+    "result",
+    "sideEffects",
+    "artifactRefs"
+  ],
+  "properties": {
+    "kind": { "const": "GuardedInvocationArtifact" },
+    "bundle": { "type": "string" },
+    "capturedAt": { "type": "string", "format": "date-time" },
+    "sessionRef": { "type": "string" },
+    "taskRef": { "type": "string" },
+    "workcellArtifactRef": { "type": "string" },
+    "workspacePath": { "type": "string" },
+    "command": {
+      "type": "object",
+      "required": ["argv", "commandClass", "shell"],
+      "properties": {
+        "argv": { "type": "array", "items": { "type": "string" } },
+        "commandClass": { "enum": ["agent", "test", "tool", "shell", "other"] },
+        "shell": { "type": "boolean" },
+        "cwd": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "invocation": {
+      "type": "object",
+      "required": ["allowed", "startedAt", "completedAt", "exitCode", "status"],
+      "properties": {
+        "allowed": { "type": "boolean" },
+        "startedAt": { "type": ["string", "null"], "format": "date-time" },
+        "completedAt": { "type": ["string", "null"], "format": "date-time" },
+        "exitCode": { "type": ["integer", "null"] },
+        "status": { "enum": ["success", "failure", "blocked", "needs_human"] },
+        "reason": { "type": ["string", "null"] },
+        "remediation": { "type": ["string", "null"] }
+      },
+      "additionalProperties": false
+    },
+    "guardrail": {
+      "type": "object",
+      "required": ["decisionLogRef", "hookCommand", "environment"],
+      "properties": {
+        "decisionLogRef": { "type": ["string", "null"] },
+        "hookCommand": { "type": ["string", "null"] },
+        "environment": { "type": "object", "additionalProperties": { "type": "string" } }
+      },
+      "additionalProperties": false
+    },
+    "stopGate": {
+      "type": "object",
+      "required": ["required", "evaluated", "artifactRef", "result"],
+      "properties": {
+        "required": { "type": "boolean" },
+        "evaluated": { "type": "boolean" },
+        "artifactRef": { "type": ["string", "null"] },
+        "result": { "type": ["string", "null"], "enum": ["pass", "fail", "needs_human", "waived", "not_applicable", null] }
+      },
+      "additionalProperties": false
+    },
+    "result": { "enum": ["success", "failure", "blocked", "needs_human"] },
+    "sideEffects": {
+      "type": "object",
+      "required": ["localCommandExecuted", "agentProcessInvoked", "externalMutationPerformed", "remoteMutationPerformed", "providerContacted"],
+      "properties": {
+        "localCommandExecuted": { "type": "boolean" },
+        "agentProcessInvoked": { "type": "boolean" },
+        "externalMutationPerformed": { "type": "boolean" },
+        "remoteMutationPerformed": { "type": "boolean" },
+        "providerContacted": { "type": "boolean" }
+      },
+      "additionalProperties": false
+    },
+    "artifactRefs": {
+      "type": "object",
+      "required": ["stdoutRef", "stderrRef", "stopGateArtifactRef"],
+      "properties": {
+        "stdoutRef": { "type": ["string", "null"] },
+        "stderrRef": { "type": ["string", "null"] },
+        "stopGateArtifactRef": { "type": ["string", "null"] },
+        "runArtifactRef": { "type": ["string", "null"] },
+        "replayArtifactRef": { "type": ["string", "null"] }
+      },
+      "additionalProperties": false
+    },
+    "governanceContext": {
+      "type": ["object", "null"],
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": false
+}
