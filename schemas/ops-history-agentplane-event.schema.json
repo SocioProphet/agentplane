@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.socioprophet.ai/agentplane/ops-history-agentplane-event.schema.json",
+  "title": "OpsHistoryAgentPlaneEvent",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "eventId",
+    "specVersion",
+    "eventClass",
+    "occurredAt",
+    "agentPlaneArtifactRefs",
+    "policyDecisionRefs"
+  ],
+  "properties": {
+    "eventId": {"type": "string", "pattern": "^urn:srcos:ops-history-event:"},
+    "specVersion": {"type": "string"},
+    "eventClass": {
+      "type": "string",
+      "enum": [
+        "agentplane.validation",
+        "agentplane.placement",
+        "agentplane.run",
+        "agentplane.replay",
+        "artifact.reference",
+        "policy.decision",
+        "redaction.tombstone",
+        "agent.handoff"
+      ]
+    },
+    "occurredAt": {"type": "string", "format": "date-time"},
+    "contextIntakeRef": {"type": ["string", "null"]},
+    "bundleRef": {"type": ["string", "null"]},
+    "agentPlaneArtifactRefs": {"type": "array", "items": {"type": "string"}},
+    "policyDecisionRefs": {"type": "array", "items": {"type": "string"}},
+    "evidenceRefs": {"type": "array", "items": {"type": "string"}, "default": []},
+    "payloadMode": {"type": "string", "enum": ["metadata-only", "summary", "ref-only"], "default": "ref-only"}
+  }
+}
