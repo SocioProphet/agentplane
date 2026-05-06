@@ -1,6 +1,6 @@
-.PHONY: validate test validate-governance-context validate-lattice-data-governai-execution-refs validate-lattice-runtime-profile-refs validate-network-native-assistant-evidence validate-guardrail-evidence-artifacts validate-stop-gate-evaluator validate-guarded-workcell-artifact validate-guarded-workcell-executor
+.PHONY: validate test validate-governance-context validate-lattice-data-governai-execution-refs validate-lattice-runtime-profile-refs validate-network-native-assistant-evidence validate-guardrail-evidence-artifacts validate-stop-gate-evaluator validate-guarded-workcell-artifact validate-guarded-workcell-executor validate-superconscious-reasoning-import
 
-validate: validate-governance-context validate-lattice-data-governai-execution-refs validate-lattice-runtime-profile-refs validate-network-native-assistant-evidence validate-guardrail-evidence-artifacts validate-stop-gate-evaluator validate-guarded-workcell-artifact validate-guarded-workcell-executor
+validate: validate-governance-context validate-lattice-data-governai-execution-refs validate-lattice-runtime-profile-refs validate-network-native-assistant-evidence validate-guardrail-evidence-artifacts validate-stop-gate-evaluator validate-guarded-workcell-artifact validate-guarded-workcell-executor validate-superconscious-reasoning-import
 	python3 tools/validate_execution_timing.py
 
 validate-governance-context:
@@ -26,6 +26,9 @@ validate-guarded-workcell-artifact:
 
 validate-guarded-workcell-executor:
 	python3 tools/validate_guarded_workcell_executor.py
+
+validate-superconscious-reasoning-import:
+	python3 scripts/import_superconscious_reasoning.py examples/superconscious/deterministic >/dev/null
 
 test:
 	python3 -m pytest -q tools/tests
