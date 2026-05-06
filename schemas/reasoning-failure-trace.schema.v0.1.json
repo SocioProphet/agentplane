@@ -1,0 +1,145 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://socioprophet.org/schemas/agentplane/reasoning-failure-trace.v0.1.schema.json",
+  "title": "AgentPlane ReasoningFailureTrace v0.1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "kind",
+    "version",
+    "traceId",
+    "sessionRef",
+    "taskRef",
+    "caseId",
+    "receiptRef",
+    "failureModeRefs",
+    "reasoningTask",
+    "agentRun",
+    "verifier",
+    "invariantChecks",
+    "termination",
+    "annotations",
+    "evidenceRefs",
+    "riskAction"
+  ],
+  "properties": {
+    "kind": { "const": "ReasoningFailureTrace" },
+    "version": { "const": "0.1" },
+    "traceId": { "type": "string", "minLength": 1 },
+    "sessionRef": { "type": "string", "minLength": 1 },
+    "taskRef": { "type": "string", "minLength": 1 },
+    "caseId": { "type": "string", "minLength": 1 },
+    "receiptRef": { "type": "string", "minLength": 1 },
+    "failureModeRefs": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "pattern": "^https://socioprophet\\.github\\.io/ontogenesis/platform/reasoning-failure#"
+      },
+      "uniqueItems": true
+    },
+    "reasoningTask": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["taskClass", "domain", "invariantRef"],
+      "properties": {
+        "taskClass": {
+          "type": "string",
+          "enum": ["exactness", "relation", "code", "causal", "temporal", "multimodal", "embodied", "social", "scientific", "multi-agent", "general"]
+        },
+        "domain": { "type": "string", "minLength": 1 },
+        "invariantRef": { "type": "string", "minLength": 1 }
+      }
+    },
+    "agentRun": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["agentRef", "role", "capabilityEnvelopeRef", "governanceContextRef"],
+      "properties": {
+        "agentRef": { "type": "string", "minLength": 1 },
+        "role": { "type": "string", "minLength": 1 },
+        "capabilityEnvelopeRef": { "type": "string", "minLength": 1 },
+        "governanceContextRef": { "type": "string", "minLength": 1 }
+      }
+    },
+    "verifier": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["verifierRef", "verifierFamily", "required", "result"],
+      "properties": {
+        "verifierRef": { "type": "string", "minLength": 1 },
+        "verifierFamily": {
+          "type": "string",
+          "enum": ["deterministic", "symbolic", "schema", "policy", "tool-backed", "human-review", "llm-judge-advisory"]
+        },
+        "required": { "type": "boolean" },
+        "result": { "type": "string", "enum": ["passed", "failed", "requires-review", "blocked"] }
+      }
+    },
+    "traceSteps": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["stepId", "actorRef", "action", "evidenceRefs"],
+        "properties": {
+          "stepId": { "type": "string", "minLength": 1 },
+          "actorRef": { "type": "string", "minLength": 1 },
+          "action": { "type": "string", "minLength": 1 },
+          "evidenceRefs": { "type": "array", "items": { "type": "string" }, "uniqueItems": true }
+        }
+      }
+    },
+    "invariantChecks": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["invariantRef", "passed", "expected", "observed", "evidenceRef"],
+        "properties": {
+          "invariantRef": { "type": "string", "minLength": 1 },
+          "passed": { "type": "boolean" },
+          "expected": { "type": "string" },
+          "observed": { "type": "string" },
+          "evidenceRef": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "termination": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["terminationAuthorityRef", "candidateStatus", "finalStatus", "reason"],
+      "properties": {
+        "terminationAuthorityRef": { "type": "string", "minLength": 1 },
+        "candidateStatus": { "type": "string", "enum": ["not-candidate", "candidate", "premature-candidate"] },
+        "finalStatus": { "type": "string", "enum": ["open", "needs-review", "blocked", "closed"] },
+        "reason": { "type": "string", "minLength": 1 }
+      }
+    },
+    "annotations": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["annotationId", "cluster", "failureModeRef", "severity"],
+        "properties": {
+          "annotationId": { "type": "string", "minLength": 1 },
+          "cluster": { "type": "string", "enum": ["specification-system-design", "inter-agent-misalignment", "task-verification-termination"] },
+          "failureModeRef": {
+            "type": "string",
+            "pattern": "^https://socioprophet\\.github\\.io/ontogenesis/platform/reasoning-failure#"
+          },
+          "severity": { "type": "string", "enum": ["low", "medium", "high", "critical"] }
+        }
+      }
+    },
+    "evidenceRefs": { "type": "array", "minItems": 1, "items": { "type": "string" }, "uniqueItems": true },
+    "riskAction": {
+      "type": "string",
+      "enum": ["record-only", "warn", "require-tool-verification", "require-independent-verifier", "require-human-review", "quarantine", "block", "rollback", "revoke-authority"]
+    }
+  }
+}
