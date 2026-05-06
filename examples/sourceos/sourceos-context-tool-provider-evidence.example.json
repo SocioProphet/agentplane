@@ -1,0 +1,66 @@
+{
+  "kind": "SourceOSContextToolProviderEvidence",
+  "apiVersion": "agentplane.socioprophet.org/v0.1",
+  "capturedAt": "2026-05-06T00:00:00Z",
+  "provider": {
+    "id": "smart-tree-context-provider",
+    "runtime": "sourceos-context",
+    "sourceRepo": "SocioProphet/smart-tree",
+    "upstreamRepo": "8b-is/smart-tree"
+  },
+  "trustTier": "governed_local_publish",
+  "policyProfile": "sourceos.repo_context.read_only",
+  "allowedCapabilities": [
+    "repo.tree.read",
+    "repo.stats.read",
+    "repo.git_status.read",
+    "repo.security_scan.read",
+    "lampstand.project_root.consume",
+    "lampstand.search_record.publish.local",
+    "memory_mesh.promotion_packet.emit",
+    "sherlock.adapter_record_search.emit"
+  ],
+  "deniedCapabilities": [
+    "repo.write",
+    "hooks.install",
+    "hooks.modify",
+    "dashboard.expose",
+    "dashboard.network_bind",
+    "pty.spawn",
+    "memory.persist.native",
+    "network.callback",
+    "external.update_check",
+    "external.feedback_submit",
+    "desktop.search.bypass_lampstand",
+    "home.scan.unbounded",
+    "system.scan",
+    "symlink.follow"
+  ],
+  "integratesWith": [
+    "SocioProphet/lampstand",
+    "SocioProphet/sherlock-search",
+    "SocioProphet/memory-mesh",
+    "SocioProphet/policy-fabric"
+  ],
+  "nonMutatingByDefault": true,
+  "sideEffectFlags": {
+    "repoWrites": false,
+    "hookMutation": false,
+    "dashboardExposure": false,
+    "ptySpawn": false,
+    "externalCallbacks": false,
+    "nativeMemoryPersistence": false,
+    "lampstandPublishRequiresExplicitFlag": true
+  },
+  "evidenceRefs": [
+    "repo:SocioProphet/smart-tree",
+    "policy:sourceos.repo_context.read_only",
+    "capability:lampstand.search_record.publish.local",
+    "memory-promotion:review_only"
+  ],
+  "notes": [
+    "This evidence registers a constrained local tool provider; it does not dispatch work by itself.",
+    "Lampstand publish remains explicit via --publish.",
+    "Durable Memory Mesh writeback remains review-gated."
+  ]
+}
