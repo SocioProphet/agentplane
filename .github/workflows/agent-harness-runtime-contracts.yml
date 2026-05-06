@@ -1,0 +1,35 @@
+name: Agent Harness Runtime Contracts
+
+on:
+  pull_request:
+    paths:
+      - 'schemas/agent-harness-runtime-contracts.schema.v0.1.json'
+      - 'examples/agent-harness-runtime-contracts.example.json'
+      - 'scripts/validate_agent_harness_runtime_contracts.py'
+      - '.github/workflows/agent-harness-runtime-contracts.yml'
+  push:
+    branches:
+      - main
+    paths:
+      - 'schemas/agent-harness-runtime-contracts.schema.v0.1.json'
+      - 'examples/agent-harness-runtime-contracts.example.json'
+      - 'scripts/validate_agent_harness_runtime_contracts.py'
+      - '.github/workflows/agent-harness-runtime-contracts.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  validate-agent-harness-runtime-contracts:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Validate Agent Harness runtime contracts
+        run: python3 scripts/validate_agent_harness_runtime_contracts.py
