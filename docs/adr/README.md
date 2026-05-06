@@ -17,6 +17,7 @@ ADRs capture significant design decisions, their context, the options considered
 | [ADR-0005](0005-lima-process-kvm-fallback.md) | lima-process fallback when KVM is absent | Accepted |
 | [ADR-0006](0006-narrow-sociosphere-seam.md) | Intentionally narrow sociosphere ↔ agentplane seam | Accepted |
 | [ADR-0007](0007-single-writer-receipt-field-ownership.md) | Single-writer field ownership for receipt assembly | Accepted |
+| [ADR-0008](0008-agent-operation-plane-routing.md) | Route agent execution through Workspace Operation Plane contracts | Accepted |
 
 ---
 

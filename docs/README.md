@@ -18,6 +18,7 @@ Documentation for agentplane.
 | [integration/](integration/README.md) | Per-system integration guides |
 | [instrumentation/live_receipt_integration_plan.md](instrumentation/live_receipt_integration_plan.md) | Live receipt integration plan v0.1 (plan document) |
 | [runtime-governance/control-matrix-integration.md](runtime-governance/control-matrix-integration.md) | Control matrix runtime binding plan (plan document) |
+| [integration/workspace-operation-plane.md](integration/workspace-operation-plane.md) | Routing agent execution through AgentOperationContracts (see ADR-0008) |
 
 ---
 

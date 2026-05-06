@@ -11,6 +11,7 @@ systems in the SocioProphet stack.
 |---|---|---|
 | [sociosphere.md](sociosphere.md) | `sociosphere` | Running a bundle from a sociosphere workspace; passing upstream artifacts |
 | [broker-reasoning-execution-binding.md](broker-reasoning-execution-binding.md) | Broker reasoning | AgentPlane execution and replay binding for broker execution bundles |
+| [workspace-operation-plane.md](workspace-operation-plane.md) | Workspace Operation Plane | Routing agent execution through AgentOperationContracts for observability and governance |
 
 ---
 

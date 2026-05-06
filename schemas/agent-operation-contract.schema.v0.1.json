@@ -1,0 +1,285 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.socioprophet.org/agentplane/agent-operation-contract.schema.v0.1.json",
+  "title": "AgentOperationContract v0.1",
+  "description": "Routes agent execution through the Workspace Operation Plane. Every agent-initiated workspace mutation must produce an AgentOperationContract instead of hidden side effects.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "kind",
+    "operationId",
+    "operationType",
+    "capturedAt",
+    "authority",
+    "lifecycle",
+    "tasks",
+    "events",
+    "artifacts",
+    "policyGate"
+  ],
+  "properties": {
+    "kind": { "const": "AgentOperationContract" },
+    "operationId": {
+      "type": "string",
+      "description": "Unique stable identifier for this operation, used for idempotency and ledger correlation.",
+      "minLength": 1
+    },
+    "operationType": {
+      "type": "string",
+      "description": "The operation command type this contract covers.",
+      "enum": [
+        "agent.patch.propose",
+        "agent.report.create",
+        "agent.metadata.fill",
+        "agent.failure.explain",
+        "agent.remediation.propose",
+        "agent.terminal.assist"
+      ]
+    },
+    "bundle": {
+      "type": ["string", "null"],
+      "description": "Bundle identity (name@version) that initiated this operation, when applicable."
+    },
+    "capturedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO-8601 UTC timestamp at which this contract record was emitted."
+    },
+    "authority": {
+      "type": "object",
+      "description": "Delegated-authority record: the agent acts for a user/org/system under explicit scope, budget, policy profile, and audit level.",
+      "additionalProperties": false,
+      "required": ["actingFor", "scope", "auditLevel"],
+      "properties": {
+        "actingFor": {
+          "type": "string",
+          "description": "Identity (user, org, system) on whose behalf the agent acts.",
+          "minLength": 1
+        },
+        "scope": {
+          "type": "array",
+          "description": "List of explicit capability scopes granted for this operation.",
+          "items": { "type": "string" },
+          "minItems": 1
+        },
+        "budget": {
+          "type": ["object", "null"],
+          "description": "Optional resource budget constraints for the operation.",
+          "additionalProperties": false,
+          "properties": {
+            "maxTokens": { "type": ["integer", "null"] },
+            "maxWallSeconds": { "type": ["integer", "null"] },
+            "maxFilesMutated": { "type": ["integer", "null"] }
+          }
+        },
+        "policyProfileRef": {
+          "type": ["string", "null"],
+          "description": "Reference to the policy profile governing this delegated authority."
+        },
+        "auditLevel": {
+          "type": "string",
+          "description": "How thoroughly this operation must be audited.",
+          "enum": ["full", "summary", "minimal"]
+        }
+      }
+    },
+    "lifecycle": {
+      "type": "object",
+      "description": "Lifecycle state of the operation including idempotency, retry, cancellation, and compensation semantics.",
+      "additionalProperties": false,
+      "required": ["status", "idempotencyKey", "retryable", "retryCount"],
+      "properties": {
+        "status": {
+          "type": "string",
+          "description": "Current lifecycle state of the operation.",
+          "enum": ["created", "in-progress", "completed", "failed", "cancelled", "compensating"]
+        },
+        "startedAt": {
+          "type": ["string", "null"],
+          "format": "date-time"
+        },
+        "completedAt": {
+          "type": ["string", "null"],
+          "format": "date-time"
+        },
+        "idempotencyKey": {
+          "type": "string",
+          "description": "Stable key for idempotent re-submission; repeated submissions with the same key must not duplicate effects.",
+          "minLength": 1
+        },
+        "retryable": {
+          "type": "boolean",
+          "description": "Whether this operation can be retried after a transient failure."
+        },
+        "retryCount": {
+          "type": "integer",
+          "description": "Number of retry attempts so far (0 for the first attempt).",
+          "minimum": 0
+        },
+        "cancellation": {
+          "type": ["object", "null"],
+          "description": "Cancellation evidence when the operation was cancelled.",
+          "additionalProperties": false,
+          "properties": {
+            "cancelledAt": { "type": "string", "format": "date-time" },
+            "cancelledBy": { "type": "string" },
+            "reason": { "type": "string" },
+            "recoverableArtifactRefs": {
+              "type": "array",
+              "description": "Refs to artifacts that can be recovered or reviewed despite cancellation.",
+              "items": { "type": "string" }
+            }
+          }
+        },
+        "compensation": {
+          "type": ["object", "null"],
+          "description": "Compensation record when the operation was rolled back or corrective action was taken.",
+          "additionalProperties": false,
+          "properties": {
+            "compensatedAt": { "type": "string", "format": "date-time" },
+            "compensationType": {
+              "type": "string",
+              "enum": ["rollback", "undo-patch", "archive-artifacts", "manual-review"]
+            },
+            "evidenceRef": { "type": ["string", "null"] }
+          }
+        }
+      }
+    },
+    "tasks": {
+      "type": "array",
+      "description": "OperationTask records: the individual units of work within this operation.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["taskId", "taskType", "status"],
+        "properties": {
+          "taskId": { "type": "string", "minLength": 1 },
+          "taskType": { "type": "string", "minLength": 1 },
+          "status": {
+            "type": "string",
+            "enum": ["pending", "running", "completed", "failed", "cancelled", "skipped"]
+          },
+          "startedAt": { "type": ["string", "null"], "format": "date-time" },
+          "completedAt": { "type": ["string", "null"], "format": "date-time" },
+          "inputRef": { "type": ["string", "null"] },
+          "outputRef": { "type": ["string", "null"] },
+          "notes": { "type": ["string", "null"] }
+        }
+      }
+    },
+    "events": {
+      "type": "array",
+      "description": "OperationEvent records: observable lifecycle events emitted during the operation.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["eventId", "eventType", "emittedAt"],
+        "properties": {
+          "eventId": { "type": "string", "minLength": 1 },
+          "eventType": {
+            "type": "string",
+            "enum": [
+              "created",
+              "updated",
+              "retried",
+              "cancelled",
+              "artifact_emitted",
+              "gate_evaluated",
+              "completed",
+              "failed",
+              "compensation_started",
+              "compensation_completed"
+            ]
+          },
+          "emittedAt": { "type": "string", "format": "date-time" },
+          "data": {
+            "type": ["object", "null"],
+            "additionalProperties": true
+          }
+        }
+      }
+    },
+    "artifacts": {
+      "type": "array",
+      "description": "Agent-created artifacts that must be reviewed/admitted before activation.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["artifactId", "artifactType", "admissionStatus", "createdAt"],
+        "properties": {
+          "artifactId": { "type": "string", "minLength": 1 },
+          "artifactType": {
+            "type": "string",
+            "description": "The kind of artifact produced.",
+            "enum": [
+              "patch",
+              "report",
+              "document",
+              "test-result",
+              "terminal-transcript",
+              "metadata-fill"
+            ]
+          },
+          "admissionStatus": {
+            "type": "string",
+            "description": "Whether this artifact has been admitted for activation. Agents must not activate artifacts directly.",
+            "enum": ["pending-review", "admitted", "rejected", "archived"]
+          },
+          "ref": {
+            "type": ["string", "null"],
+            "description": "Reference (path, URN, or URL) to the artifact content."
+          },
+          "createdAt": { "type": "string", "format": "date-time" },
+          "admittedAt": { "type": ["string", "null"], "format": "date-time" },
+          "admittedBy": { "type": ["string", "null"] }
+        }
+      }
+    },
+    "decisionCard": {
+      "type": ["object", "null"],
+      "description": "DecisionCard: human-readable record of what the agent decided and why.",
+      "additionalProperties": false,
+      "properties": {
+        "decision": { "type": "string", "minLength": 1 },
+        "rationale": { "type": "string", "minLength": 1 },
+        "constraints": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "reviewRequired": { "type": "boolean" },
+        "reviewedBy": { "type": ["string", "null"] },
+        "reviewedAt": { "type": ["string", "null"], "format": "date-time" }
+      }
+    },
+    "policyGate": {
+      "type": "object",
+      "description": "PolicyGateRecord: result of the policy gate check that governed this operation.",
+      "additionalProperties": false,
+      "required": ["evaluated", "result"],
+      "properties": {
+        "evaluated": { "type": "boolean" },
+        "result": {
+          "type": "string",
+          "enum": ["allow", "deny", "pending", "needs_human"]
+        },
+        "policyRef": { "type": ["string", "null"] },
+        "evaluatedAt": { "type": ["string", "null"], "format": "date-time" },
+        "reason": { "type": ["string", "null"] }
+      }
+    },
+    "replayRef": {
+      "type": ["string", "null"],
+      "description": "Reference to the ReplayArtifact for this operation, enabling evidence-based replay."
+    },
+    "ledgerRef": {
+      "type": ["string", "null"],
+      "description": "Reference to the ledger record where this operation's evidence is durably stored."
+    },
+    "governanceContext": {
+      "type": ["object", "null"],
+      "description": "Governance context copied from the triggering Bundle.spec.governanceContext when present.",
+      "additionalProperties": true
+    }
+  }
+}
