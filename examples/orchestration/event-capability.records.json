@@ -1,0 +1,92 @@
+[
+  {
+    "record_id": "record:cool-room-with-fan",
+    "mode": "event-capability-evidence-v0",
+    "event": {
+      "event_id": "event:sensor:living-room-temp-high",
+      "event_type": "sensor.threshold_crossed",
+      "target_node_id": "node:living-room-fan-01",
+      "causality": {
+        "idempotency_key": "idem:event:sensor:living-room-temp-high:capability:cool-room-with-fan:node:living-room-fan-01:policy-epoch-0",
+        "policy_epoch": "policy-epoch-0"
+      }
+    },
+    "capability": {
+      "capability_id": "capability:cool-room-with-fan",
+      "display_name": "Cool room with fan when hot",
+      "effect_class": "low_risk_actuation",
+      "required_policy_outcome": "allowed",
+      "approval_mode": "notify"
+    },
+    "reaction": {
+      "reaction_id": "reaction:cool-room-with-fan",
+      "event_id": "event:sensor:living-room-temp-high",
+      "capability_id": "capability:cool-room-with-fan",
+      "policy_outcome": "allowed",
+      "status": "scheduled",
+      "receipt_refs": ["receipt:event:living-room-temp-high", "receipt:policy:allow-cool-living-room"],
+      "dead_letter_on_failure": true
+    },
+    "evidence_refs": ["receipt:event:living-room-temp-high", "receipt:policy:allow-cool-living-room"]
+  },
+  {
+    "record_id": "record:security-arm-needs-approval",
+    "mode": "event-capability-evidence-v0",
+    "event": {
+      "event_id": "event:agent:propose-arm-security",
+      "event_type": "agent.plan_proposed",
+      "target_node_id": "node:security-system-01",
+      "causality": {
+        "idempotency_key": "idem:event:agent:propose-arm-security:capability:arm-security-system:node:security-system-01:policy-epoch-0",
+        "policy_epoch": "policy-epoch-0"
+      }
+    },
+    "capability": {
+      "capability_id": "capability:arm-security-system",
+      "display_name": "Arm household security system",
+      "effect_class": "high_risk_actuation",
+      "required_policy_outcome": "requires_approval",
+      "approval_mode": "explicit_user_approval"
+    },
+    "reaction": {
+      "reaction_id": "reaction:security-arm-needs-approval",
+      "event_id": "event:agent:propose-arm-security",
+      "capability_id": "capability:arm-security-system",
+      "policy_outcome": "requires_approval",
+      "status": "blocked_or_waiting",
+      "receipt_refs": ["receipt:agent:propose-arm-security", "receipt:policy:requires-approval-arm-security"],
+      "dead_letter_on_failure": true
+    },
+    "evidence_refs": ["receipt:agent:propose-arm-security", "receipt:policy:requires-approval-arm-security"]
+  },
+  {
+    "record_id": "record:block-camera-media-release",
+    "mode": "event-capability-evidence-v0",
+    "event": {
+      "event_id": "event:agent:request-camera-media-release",
+      "event_type": "agent.plan_proposed",
+      "target_node_id": "node:front-door-camera-01",
+      "causality": {
+        "idempotency_key": "idem:event:agent:request-camera-media-release:capability:block-camera-media-release:node:front-door-camera-01:policy-epoch-0",
+        "policy_epoch": "policy-epoch-0"
+      }
+    },
+    "capability": {
+      "capability_id": "capability:block-camera-media-release",
+      "display_name": "Block camera media release",
+      "effect_class": "high_risk_actuation",
+      "required_policy_outcome": "denied",
+      "approval_mode": "not_overridable_in_first_slice"
+    },
+    "reaction": {
+      "reaction_id": "reaction:block-camera-media-release",
+      "event_id": "event:agent:request-camera-media-release",
+      "capability_id": "capability:block-camera-media-release",
+      "policy_outcome": "denied",
+      "status": "blocked_or_waiting",
+      "receipt_refs": ["receipt:policy:deny-camera-media-release"],
+      "dead_letter_on_failure": true
+    },
+    "evidence_refs": ["receipt:policy:deny-camera-media-release"]
+  }
+]
