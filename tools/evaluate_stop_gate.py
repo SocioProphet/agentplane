@@ -2,8 +2,9 @@
 """Evaluate SourceOS agent completion stop gates.
 
 The evaluator emits a StopGateArtifact without reimplementing guardrail policy
-logic. It consumes repo state, CI/PR/summary evidence, and guardrail decision
-logs, then produces actionable pass/fail/needs-human evidence for AgentPlane.
+logic. It consumes repo state, CI/PR/summary evidence, guardrail decision logs,
+and optional PolicyFabric BreakGlassOverride artifacts, then produces actionable
+pass/fail/needs-human/waived evidence for AgentPlane.
 """
 
 from __future__ import annotations
@@ -19,6 +20,8 @@ from typing import Any, Callable
 
 TERMINAL_BLOCKING_DECISIONS = {"deny", "quarantine", "defer", "escalate"}
 DEFAULT_PROTECTED_BRANCHES = ("main", "master", "trunk", "prod", "production")
+POLICYFABRIC_BREAK_GLASS_API = "policy.fabric.break-glass/v1"
+POLICYFABRIC_BREAK_GLASS_KIND = "BreakGlassOverride"
 
 
 @dataclass(frozen=True)
@@ -45,6 +48,18 @@ class RepoState:
 
 
 @dataclass(frozen=True)
+class BreakGlassValidation:
+    ref: str | None = None
+    override_id: str | None = None
+    valid: bool = False
+    reason: str | None = None
+    audit_ref: str | None = None
+    approver_ref: str | None = None
+    action_class: str | None = None
+    resource: str | None = None
+
+
+@dataclass(frozen=True)
 class StopGateConfig:
     bundle: str
     session_ref: str
@@ -58,10 +73,21 @@ class StopGateConfig:
     require_summary: bool = True
     require_decision_log: bool = False
     human_override_ref: str | None = None
+    break_glass: BreakGlassValidation = BreakGlassValidation()
 
 
 def utc_now() -> str:
     return datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
+
+
+def parse_datetime(value: str, field: str) -> datetime:
+    try:
+        parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+    except ValueError as exc:
+        raise ValueError(f"{field} must be ISO-8601 datetime") from exc
+    if parsed.tzinfo is None:
+        parsed = parsed.replace(tzinfo=timezone.utc)
+    return parsed
 
 
 def run_command(args: list[str], cwd: Path) -> CommandResult:
@@ -135,6 +161,72 @@ def inspect_decision_log(path: Path | None) -> list[str]:
             if decision in TERMINAL_BLOCKING_DECISIONS or (decision == "redact" and severity in {"high", "critical"}):
                 unresolved.append(decision_id)
     return unresolved
+
+
+def validate_break_glass_override(path: Path | None, *, now: datetime | None = None) -> BreakGlassValidation:
+    if path is None:
+        return BreakGlassValidation()
+    ref = str(path)
+    if not path.exists():
+        return BreakGlassValidation(ref=ref, valid=False, reason=f"BreakGlassOverride artifact not found: {path}")
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as exc:
+        return BreakGlassValidation(ref=ref, valid=False, reason=f"BreakGlassOverride artifact is invalid JSON: {exc}")
+    if not isinstance(data, dict):
+        return BreakGlassValidation(ref=ref, valid=False, reason="BreakGlassOverride artifact must be a JSON object")
+
+    try:
+        if data.get("apiVersion") != POLICYFABRIC_BREAK_GLASS_API:
+            raise ValueError("apiVersion must be policy.fabric.break-glass/v1")
+        if data.get("kind") != POLICYFABRIC_BREAK_GLASS_KIND:
+            raise ValueError("kind must be BreakGlassOverride")
+        metadata = data["metadata"]
+        spec = data["spec"]
+        status = data["status"]
+        override_id = str(metadata["overrideId"])
+        created_at = parse_datetime(str(metadata["createdAt"]), "metadata.createdAt")
+        expires_at = parse_datetime(str(metadata["expiresAt"]), "metadata.expiresAt")
+        clock = now or datetime.now(timezone.utc)
+        if expires_at <= created_at:
+            raise ValueError("expiresAt must be after createdAt")
+        if expires_at <= clock:
+            raise ValueError("override is expired")
+
+        approver = spec["approver"]
+        if approver.get("type") != "human":
+            raise ValueError("approver.type must be human")
+        if not str(approver.get("id") or "").strip():
+            raise ValueError("approver.id is required")
+        if not str(spec.get("reason") or "").strip():
+            raise ValueError("reason is required")
+        if not str(spec.get("auditRef") or "").strip():
+            raise ValueError("auditRef is required")
+        if spec.get("signature") is None:
+            raise ValueError("signature object is required")
+
+        constraints = spec["constraints"]
+        max_uses = int(constraints["maxUses"])
+        used_count = int(status["usedCount"])
+        if bool(constraints.get("singleUse")) and max_uses != 1:
+            raise ValueError("singleUse overrides must have maxUses=1")
+        if used_count >= max_uses:
+            raise ValueError("override has no remaining uses")
+        if status.get("state") != "active":
+            raise ValueError("override status.state must be active")
+
+        return BreakGlassValidation(
+            ref=ref,
+            override_id=override_id,
+            valid=True,
+            reason="BreakGlassOverride is active, scoped, human-approved, unexpired, and has remaining uses.",
+            audit_ref=str(spec.get("auditRef")),
+            approver_ref=str(approver.get("id")),
+            action_class=str(spec.get("actionClass")),
+            resource=str(spec.get("resource")),
+        )
+    except (KeyError, TypeError, ValueError) as exc:
+        return BreakGlassValidation(ref=ref, valid=False, reason=f"BreakGlassOverride validation failed: {exc}")
 
 
 def make_check(
@@ -223,13 +315,22 @@ def evaluate_checks(config: StopGateConfig, state: RepoState) -> list[dict[str, 
     else:
         checks.append(make_check("guardrail-clear", "No unresolved blocking guardrail decisions", "pass", True, "No unresolved blocking guardrail decisions were found.", None, [state.decision_log_ref] if state.decision_log_ref else []))
 
+    if config.break_glass.ref:
+        if config.break_glass.valid:
+            checks.append(make_check("break-glass-valid", "PolicyFabric break-glass override valid", "pass", True, config.break_glass.reason, None, [config.break_glass.ref]))
+        else:
+            checks.append(make_check("break-glass-valid", "PolicyFabric break-glass override valid", "fail", True, config.break_glass.reason, "Provide an active, unexpired, human-approved PolicyFabric BreakGlassOverride artifact.", [config.break_glass.ref]))
+
     return checks
 
 
-def aggregate_result(checks: list[dict[str, Any]], human_override_ref: str | None) -> str:
+def aggregate_result(checks: list[dict[str, Any]], human_override_ref: str | None, break_glass: BreakGlassValidation) -> str:
     required_failures = [check for check in checks if check["required"] and check["result"] == "fail"]
     required_human = [check for check in checks if check["required"] and check["result"] == "needs_human"]
-    if human_override_ref and (required_failures or required_human):
+    invalid_break_glass = any(check["checkId"] == "break-glass-valid" and check["result"] == "fail" for check in checks)
+    if invalid_break_glass:
+        return "fail"
+    if (human_override_ref or break_glass.valid) and (required_failures or required_human):
         return "waived"
     if required_failures:
         return "fail"
@@ -239,7 +340,7 @@ def aggregate_result(checks: list[dict[str, Any]], human_override_ref: str | Non
 
 
 def build_stop_gate_artifact(config: StopGateConfig, state: RepoState, checks: list[dict[str, Any]]) -> dict[str, Any]:
-    result = aggregate_result(checks, config.human_override_ref)
+    result = aggregate_result(checks, config.human_override_ref, config.break_glass)
     summary = "Stop gate passed."
     if result == "fail":
         failed = [check["checkId"] for check in checks if check["required"] and check["result"] == "fail"]
@@ -247,7 +348,7 @@ def build_stop_gate_artifact(config: StopGateConfig, state: RepoState, checks: l
     elif result == "needs_human":
         summary = "Stop gate requires human attention before completion."
     elif result == "waived":
-        summary = "Stop gate failures were waived by human override."
+        summary = "Stop gate failures were waived by human override or PolicyFabric break-glass override."
 
     return {
         "kind": "StopGateArtifact",
@@ -262,15 +363,27 @@ def build_stop_gate_artifact(config: StopGateConfig, state: RepoState, checks: l
         "summary": summary,
         "checks": checks,
         "humanOverrideRef": config.human_override_ref,
+        "breakGlassOverrideRef": config.break_glass.ref,
         "artifactRefs": {
             "policyDecisionArtifactRefs": state.unresolved_policy_decision_refs,
+            "breakGlassOverrideRef": config.break_glass.ref,
             "runArtifactRef": None,
             "replayArtifactRef": None,
             "pullRequestRef": state.pr_ref,
             "ciStatusRef": f"ci:{state.ci_status}" if state.ci_status else None,
             "summaryRef": state.summary_ref,
         },
-        "governanceContext": None,
+        "governanceContext": {
+            "breakGlass": {
+                "overrideId": config.break_glass.override_id,
+                "valid": config.break_glass.valid,
+                "reason": config.break_glass.reason,
+                "auditRef": config.break_glass.audit_ref,
+                "approverRef": config.break_glass.approver_ref,
+                "actionClass": config.break_glass.action_class,
+                "resource": config.break_glass.resource,
+            } if config.break_glass.ref else None
+        },
     }
 
 
@@ -339,6 +452,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--decision-log")
     parser.add_argument("--require-decision-log", action="store_true")
     parser.add_argument("--human-override-ref")
+    parser.add_argument("--break-glass-override", help="Path to PolicyFabric BreakGlassOverride artifact")
     parser.add_argument("--out", help="Path to write StopGateArtifact JSON. Defaults to stdout only.")
     return parser
 
@@ -346,6 +460,7 @@ def build_parser() -> argparse.ArgumentParser:
 def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
     protected = tuple(args.protected_branches or DEFAULT_PROTECTED_BRANCHES)
+    break_glass = validate_break_glass_override(Path(args.break_glass_override).resolve() if args.break_glass_override else None)
     config = StopGateConfig(
         bundle=args.bundle,
         session_ref=args.session_ref,
@@ -359,6 +474,7 @@ def main(argv: list[str] | None = None) -> int:
         require_summary=not args.no_require_summary,
         require_decision_log=args.require_decision_log,
         human_override_ref=args.human_override_ref,
+        break_glass=break_glass,
     )
     state = build_state_from_environment(args)
     artifact = evaluate_stop_gate(config, state)
