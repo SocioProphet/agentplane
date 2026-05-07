@@ -39,6 +39,12 @@ python scripts/validate_event_capability_admission.py --input examples/orchestra
 6. Policy outcome must match the capability-required outcome.
 7. Degraded or denied records remain evidence, not executable work.
 
+## Validation posture
+
+The bootstrap validator is intentionally non-mutating. A passing validation means records are admissible for the next control-plane step, not that any device, provider, shell, or external system should be touched.
+
+Strict mode is reserved for future slices where every record is expected to be executable. The bootstrap fixture intentionally includes blocked and approval-required records, so the normal validation path must allow those states while still rejecting invalid records.
+
 ## Execution posture
 
 This validator does not execute a routine, mutate a device, call a provider, or write to external systems. It emits an `agentplane.event_capability_admission.v0.1` artifact that can be stored beside other AgentPlane evidence artifacts and used as a stop gate before guarded execution.
