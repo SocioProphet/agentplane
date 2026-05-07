@@ -1,0 +1,88 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.socioprophet.org/agentplane/sourceos-context-cumin-run.schema.v0.1.json",
+  "title": "SourceOS Context Cumin Run",
+  "type": "object",
+  "required": [
+    "kind",
+    "apiVersion",
+    "runId",
+    "createdAt",
+    "runner",
+    "toolProviderRef",
+    "policyProfileRef",
+    "command",
+    "scope",
+    "sideEffectPolicy",
+    "expectedArtifacts"
+  ],
+  "properties": {
+    "kind": { "const": "SourceOSContextCuminRun" },
+    "apiVersion": { "const": "agentplane.socioprophet.org/v0.1" },
+    "runId": { "type": "string", "minLength": 1 },
+    "createdAt": { "type": "string" },
+    "runner": {
+      "type": "object",
+      "required": ["runnerType", "executionMode", "forbidLocalMac"],
+      "properties": {
+        "runnerType": { "const": "cumin" },
+        "executionMode": { "type": "string", "enum": ["dry_run", "ci", "remote_runner"] },
+        "forbidLocalMac": { "const": true },
+        "runnerRef": { "type": ["string", "null"] }
+      },
+      "additionalProperties": true
+    },
+    "toolProviderRef": { "const": "agentplane://tool-provider/smart-tree-context-provider" },
+    "policyProfileRef": { "const": "policy-fabric://sourceos.repo_context.read_only" },
+    "command": {
+      "type": "object",
+      "required": ["binary", "operation", "args"],
+      "properties": {
+        "binary": { "const": "sourceos-context" },
+        "operation": { "type": "string", "enum": ["snapshot", "security", "lampstand-roots", "lampstand-publish"] },
+        "args": { "type": "array", "items": { "type": "string" } },
+        "requiresExplicitPublishFlag": { "type": "boolean" }
+      },
+      "additionalProperties": true
+    },
+    "scope": {
+      "type": "object",
+      "required": ["rootRefs", "allowedRootPattern"],
+      "properties": {
+        "rootRefs": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+        "allowedRootPattern": { "const": "~/dev/**" },
+        "workroomRef": { "type": ["string", "null"] },
+        "slashTopicRef": { "type": ["string", "null"] }
+      },
+      "additionalProperties": true
+    },
+    "sideEffectPolicy": {
+      "type": "object",
+      "required": ["repoWrites", "hookMutation", "dashboardExposure", "ptySpawn", "externalCallbacks", "nativeMemoryPersistence", "lampstandPublishRequiresExplicitFlag"],
+      "properties": {
+        "repoWrites": { "const": false },
+        "hookMutation": { "const": false },
+        "dashboardExposure": { "const": false },
+        "ptySpawn": { "const": false },
+        "externalCallbacks": { "const": false },
+        "nativeMemoryPersistence": { "const": false },
+        "lampstandPublishRequiresExplicitFlag": { "const": true }
+      },
+      "additionalProperties": true
+    },
+    "expectedArtifacts": {
+      "type": "object",
+      "required": ["adapterResponse", "policyDecisionTrace", "toolProvenance"],
+      "properties": {
+        "adapterResponse": { "type": "string" },
+        "policyDecisionTrace": { "type": "string" },
+        "toolProvenance": { "type": "string" },
+        "lampstandPublishReport": { "type": ["string", "null"] },
+        "memoryPromotionPacketRef": { "type": ["string", "null"] }
+      },
+      "additionalProperties": true
+    },
+    "notes": { "type": "array", "items": { "type": "string" } }
+  },
+  "additionalProperties": false
+}

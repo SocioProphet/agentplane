@@ -1,0 +1,47 @@
+{
+  "kind": "SourceOSContextCuminRun",
+  "apiVersion": "agentplane.socioprophet.org/v0.1",
+  "runId": "agentplane-run:sourceos-context:cumin:smart-tree:0001",
+  "createdAt": "2026-05-07T00:00:00Z",
+  "runner": {
+    "runnerType": "cumin",
+    "executionMode": "dry_run",
+    "forbidLocalMac": true,
+    "runnerRef": "cumin://sourceos-context/default"
+  },
+  "toolProviderRef": "agentplane://tool-provider/smart-tree-context-provider",
+  "policyProfileRef": "policy-fabric://sourceos.repo_context.read_only",
+  "command": {
+    "binary": "sourceos-context",
+    "operation": "lampstand-publish",
+    "args": ["lampstand-publish", "~/dev/smart-tree", "--format", "json"],
+    "requiresExplicitPublishFlag": true
+  },
+  "scope": {
+    "rootRefs": ["~/dev/smart-tree"],
+    "allowedRootPattern": "~/dev/**",
+    "workroomRef": null,
+    "slashTopicRef": null
+  },
+  "sideEffectPolicy": {
+    "repoWrites": false,
+    "hookMutation": false,
+    "dashboardExposure": false,
+    "ptySpawn": false,
+    "externalCallbacks": false,
+    "nativeMemoryPersistence": false,
+    "lampstandPublishRequiresExplicitFlag": true
+  },
+  "expectedArtifacts": {
+    "adapterResponse": "artifact://sourceos-context/adapter-response.json",
+    "policyDecisionTrace": "artifact://sourceos-context/policy-decision-trace.json",
+    "toolProvenance": "artifact://sourceos-context/tool-provenance.json",
+    "lampstandPublishReport": "artifact://sourceos-context/lampstand-publish-report.json",
+    "memoryPromotionPacketRef": null
+  },
+  "notes": [
+    "This example is dry-run and must not execute on the operator Mac.",
+    "Cumin is the intended remote-runner boundary for sourceos-context execution.",
+    "Actual Lampstand ingestion still requires explicit --publish in the command args."
+  ]
+}
