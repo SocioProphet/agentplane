@@ -20,7 +20,6 @@ from __future__ import annotations
 import argparse
 import json
 import os
-import shlex
 import subprocess
 import sys
 from dataclasses import dataclass
@@ -65,7 +64,7 @@ def artifact_root(workspace: Path, session_ref: str) -> Path:
     return workspace / DEFAULT_INVOCATION_DIR / safe_ref_fragment(session_ref)
 
 
-def command_env(workcell: dict[str, Any], invocation_dir: Path, stop_gate_ref: str) -> dict[str, str]:
+def command_env(workcell: dict[str, Any], invocation_dir: Path, stop_gate_ref: str, break_glass_ref: str | None = None) -> dict[str, str]:
     guardrail = workcell.get("guardrail") or {}
     stop_gate = workcell.get("stopGate") or {}
     env = os.environ.copy()
@@ -79,6 +78,7 @@ def command_env(workcell: dict[str, Any], invocation_dir: Path, stop_gate_ref: s
         "SOURCEOS_GUARDRAIL_HOOK_COMMAND": str(guardrail.get("hookCommand") or ""),
         "SOURCEOS_STOP_GATE_ARTIFACT": stop_gate_ref,
         "SOURCEOS_STOP_GATE_EVALUATOR": str(stop_gate.get("evaluatorCommand") or DEFAULT_STOP_GATE_EVALUATOR),
+        "SOURCEOS_BREAK_GLASS_OVERRIDE": break_glass_ref or "",
     }
     env.update(additions)
     return env
@@ -142,6 +142,8 @@ def run_stop_gate(args: argparse.Namespace, workcell: dict[str, Any], workspace:
         command.extend(["--decision-log", str(workspace / decision_log if not Path(decision_log).is_absolute() else decision_log)])
     if args.human_override_ref:
         command.extend(["--human-override-ref", args.human_override_ref])
+    if args.break_glass_override:
+        command.extend(["--break-glass-override", str(Path(args.break_glass_override).resolve())])
 
     completed = run_command(command, Path.cwd(), os.environ.copy())
     if stop_gate_ref.exists():
@@ -175,6 +177,7 @@ def build_artifact(
     stop_gate_ref: Path | None,
     stop_gate_result: str | None,
 ) -> dict[str, Any]:
+    break_glass_ref = str(Path(args.break_glass_override).resolve()) if args.break_glass_override else None
     return {
         "kind": "GuardedInvocationArtifact",
         "bundle": str(workcell.get("bundle") or args.bundle or "guarded-command@0.1.0"),
@@ -206,12 +209,14 @@ def build_artifact(
                 "AGENTPLANE_TASK_REF": str(workcell.get("taskRef") or args.task_ref),
                 "SOURCEOS_GUARDRAIL_DECISION_LOG": str((workcell.get("guardrail") or {}).get("decisionLogRef") or ""),
                 "SOURCEOS_STOP_GATE_ARTIFACT": str(stop_gate_ref) if stop_gate_ref else "",
+                "SOURCEOS_BREAK_GLASS_OVERRIDE": break_glass_ref or "",
             },
         },
         "stopGate": {
             "required": not args.no_stop_gate,
             "evaluated": stop_gate_evaluated,
             "artifactRef": str(stop_gate_ref) if stop_gate_ref else None,
+            "breakGlassOverrideRef": break_glass_ref,
             "result": stop_gate_result,
         },
         "result": result,
@@ -226,6 +231,7 @@ def build_artifact(
             "stdoutRef": str(stdout_ref) if stdout_ref else None,
             "stderrRef": str(stderr_ref) if stderr_ref else None,
             "stopGateArtifactRef": str(stop_gate_ref) if stop_gate_ref else None,
+            "breakGlassOverrideRef": break_glass_ref,
             "runArtifactRef": None,
             "replayArtifactRef": None,
         },
@@ -233,6 +239,7 @@ def build_artifact(
             "invocationDir": str(invocation_dir),
             "sideEffectsAllowed": bool(args.allow_command_execution),
             "requiresStopGateForSuccess": not args.no_stop_gate,
+            "breakGlassOverrideRef": break_glass_ref,
         },
     }
 
@@ -290,7 +297,8 @@ def execute(args: argparse.Namespace) -> tuple[int, dict[str, Any]]:
     invocation_dir.mkdir(parents=True, exist_ok=True)
     stdout_ref = invocation_dir / "stdout.txt"
     stderr_ref = invocation_dir / "stderr.txt"
-    env = command_env(workcell, invocation_dir, str(stop_gate_ref))
+    break_glass_ref = str(Path(args.break_glass_override).resolve()) if args.break_glass_override else None
+    env = command_env(workcell, invocation_dir, str(stop_gate_ref), break_glass_ref)
     started_at = utc_now()
     completed = run_command(args.command, workspace, env)
     completed_at = utc_now()
@@ -368,6 +376,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--no-require-ci", action="store_true")
     parser.add_argument("--no-require-summary", action="store_true")
     parser.add_argument("--human-override-ref")
+    parser.add_argument("--break-glass-override", help="Path to PolicyFabric BreakGlassOverride artifact")
     parser.add_argument("command", nargs=argparse.REMAINDER)
     return parser
 

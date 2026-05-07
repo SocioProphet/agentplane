@@ -52,6 +52,7 @@
       }
     },
     "humanOverrideRef": { "type": ["string", "null"] },
+    "breakGlassOverrideRef": { "type": ["string", "null"] },
     "artifactRefs": {
       "type": "object",
       "properties": {
@@ -59,6 +60,7 @@
           "type": "array",
           "items": { "type": "string" }
         },
+        "breakGlassOverrideRef": { "type": ["string", "null"] },
         "runArtifactRef": { "type": ["string", "null"] },
         "replayArtifactRef": { "type": ["string", "null"] },
         "pullRequestRef": { "type": ["string", "null"] },

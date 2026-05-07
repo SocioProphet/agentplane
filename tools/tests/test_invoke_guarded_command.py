@@ -3,6 +3,7 @@ from __future__ import annotations
 import importlib.util
 import json
 import sys
+from datetime import datetime, timezone
 from pathlib import Path
 
 TOOLS_DIR = Path(__file__).resolve().parents[1]
@@ -73,6 +74,49 @@ def write_workcell(tmp_path: Path, workspace: Path) -> Path:
         "governanceContext": None,
     }
     path = tmp_path / "guarded-workcell-artifact.json"
+    path.write_text(json.dumps(artifact), encoding="utf-8")
+    return path
+
+
+def write_break_glass(path: Path) -> Path:
+    artifact = {
+        "apiVersion": "policy.fabric.break-glass/v1",
+        "kind": "BreakGlassOverride",
+        "metadata": {
+            "overrideId": "urn:srcos:override:test-invocation",
+            "createdAt": "2026-05-05T00:00:00Z",
+            "expiresAt": "2099-05-05T00:00:00Z",
+            "relatedPolicyDecisionId": "deny-1",
+            "relatedStopGateId": "sourceos.default.agent-completion",
+        },
+        "spec": {
+            "approver": {"id": "human:tester", "type": "human", "displayName": "tester"},
+            "scope": "repository",
+            "actionClass": "git",
+            "resource": "SocioProphet/agentplane:work/test-invocation",
+            "reason": "Human approved a bounded stop-gate waiver for test evidence.",
+            "auditRef": "urn:srcos:audit:test-invocation",
+            "constraints": {
+                "singleUse": True,
+                "maxUses": 1,
+                "allowedCommands": [],
+                "allowedPaths": [],
+                "allowedProviders": [],
+            },
+            "signature": {
+                "scheme": "sourceos-dev-placeholder-v0",
+                "keyRef": "did:example:tester#approval",
+                "signature": "placeholder",
+            },
+        },
+        "status": {
+            "state": "active",
+            "usedCount": 0,
+            "lastUsedAt": None,
+            "revokedAt": None,
+            "revocationReason": None,
+        },
+    }
     path.write_text(json.dumps(artifact), encoding="utf-8")
     return path
 
@@ -198,3 +242,33 @@ def test_stop_gate_failure_blocks_success(tmp_path, capsys) -> None:  # type: ig
     assert artifact["stopGate"]["evaluated"] is True
     assert artifact["stopGate"]["result"] == "fail"
     assert "Stop gate" in (artifact["invocation"]["reason"] or "")
+
+
+def test_break_glass_override_waives_stop_gate_failure(tmp_path, capsys) -> None:  # type: ignore[no-untyped-def]
+    workspace = tmp_path / "workspace"
+    workcell = write_workcell(tmp_path, workspace)
+    invocation_dir = tmp_path / "invocation"
+    break_glass = write_break_glass(tmp_path / "break-glass.json")
+    decision_log = workspace / ".sourceos" / "logs" / "guardrail-decisions.jsonl"
+    decision_log.parent.mkdir(parents=True, exist_ok=True)
+    decision_log.write_text(json.dumps({"decisionId": "deny-1", "decision": "deny", "severity": "critical"}) + "\n", encoding="utf-8")
+
+    exit_code = main([
+        *common_args(workcell, invocation_dir),
+        "--allow-command-execution",
+        "--break-glass-override",
+        str(break_glass),
+        "--",
+        sys.executable,
+        "-c",
+        "print('ok')",
+    ])
+    captured = capsys.readouterr()
+    artifact = json.loads(captured.out)
+
+    assert exit_code == 0
+    assert artifact["result"] == "success"
+    assert artifact["stopGate"]["result"] == "waived"
+    assert artifact["stopGate"]["breakGlassOverrideRef"] == str(break_glass.resolve())
+    assert artifact["artifactRefs"]["breakGlassOverrideRef"] == str(break_glass.resolve())
+    assert artifact["guardrail"]["environment"]["SOURCEOS_BREAK_GLASS_OVERRIDE"] == str(break_glass.resolve())
