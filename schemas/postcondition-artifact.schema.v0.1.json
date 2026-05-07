@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Agentplane Postcondition Artifact v0.1",
+  "type": "object",
+  "required": [
+    "kind",
+    "bundle",
+    "capturedAt",
+    "runArtifactRef",
+    "planCommitRef",
+    "expectedStateHash",
+    "observedStateHash",
+    "comparisonResult",
+    "verificationMode"
+  ],
+  "properties": {
+    "kind": { "const": "PostconditionArtifact" },
+    "bundle": { "type": "string" },
+    "capturedAt": { "type": "string", "format": "date-time" },
+    "runArtifactRef": { "type": "string" },
+    "planCommitRef": { "type": "string" },
+    "expectedStateHash": { "type": "string" },
+    "observedStateHash": { "type": "string" },
+    "comparisonResult": {
+      "type": "string",
+      "enum": ["MATCH", "PARTIAL_MISMATCH", "FAIL", "UNKNOWN"]
+    },
+    "verificationMode": {
+      "type": "string",
+      "enum": [
+        "NONE",
+        "POLICY_ONLY",
+        "COUNTEREXAMPLE_SEARCH",
+        "PROGRAM_EXECUTION",
+        "CAUSAL_CHECK",
+        "HUMAN_REVIEW",
+        "COMPOSITE"
+      ]
+    },
+    "matchedConditions": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "failedConditions": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "counterexampleRefs": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "evidenceRefs": {
+      "type": "array",
+      "items": { "type": "string" }
+    }
+  },
+  "additionalProperties": false
+}
