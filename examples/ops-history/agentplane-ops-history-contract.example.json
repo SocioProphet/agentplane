@@ -1,0 +1,36 @@
+{
+  "specVersion": "0.1.0",
+  "intake": {
+    "intakeId": "urn:srcos:agentplane-context-intake:ops-history-demo-0001",
+    "bundleRef": "urn:srcos:agentplane-bundle:professional-intelligence-demo",
+    "contextPackRef": "urn:srcos:context-pack:ops-history-multi-agent-room-demo",
+    "scope": {
+      "workroomRef": "urn:srcos:workroom:professional-intelligence-demo",
+      "topicRef": "urn:srcos:topic:professional-intelligence",
+      "sessionRef": "urn:srcos:agent-session:codex-demo-0001"
+    },
+    "sourceEventRefs": ["urn:srcos:ops-history-event:demo-agentterm-0001"],
+    "policyDecisionRefs": ["urn:srcos:policy-decision:ops-history-hydrate-context-demo-0001"],
+    "agentRegistryRefs": ["urn:srcos:agent-grant:ops-history-summarizer-demo"],
+    "dryRun": true
+  },
+  "emittedEvents": [
+    {
+      "eventId": "urn:srcos:ops-history-event:agentplane-validation-demo-0001",
+      "eventClass": "agentplane.validation",
+      "payloadMode": "ref-only",
+      "agentPlaneArtifactRefs": ["urn:srcos:agentplane-artifact:validation-demo-0001"],
+      "policyDecisionRefs": ["urn:srcos:policy-decision:ops-history-hydrate-context-demo-0001"]
+    },
+    {
+      "eventId": "urn:srcos:ops-history-event:agentplane-run-demo-0001",
+      "eventClass": "agentplane.run",
+      "payloadMode": "ref-only",
+      "agentPlaneArtifactRefs": [
+        "urn:srcos:agentplane-artifact:run-demo-0001",
+        "urn:srcos:agentplane-artifact:replay-demo-0001"
+      ],
+      "policyDecisionRefs": ["urn:srcos:policy-decision:ops-history-hydrate-context-demo-0001"]
+    }
+  ]
+}
