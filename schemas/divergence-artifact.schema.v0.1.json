@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Agentplane Divergence Artifact v0.1",
+  "type": "object",
+  "required": [
+    "kind",
+    "bundle",
+    "capturedAt",
+    "runArtifactRef",
+    "planCommitRef",
+    "divergenceClass",
+    "severity",
+    "expectedRef",
+    "observedRef",
+    "replanRequired"
+  ],
+  "properties": {
+    "kind": { "const": "DivergenceArtifact" },
+    "bundle": { "type": "string" },
+    "capturedAt": { "type": "string", "format": "date-time" },
+    "runArtifactRef": { "type": "string" },
+    "planCommitRef": { "type": "string" },
+    "divergenceClass": {
+      "type": "string",
+      "enum": [
+        "STATE_MISMATCH",
+        "POLICY_MISMATCH",
+        "SIDE_EFFECT_MISMATCH",
+        "EVIDENCE_STALENESS",
+        "EXECUTION_FAILURE",
+        "ABSTRACTION_FAILURE"
+      ]
+    },
+    "severity": {
+      "type": "string",
+      "enum": ["LOW", "MODERATE", "HIGH", "CRITICAL"]
+    },
+    "expectedRef": { "type": "string" },
+    "observedRef": { "type": "string" },
+    "policyImpact": { "type": ["string", "null"] },
+    "incidentRef": { "type": ["string", "null"] },
+    "replanRequired": { "type": "boolean" },
+    "evidenceRefs": {
+      "type": "array",
+      "items": { "type": "string" }
+    }
+  },
+  "additionalProperties": false
+}
