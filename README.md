@@ -39,6 +39,9 @@ Agentplane treats execution as evidence-producing work. The current public evide
 - `NetworkDoorPlanEvidence`
 - `ExternalModelProviderRouteEvidence`
 - `NativeAssistantBridgeEvidence`
+- `ActionProposal`
+- `ActionAdmission`
+- `RuntimeReceipt`
 
 The Network Door / BYOM / Native Assistant evidence types are non-mutating by default. They record policy posture, references, route decisions, hash-only prompt/destination evidence, and side-effect flags without directly mutating firewall state, installing mesh components, contacting model providers, invoking native assistant APIs, or storing credentials.
 
@@ -129,6 +132,7 @@ agentplane/
 | Executor selection | [docs/executors.md](docs/executors.md) |
 | System space / deployment topology | [docs/system-space.md](docs/system-space.md) |
 | Receipt lifecycle | [docs/receipt-lifecycle.md](docs/receipt-lifecycle.md) |
+| Action proposal/admission/receipt contracts | [docs/integration/action-contracts.md](docs/integration/action-contracts.md) |
 | Sociosphere integration | [docs/integration/sociosphere.md](docs/integration/sociosphere.md) |
 | Network/BYOM/native assistant evidence | [docs/integration/network-native-assistant-evidence.md](docs/integration/network-native-assistant-evidence.md) |
 | State pointer model | [docs/state-pointers.md](docs/state-pointers.md) |
@@ -154,6 +158,10 @@ agentplane is the execution control plane within a multi-repo stack:
 sociosphere   →  agentplane  →  RunArtifact / ReplayArtifact / Receipt
 slash-topics  →  agentplane  (context pack event stream)
 human-digital-twin → agentplane  (policy/approval event stream)
+guardrail-fabric → agentplane  (policy decision/admission authority)
+holmes       →  agentplane  (reasoning claims feeding action proposals)
+sherlock-search → agentplane  (evidence retrieval refs for proposals)
+gaia-world-model → agentplane (world-claim targets for admitted runtime actions)
 TriTRPC       →  agentplane  (deterministic transport metadata)
 sourceosctl   →  agentplane  (Agent Machine, Office, Network, BYOM, Native Assistant evidence imports)
 ```

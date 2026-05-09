@@ -1,0 +1,30 @@
+{
+  "apiVersion": "agentplane.socioprophet.org/v0.1",
+  "kind": "ActionProposal",
+  "proposalId": "urn:ap:proposal:artifact-review-001",
+  "agentIntentRef": "urn:claim:agent-intent:artifact-review-and-publish",
+  "actionType": "office.artifact.review",
+  "targetRef": "urn:office-artifact:workspace-42:doc-991",
+  "parametersHash": "sha256:5555555555555555555555555555555555555555555555555555555555555555",
+  "claims": [
+    {
+      "claimRef": "urn:claim:action-intent:artifact-review",
+      "role": "intent"
+    },
+    {
+      "claimRef": "urn:claim:expected-effect:artifact-is-policy-safe-for-publish",
+      "role": "expected_effect"
+    }
+  ],
+  "evidence": [
+    {
+      "evidenceRef": "urn:sherlock:evidence:artifact-review-context:workspace-42:doc-991",
+      "digest": "sha256:6666666666666666666666666666666666666666666666666666666666666666"
+    }
+  ],
+  "expectedEffects": [
+    "artifact review state updated",
+    "publish recommendation recorded for governance"
+  ],
+  "createdAt": "2026-05-09T09:10:00Z"
+}

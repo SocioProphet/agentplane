@@ -13,6 +13,9 @@ All schemas use [JSON Schema Draft 2020-12](https://json-schema.org/specificatio
 | [`bundle.schema.v0.1.json`](bundle.schema.v0.1.json) | `Bundle` | v0.1 | Bundle manifest schema. Defines the structure of `bundle.json`. |
 | [`bundle.schema.patch.json`](bundle.schema.patch.json) | patch fragment | — | Staged future fields for agent-runtime bundles (not yet enforced). |
 | [`broker-execution-bundle.schema.v0.1.json`](broker-execution-bundle.schema.v0.1.json) | `BrokerExecutionBundle` | v0.1 | Broker validation/smoke/continuity/exit/cost-meter execution bundle contract. |
+| [`action-proposal.schema.v0.1.json`](action-proposal.schema.v0.1.json) | `ActionProposal` | v0.1 | Agentplane action proposal contract for governed action intent, claims, and evidence refs. |
+| [`action-admission.schema.v0.1.json`](action-admission.schema.v0.1.json) | `ActionAdmission` | v0.1 | Policy decision handoff and admission record for runtime execution boundary. |
+| [`runtime-receipt.schema.v0.1.json`](runtime-receipt.schema.v0.1.json) | `RuntimeReceipt` | v0.1 | Runtime completion receipt for admitted actions with identity, hash, logs, timing, and status fields. |
 | [`run-artifact.schema.v0.1.json`](run-artifact.schema.v0.1.json) | `RunArtifact` | v0.1 | Evidence record of a completed run. |
 | [`replay-artifact.schema.v0.1.json`](replay-artifact.schema.v0.1.json) | `ReplayArtifact` | v0.1 | Inputs needed for deterministic replay. |
 | [`session-artifact.schema.v0.1.json`](session-artifact.schema.v0.1.json) | `SessionArtifact` | v0.1 | Session-level lifecycle record (status, receipt/run/replay refs). |
@@ -97,6 +100,37 @@ is ready. Do not use them in production bundles until they are promoted.
 ---
 
 ## Artifact schemas
+
+### ActionProposal (`action-proposal.schema.v0.1.json`)
+
+Defines the pre-execution proposal envelope from `AgentIntent`:
+
+- action intent + target references;
+- `Claim` refs for intent and expected effects;
+- `Evidence` refs;
+- optional prior-action `VectorCandidate` retrieval records that must remain `candidateOnly: true` and `admissionAuthority: false`.
+
+### ActionAdmission (`action-admission.schema.v0.1.json`)
+
+Defines policy-to-runtime admission handoff:
+
+- proposal reference;
+- policy decision reference (`PolicyDecisionArtifact` compatible);
+- admitted runtime boundary (`nodeRef`, `runtimeRef`, `runtimeProfileRef`, `sandboxProfileRef`) for admitted actions;
+- denied records with reason for non-admitted actions.
+
+### RuntimeReceipt (`runtime-receipt.schema.v0.1.json`)
+
+Defines required receipt fields for admitted runtime work:
+
+- agent identity;
+- node/runtime identity;
+- runtime/sandbox profile refs;
+- input/output hashes;
+- logs reference;
+- policy decision reference;
+- start and end times;
+- final status.
 
 ### RunArtifact (`run-artifact.schema.v0.1.json`)
 

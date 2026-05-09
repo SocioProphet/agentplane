@@ -1,0 +1,15 @@
+{
+  "apiVersion": "agentplane.socioprophet.org/v0.1",
+  "kind": "ActionAdmission",
+  "admissionId": "urn:ap:admission:artifact-review-001-denied",
+  "proposalRef": "urn:ap:proposal:artifact-review-001",
+  "policyDecision": {
+    "policyDecisionRef": "urn:policy-decision:guardrail-fabric:artifact-review-deny-001",
+    "decision": "deny",
+    "policyFabricEnvelopeRef": "urn:policy-fabric:verdict-envelope:artifact-review-deny-001",
+    "policyDecisionArtifactRef": "urn:agentplane:artifact:policy-decision:artifact-review-deny-001"
+  },
+  "status": "denied",
+  "reason": "artifact contains unresolved policy-sensitive PII claim",
+  "recordedAt": "2026-05-09T09:10:05Z"
+}

@@ -16,6 +16,7 @@ Documentation for agentplane.
 | [receipt-lifecycle.md](receipt-lifecycle.md) | Full MAIPJ run receipt lifecycle: events, field ownership, energy accounting |
 | [state-pointers.md](state-pointers.md) | `state/pointers/` model: current-staging, current-prod, previous-good |
 | [integration/](integration/README.md) | Per-system integration guides |
+| [integration/action-contracts.md](integration/action-contracts.md) | Agentplane `Act -> Receipt` contracts: proposal, admission handoff, runtime boundary, receipt |
 | [instrumentation/live_receipt_integration_plan.md](instrumentation/live_receipt_integration_plan.md) | Live receipt integration plan v0.1 (plan document) |
 | [runtime-governance/control-matrix-integration.md](runtime-governance/control-matrix-integration.md) | Control matrix runtime binding plan (plan document) |
 

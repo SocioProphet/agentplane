@@ -11,6 +11,7 @@ systems in the SocioProphet stack.
 |---|---|---|
 | [sociosphere.md](sociosphere.md) | `sociosphere` | Running a bundle from a sociosphere workspace; passing upstream artifacts |
 | [broker-reasoning-execution-binding.md](broker-reasoning-execution-binding.md) | Broker reasoning | AgentPlane execution and replay binding for broker execution bundles |
+| [action-contracts.md](action-contracts.md) | Governed action handoff | Action proposal, admission handoff, runtime boundary, and runtime receipt contracts |
 
 ---
 

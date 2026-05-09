@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "RuntimeReceipt",
+  "type": "object",
+  "required": [
+    "apiVersion",
+    "kind",
+    "receiptId",
+    "proposalRef",
+    "admissionRef",
+    "policyDecisionRef",
+    "agentIdentity",
+    "runtimeIdentity",
+    "runtimeProfile",
+    "inputHash",
+    "outputHash",
+    "logsRef",
+    "startTime",
+    "endTime",
+    "status"
+  ],
+  "properties": {
+    "apiVersion": { "const": "agentplane.socioprophet.org/v0.1" },
+    "kind": { "const": "RuntimeReceipt" },
+    "receiptId": { "type": "string", "minLength": 1 },
+    "proposalRef": { "type": "string", "minLength": 1 },
+    "admissionRef": { "type": "string", "minLength": 1 },
+    "policyDecisionRef": { "type": "string", "minLength": 1 },
+    "agentIdentity": {
+      "type": "object",
+      "required": ["agentId", "agentRef"],
+      "properties": {
+        "agentId": { "type": "string", "minLength": 1 },
+        "agentRef": { "type": "string", "minLength": 1 }
+      },
+      "additionalProperties": false
+    },
+    "runtimeIdentity": {
+      "type": "object",
+      "required": ["nodeRef", "runtimeRef"],
+      "properties": {
+        "nodeRef": { "type": "string", "minLength": 1 },
+        "runtimeRef": { "type": "string", "minLength": 1 }
+      },
+      "additionalProperties": false
+    },
+    "runtimeProfile": {
+      "type": "object",
+      "required": ["runtimeProfileRef", "sandboxProfileRef"],
+      "properties": {
+        "runtimeProfileRef": { "type": "string", "minLength": 1 },
+        "sandboxProfileRef": { "type": "string", "minLength": 1 }
+      },
+      "additionalProperties": false
+    },
+    "inputHash": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+    "outputHash": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+    "logsRef": { "type": "string", "minLength": 1 },
+    "startTime": { "type": "string", "format": "date-time" },
+    "endTime": { "type": "string", "format": "date-time" },
+    "status": { "enum": ["succeeded", "failed", "aborted"] }
+  },
+  "additionalProperties": false
+}
