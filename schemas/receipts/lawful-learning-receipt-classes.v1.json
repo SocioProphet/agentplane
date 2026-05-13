@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://socioprophet.org/schemas/receipts/lawful-learning-receipt-classes.v1.json",
   "title": "Lawful Learning Receipt Classes",
-  "description": "Phase 9 doctrine-only AgentPlane receipt classes for lawful-learning artifacts. Structural receipts only; no runtime replay execution, semantic verification, or cross-plane evidence resolution.",
+  "description": "Phase 9 doctrine-only AgentPlane receipt classes for lawful-learning artifacts. Structural receipts only; no runtime replay execution, semantic verification, truth-annealing execution, or cross-plane evidence resolution.",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -69,9 +69,14 @@
     "seal_b_ref": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
     "composition_rule": {"type": "string", "minLength": 1},
     "boundary_hash": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "truth_record": {"$ref": "#/$defs/truth_record"},
+    "policy_threshold_ref": {
+      "type": "string",
+      "description": "Optional policy/telos threshold reference. This may be compared against truth_record.omega_value by future policy logic, but this schema forbids policy overwrite of truth_record.omega_value."
+    },
     "non_claims": {
       "type": "array",
-      "minItems": 9,
+      "minItems": 10,
       "uniqueItems": true,
       "items": {
         "enum": [
@@ -83,8 +88,55 @@
           "no_runtime_ablation_verification",
           "no_cross_plane_evidence_resolution",
           "no_cryptographic_authenticity_verification",
-          "no_sourceos_spec_promotion"
+          "no_sourceos_spec_promotion",
+          "no_runtime_truth_annealing"
         ]
+      }
+    }
+  },
+  "$defs": {
+    "truth_record": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["omega_value", "sieve_state"],
+      "properties": {
+        "omega_value": {
+          "type": "string",
+          "enum": [
+            "F_v",
+            "T_v",
+            "bottom_e",
+            "sigma_hat",
+            "tau_hat",
+            "partial",
+            "top_e"
+          ]
+        },
+        "sieve_state": {
+          "type": "string",
+          "enum": [
+            "no_valid_chain",
+            "source_anchored_only",
+            "target_anchored_only",
+            "endpoints_supported_no_chain",
+            "full_traversal_declared"
+          ]
+        },
+        "edge_contract_ref": {
+          "type": "string",
+          "pattern": "^E(0[1-9]|1[0-9]|2[0-2])$"
+        },
+        "provenance_refs": {
+          "type": "array",
+          "items": {"type": "string"}
+        },
+        "adversary_model_refs": {
+          "type": "array",
+          "items": {"type": "string"}
+        },
+        "categorical_substrate_ref": {
+          "const": "docs/integration-contracts/lawful-learning-categorical-substrate.md"
+        }
       }
     }
   },
