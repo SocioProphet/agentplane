@@ -1,0 +1,23 @@
+{
+  "apiVersion": "agentplane.socioprophet.org/v0.1",
+  "kind": "AgenticOpsWorkloadSignature",
+  "metadata": {
+    "name": "regulated-agentic-pr-budget-workload",
+    "taskRef": "SocioProphet/agentplane#161",
+    "repository": "SocioProphet/agentplane",
+    "createdAt": "2026-05-13T12:00:00Z",
+    "labels": ["agentic-pr", "regulated", "runtime-budget"]
+  },
+  "spec": {
+    "scenario": "agentic_pr",
+    "dataClass": "regulated",
+    "sensitivityClass": "regulated",
+    "expectedTrajectoryLength": 15,
+    "expectedToolCalls": 8,
+    "readWriteRatio": 0.70,
+    "hotnessSkew": 0.40,
+    "actionReversibilityRequired": "compensable",
+    "humanCheckpointRequired": true,
+    "expectedValidationCommands": ["git status --short", "git diff --stat", "make validate"]
+  }
+}
