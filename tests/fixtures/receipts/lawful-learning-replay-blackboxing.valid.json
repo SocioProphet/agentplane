@@ -13,6 +13,15 @@
   "seal_b_ref": "sha256:6666666666666666666666666666666666666666666666666666666666666666",
   "composition_rule": "compose_adapter_a_then_b",
   "boundary_hash": "sha256:7777777777777777777777777777777777777777777777777777777777777777",
+  "truth_record": {
+    "omega_value": "top_e",
+    "sieve_state": "full_traversal_declared",
+    "edge_contract_ref": "E18",
+    "provenance_refs": [
+      "sha256:4444444444444444444444444444444444444444444444444444444444444444"
+    ],
+    "categorical_substrate_ref": "docs/integration-contracts/lawful-learning-categorical-substrate.md"
+  },
   "non_claims": [
     "no_runtime_replay_execution",
     "no_runtime_evidence_validation",
@@ -22,6 +31,7 @@
     "no_runtime_ablation_verification",
     "no_cross_plane_evidence_resolution",
     "no_cryptographic_authenticity_verification",
-    "no_sourceos_spec_promotion"
+    "no_sourceos_spec_promotion",
+    "no_runtime_truth_annealing"
   ]
 }
