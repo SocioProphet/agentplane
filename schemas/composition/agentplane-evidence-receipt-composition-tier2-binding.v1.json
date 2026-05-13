@@ -1,0 +1,112 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://socioprophet.org/schemas/composition/agentplane-evidence-receipt-composition-tier2-binding.v1.json",
+  "title": "AgentPlane Evidence Receipt Composition — Tier 2 Invariant Binding",
+  "description": "Doctrine-only schema binding AgentPlane evidence-receipt compositions to ProCybernetica Tier 2 invariant declared modes. Opaque hashes only; no runtime replay execution, evidence validation, execution attestation, bundle-to-run integrity check, or cross-plane evidence resolution.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "composition_id",
+    "composition_kind",
+    "binding_doctrine_version",
+    "evidence_receipt_refs",
+    "replay_bundle_refs",
+    "execution_run_refs",
+    "validation_evidence_refs",
+    "agentplane_run_ledger_refs",
+    "bound_modes",
+    "non_claims"
+  ],
+  "properties": {
+    "composition_id": {"const": "agentplane.evidence_receipt_composition"},
+    "composition_kind": {"const": "evidence_receipt_composition"},
+    "binding_doctrine_version": {
+      "type": "string",
+      "pattern": "^v[0-9]+\\.[0-9]+$",
+      "description": "Doctrine version under which this binding is declared. Pins the binding to a specific Tier 2 invariant binding revision."
+    },
+    "evidence_receipt_refs": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/evidence_ref"}},
+    "replay_bundle_refs": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/evidence_ref"}},
+    "execution_run_refs": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/evidence_ref"}},
+    "validation_evidence_refs": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/evidence_ref"}},
+    "agentplane_run_ledger_refs": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/evidence_ref"}},
+    "bound_modes": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "receipt_integration",
+        "authority_scope_analysis",
+        "non_claim_analysis",
+        "monitor_independence_analysis",
+        "evidence_freshness_analysis"
+      ],
+      "properties": {
+        "receipt_integration": {"const": "hash_bound_reference"},
+        "authority_scope_analysis": {"const": "declared_scope_lattice_v1"},
+        "non_claim_analysis": {"const": "explicit_propagate_or_resolve_v1"},
+        "monitor_independence_analysis": {"const": "declared_monitor_independence_v1"},
+        "evidence_freshness_analysis": {"const": "declared_evidence_freshness_v1"}
+      }
+    },
+    "non_claims": {
+      "type": "array",
+      "minItems": 10,
+      "maxItems": 10,
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "no_runtime_receipt_lookup",
+          "no_runtime_non_claim_verification",
+          "no_runtime_monitor_attestation",
+          "no_timestamp_authenticity",
+          "opaque_hashes_not_resolved",
+          "no_runtime_replay_execution",
+          "no_runtime_evidence_validation",
+          "no_runtime_execution_attestation",
+          "no_bundle_to_run_integrity_check",
+          "no_cross_plane_evidence_resolution"
+        ]
+      }
+    }
+  },
+  "$defs": {
+    "evidence_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["ref_kind", "ref_id", "opaque_hash"],
+      "properties": {
+        "ref_kind": {
+          "type": "string",
+          "enum": [
+            "evidence_receipt",
+            "replay_bundle",
+            "execution_run",
+            "validation_evidence",
+            "agentplane_run_ledger"
+          ]
+        },
+        "ref_id": {"type": "string"},
+        "opaque_hash": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "description": "Opaque content-addressed reference. This binding schema does not resolve the hash at validation time."
+        },
+        "origin_plane": {
+          "type": "string",
+          "enum": [
+            "agentplane",
+            "superconscious",
+            "sociosphere",
+            "policy-fabric",
+            "procybernetica",
+            "sourceos-syncd",
+            "model-governance-ledger",
+            "prophet-platform",
+            "other"
+          ],
+          "description": "Declared origin plane for the opaque reference. This binding schema does not resolve cross-plane references at validation time."
+        }
+      }
+    }
+  }
+}
