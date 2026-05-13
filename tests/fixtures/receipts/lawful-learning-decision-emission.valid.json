@@ -1,0 +1,28 @@
+{
+  "schema_version": "1.0.0",
+  "receipt_id": "receipt.lawful_learning.decision_emission.synthetic",
+  "receipt_class": "lawful_learning_decision_emission",
+  "source_repo": "SocioProphet/superconscious",
+  "artifact_ref": {
+    "artifact_class": "LawfulLearningDecisionArtifact",
+    "artifact_id": "decision.synthetic.claim-promote",
+    "opaque_hash": "sha256:1111111111111111111111111111111111111111111111111111111111111111"
+  },
+  "decision_id": "decision.synthetic.claim-promote",
+  "decision_type": "claim_promote",
+  "evidence_status_refs": [
+    "artifact.synthetic.causal-triad"
+  ],
+  "replay_seal": "sha256:2222222222222222222222222222222222222222222222222222222222222222",
+  "non_claims": [
+    "no_runtime_replay_execution",
+    "no_runtime_evidence_validation",
+    "no_semantic_invariant_verification",
+    "no_tag_promotion_decision",
+    "no_runtime_circuit_discovery",
+    "no_runtime_ablation_verification",
+    "no_cross_plane_evidence_resolution",
+    "no_cryptographic_authenticity_verification",
+    "no_sourceos_spec_promotion"
+  ]
+}
