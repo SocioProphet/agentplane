@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import re
 import sys
 from pathlib import Path
 from typing import Any
@@ -16,6 +17,7 @@ REQUIRED_NON_CLAIMS = {
     "no_cross_plane_evidence_resolution",
     "no_cryptographic_authenticity_verification",
     "no_sourceos_spec_promotion",
+    "no_runtime_truth_annealing",
 }
 
 FORBIDDEN_PHASE9_FIELDS = {
@@ -31,6 +33,11 @@ FORBIDDEN_PHASE9_FIELDS = {
     "verified_tier2_mode",
     "semantic_correctness_proof",
     "empirical_measurement_verified",
+    "runtime_truth_annealing",
+    "truth_annealing_executed",
+    "policy_writes_truth_record",
+    "policy_overwrite_omega",
+    "policy_overwrites_sieve_state",
 }
 
 CLASS_REQUIRED_FIELDS = {
@@ -81,6 +88,27 @@ HASH_FIELDS = {
     "ablation_evidence_ref",
 }
 
+OMEGA_VALUES = {
+    "F_v",
+    "T_v",
+    "bottom_e",
+    "sigma_hat",
+    "tau_hat",
+    "partial",
+    "top_e",
+}
+
+SIEVE_STATES = {
+    "no_valid_chain",
+    "source_anchored_only",
+    "target_anchored_only",
+    "endpoints_supported_no_chain",
+    "full_traversal_declared",
+}
+
+EDGE_CONTRACT_RE = re.compile(r"^E(0[1-9]|1[0-9]|2[0-2])$")
+CATEGORICAL_SUBSTRATE_REF = "docs/integration-contracts/lawful-learning-categorical-substrate.md"
+
 
 def _is_sha256(value: Any) -> bool:
     if not isinstance(value, str):
@@ -89,6 +117,53 @@ def _is_sha256(value: Any) -> bool:
         return False
     suffix = value[len("sha256:"):]
     return len(suffix) == 64 and all(ch in "0123456789abcdef" for ch in suffix)
+
+
+def _check_truth_record(data: dict[str, Any]) -> tuple[bool, str]:
+    truth_record = data.get("truth_record")
+    if truth_record is None:
+        return True, "OK"
+    if not isinstance(truth_record, dict):
+        return False, "truth_record must be object when present"
+
+    allowed = {
+        "omega_value",
+        "sieve_state",
+        "edge_contract_ref",
+        "provenance_refs",
+        "adversary_model_refs",
+        "categorical_substrate_ref",
+    }
+    extra = sorted(set(truth_record) - allowed)
+    if extra:
+        return False, f"truth_record contains unsupported fields: {extra}"
+
+    for required in ["omega_value", "sieve_state"]:
+        if required not in truth_record:
+            return False, f"truth_record missing required field: {required}"
+
+    if truth_record["omega_value"] not in OMEGA_VALUES:
+        return False, f"truth_record.omega_value must be one of {sorted(OMEGA_VALUES)}"
+    if truth_record["sieve_state"] not in SIEVE_STATES:
+        return False, f"truth_record.sieve_state must be one of {sorted(SIEVE_STATES)}"
+
+    edge_ref = truth_record.get("edge_contract_ref")
+    if edge_ref is not None and not (isinstance(edge_ref, str) and EDGE_CONTRACT_RE.fullmatch(edge_ref)):
+        return False, "truth_record.edge_contract_ref must be E01-E22"
+
+    for list_field in ["provenance_refs", "adversary_model_refs"]:
+        if list_field in truth_record:
+            if not isinstance(truth_record[list_field], list) or not all(isinstance(item, str) for item in truth_record[list_field]):
+                return False, f"truth_record.{list_field} must be list[str]"
+
+    if truth_record.get("categorical_substrate_ref") not in (None, CATEGORICAL_SUBSTRATE_REF):
+        return False, f"truth_record.categorical_substrate_ref must be {CATEGORICAL_SUBSTRATE_REF}"
+
+    if "policy_threshold_ref" in data:
+        if not isinstance(data["policy_threshold_ref"], str) or not data["policy_threshold_ref"].strip():
+            return False, "policy_threshold_ref must be a non-empty string when present"
+
+    return True, "OK"
 
 
 def check_receipt(data: dict[str, Any]) -> tuple[bool, str]:
@@ -108,7 +183,7 @@ def check_receipt(data: dict[str, Any]) -> tuple[bool, str]:
 
     forbidden_present = sorted(FORBIDDEN_PHASE9_FIELDS & set(data))
     if forbidden_present:
-        return False, "Phase 9 receipt must not claim runtime/semantic verification; forbidden fields present: " + ", ".join(forbidden_present)
+        return False, "Phase 9 receipt must not claim runtime/semantic/truth verification; forbidden fields present: " + ", ".join(forbidden_present)
 
     non_claims = set(data.get("non_claims", []))
     if non_claims != REQUIRED_NON_CLAIMS:
@@ -142,7 +217,7 @@ def check_receipt(data: dict[str, Any]) -> tuple[bool, str]:
     if "composition_rule" in data and not str(data.get("composition_rule", "")).strip():
         return False, "composition_rule must be non-empty"
 
-    return True, "OK"
+    return _check_truth_record(data)
 
 
 def main() -> int:
