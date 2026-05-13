@@ -1,0 +1,28 @@
+{
+  "schema_version": "1.0.0",
+  "receipt_id": "receipt.lawful_learning.alignment_check.semantic_overclaim",
+  "receipt_class": "lawful_learning_alignment_check",
+  "source_repo": "SocioProphet/superconscious",
+  "artifact_ref": {
+    "artifact_class": "AlignmentCheckArtifact",
+    "artifact_id": "alignment.synthetic.pre-publication",
+    "opaque_hash": "sha256:9999999999999999999999999999999999999999999999999999999999999999"
+  },
+  "replay_seal": "sha256:abababababababababababababababababababababababababababababababab",
+  "invariants_checked": [
+    "adapter_dag_acyclic"
+  ],
+  "overall_result": "partial",
+  "semantic_invariant_verification": true,
+  "non_claims": [
+    "no_runtime_replay_execution",
+    "no_runtime_evidence_validation",
+    "no_semantic_invariant_verification",
+    "no_tag_promotion_decision",
+    "no_runtime_circuit_discovery",
+    "no_runtime_ablation_verification",
+    "no_cross_plane_evidence_resolution",
+    "no_cryptographic_authenticity_verification",
+    "no_sourceos_spec_promotion"
+  ]
+}
