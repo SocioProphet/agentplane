@@ -1,0 +1,65 @@
+{
+  "composition_id": "agentplane.evidence_receipt_composition",
+  "composition_kind": "evidence_receipt_composition",
+  "binding_doctrine_version": "v0.1",
+  "evidence_receipt_refs": [
+    {
+      "ref_kind": "evidence_receipt",
+      "ref_id": "receipt.agentplane.execution.synthetic",
+      "opaque_hash": "sha256:d123456789abcdefd123456789abcdefd123456789abcdefd123456789abcdef",
+      "origin_plane": "agentplane"
+    }
+  ],
+  "replay_bundle_refs": [
+    {
+      "ref_kind": "replay_bundle",
+      "ref_id": "replay.bundle.synthetic",
+      "opaque_hash": "sha256:f3456789abcdef12f3456789abcdef12f3456789abcdef12f3456789abcdef12",
+      "origin_plane": "agentplane"
+    }
+  ],
+  "execution_run_refs": [
+    {
+      "ref_kind": "execution_run",
+      "ref_id": "run.agentplane.synthetic",
+      "opaque_hash": "sha256:a456789abcdef123a456789abcdef123a456789abcdef123a456789abcdef123",
+      "origin_plane": "agentplane"
+    }
+  ],
+  "validation_evidence_refs": [
+    {
+      "ref_kind": "validation_evidence",
+      "ref_id": "validation.agentplane.synthetic",
+      "opaque_hash": "sha256:b56789abcdef1234b56789abcdef1234b56789abcdef1234b56789abcdef1234",
+      "origin_plane": "agentplane"
+    }
+  ],
+  "agentplane_run_ledger_refs": [
+    {
+      "ref_kind": "agentplane_run_ledger",
+      "ref_id": "ledger.agentplane.run.synthetic",
+      "opaque_hash": "sha256:c6789abcdef12345c6789abcdef12345c6789abcdef12345c6789abcdef12345",
+      "origin_plane": "agentplane"
+    }
+  ],
+  "bound_modes": {
+    "receipt_integration": "hash_bound_reference",
+    "authority_scope_analysis": "declared_scope_lattice_v1",
+    "non_claim_analysis": "explicit_propagate_or_resolve_v1",
+    "monitor_independence_analysis": "declared_monitor_independence_v1",
+    "evidence_freshness_analysis": "declared_evidence_freshness_v1"
+  },
+  "non_claims": [
+    "no_runtime_receipt_lookup",
+    "no_runtime_non_claim_verification",
+    "no_runtime_monitor_attestation",
+    "no_timestamp_authenticity",
+    "opaque_hashes_not_resolved",
+    "no_runtime_replay_execution",
+    "no_runtime_evidence_validation",
+    "no_runtime_execution_attestation",
+    "no_bundle_to_run_integrity_check",
+    "no_cross_plane_evidence_resolution"
+  ],
+  "runtime_replay_execution": true
+}
