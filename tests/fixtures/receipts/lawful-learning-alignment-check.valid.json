@@ -15,6 +15,16 @@
     "epistemic_non_collapse"
   ],
   "overall_result": "partial",
+  "truth_record": {
+    "omega_value": "partial",
+    "sieve_state": "endpoints_supported_no_chain",
+    "edge_contract_ref": "E04",
+    "provenance_refs": [
+      "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    ],
+    "categorical_substrate_ref": "docs/integration-contracts/lawful-learning-categorical-substrate.md"
+  },
+  "policy_threshold_ref": "policy.lawful_learning.default.acceptance_threshold",
   "non_claims": [
     "no_runtime_replay_execution",
     "no_runtime_evidence_validation",
@@ -24,6 +34,7 @@
     "no_runtime_ablation_verification",
     "no_cross_plane_evidence_resolution",
     "no_cryptographic_authenticity_verification",
-    "no_sourceos_spec_promotion"
+    "no_sourceos_spec_promotion",
+    "no_runtime_truth_annealing"
   ]
 }
