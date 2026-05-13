@@ -1,0 +1,64 @@
+{
+  "apiVersion": "agentplane.socioprophet.org/v0.1",
+  "kind": "AgenticOpsPersonaPolicy",
+  "metadata": {
+    "name": "regulated-enterprise-assistant",
+    "personaId": "regulated-enterprise-assistant",
+    "createdAt": "2026-05-13T12:00:00Z",
+    "ownerRef": "SocioProphet/agentplane-maintainers",
+    "labels": ["agentic-ops", "regulated", "budget-control"]
+  },
+  "spec": {
+    "objectives": {
+      "latency": 0.05,
+      "throughput": 0.05,
+      "costPredictability": 0.15,
+      "correctness": 0.30,
+      "auditability": 0.30,
+      "opsSimplicity": 0.05,
+      "reproducibility": 0.05,
+      "collaboration": 0.05
+    },
+    "budgetDefaults": {
+      "tokensInMax": 200000,
+      "tokensOutMax": 10000,
+      "verificationTokensMax": 15000,
+      "toolCallsMax": 40,
+      "wallClockSecondsMax": 300,
+      "dollarsMax": 5.0,
+      "degradationThresholds": {
+        "warnRatio": 0.70,
+        "degradeRatio": 0.85,
+        "hardStopRatio": 1.0
+      }
+    },
+    "agenticAxes": {
+      "autonomyDepth": 5,
+      "reversibility": "compensable",
+      "planMode": "plan_then_execute",
+      "maxReplans": 1,
+      "verificationJudgeRate": 1.0,
+      "selfConsistencyK": 3,
+      "cascadeEnabled": false
+    },
+    "dataClassAllowlist": ["internal", "sensitive", "regulated"],
+    "modelPolicy": {
+      "routeMode": "consistent_evidence_model",
+      "allowedModelTiers": ["consistent_evidence_model", "large"],
+      "cachePolicy": "prefix_cache_required"
+    },
+    "policyRefs": {
+      "guardrailDecisionAbi": "guardrail-fabric://sourceos.guardrail.decision.v0.1",
+      "policyFabricBudgetPolicy": "policy-fabric://agentic-ops/runtime-budget-control.v0.1",
+      "diffHygieneGate": "SocioProphet/policy-fabric#44"
+    },
+    "telemetry": {
+      "emitPerStepUco": true,
+      "trajectoryHashChainRequired": true,
+      "sinkRefs": [
+        "agentplane://ledgerd/trajectory",
+        "global-devsecops-intelligence://ops.agentic_runtime_budget"
+      ]
+    }
+  }
+}
