@@ -1,0 +1,31 @@
+name: agentic-ops-runtime-budget-control
+
+on:
+  pull_request:
+    paths:
+      - 'docs/agentic-ops-runtime-budget-control-v0.1.md'
+      - 'schemas/agentic-ops-*.schema.v0.1.json'
+      - 'examples/agentic-ops/**'
+      - 'tools/validate_agentic_ops_runtime_budget_control.py'
+      - '.github/workflows/agentic-ops-runtime-budget-control.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'docs/agentic-ops-runtime-budget-control-v0.1.md'
+      - 'schemas/agentic-ops-*.schema.v0.1.json'
+      - 'examples/agentic-ops/**'
+      - 'tools/validate_agentic_ops_runtime_budget_control.py'
+      - '.github/workflows/agentic-ops-runtime-budget-control.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  validate-agentic-ops-runtime-budget-control:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Validate Agentic Ops runtime budget contracts
+        run: python3 tools/validate_agentic_ops_runtime_budget_control.py
