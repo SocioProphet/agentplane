@@ -1,0 +1,70 @@
+name: validate-shir-governed-chain-job
+
+on:
+  pull_request:
+    paths:
+      - "tools/shir_governed_chain_job.py"
+      - "docs/integration/shir-governed-chain.md"
+      - ".github/workflows/validate-shir-governed-chain-job.yml"
+  push:
+    branches: [ main ]
+    paths:
+      - "tools/shir_governed_chain_job.py"
+      - "docs/integration/shir-governed-chain.md"
+      - ".github/workflows/validate-shir-governed-chain-job.yml"
+  workflow_dispatch:
+
+jobs:
+  validate-shir-governed-chain-job:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout agentplane
+        uses: actions/checkout@v4
+        with:
+          path: agentplane
+      - name: Checkout fabric suite
+        uses: actions/checkout@v4
+        with:
+          repository: SocioProphet/prophet-platform-fabric-mlops-ts-suite
+          path: fabric-suite
+      - name: Checkout semantic-serdes schemas
+        uses: actions/checkout@v4
+        with:
+          repository: SocioProphet/semantic-serdes
+          path: semantic-serdes
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install validation dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install jsonschema pyyaml
+      - name: Run AgentPlane SHIR governed-chain fixture job
+        run: |
+          python agentplane/tools/shir_governed_chain_job.py \
+            --fabric-suite fabric-suite \
+            --schema-ref semantic-serdes/schemas \
+            --out-ref /tmp/agentplane-shir-chain \
+            --trace-id trace.shir.governed_chain.ci.001 \
+            --policy-mode fail_closed
+          test -f /tmp/agentplane-shir-chain/chain_run_receipt.json
+          test -f /tmp/agentplane-shir-chain/agentplane_run_record.json
+      - name: Assert AgentPlane run record
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          out = Path('/tmp/agentplane-shir-chain')
+          record = json.loads((out / 'agentplane_run_record.json').read_text())
+          receipt = json.loads((out / 'chain_run_receipt.json').read_text())
+          assert record['job_type'] == 'shir.governed_chain.v0.1'
+          assert record['state'] == 'succeeded'
+          assert record['policy_decision'] == 'ALLOW'
+          assert record['trace_id'] == 'trace.shir.governed_chain.ci.001'
+          assert record['chain_receipt_ref'].endswith('chain_run_receipt.json')
+          assert record['chain_receipt_sha256']
+          assert set(record['stage_receipts']) == {'rdf_to_shir', 'shir_to_pyg', 'semantic_leakage'}
+          assert len(record['artifact_refs']) >= 10
+          assert receipt['semantic_leakage_checked'] is True
+          PY
