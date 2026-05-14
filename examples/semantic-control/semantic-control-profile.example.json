@@ -2,46 +2,57 @@
   "apiVersion": "sct.socioprophet.org/v0.1",
   "kind": "SCTControlProfile",
   "metadata": {
-    "name": "deconfliction-example",
+    "name": "semk-default-audience-pass",
     "version": "0.1.0",
-    "issuedAt": "2026-04-12T00:00:00Z",
-    "expiresAt": "2026-05-12T00:00:00Z",
-    "issuer": "socioprophet-control-authority",
-    "audience": ["agentplane/authorized-executors"],
-    "keyId": "scp-key-001",
-    "profileSha256": "1111111111111111111111111111111111111111111111111111111111111111",
-    "signatureRef": "secrets://semantic-control/signatures/deconfliction-example.sig",
-    "tags": ["deconfliction", "semaphoric", "agentplane"]
+    "issuedAt": "2026-01-01T00:00:00Z",
+    "expiresAt": "2027-01-01T00:00:00Z",
+    "issuer": "urn:socioprophet:agentplane:semantic-control",
+    "audience": [
+      "agentplane-ci",
+      "agentplane-runtime"
+    ],
+    "keyId": "semk-test-key-1",
+    "profileSha256": "62a0d0c56b10d79c5af10210cd959c2922399e9931f1426a3f4f592c93c76f80",
+    "signatureRef": "urn:socioprophet:signature:semk-test-key-1:valid"
   },
   "spec": {
     "motifs": [
-      {"name": "gate", "weight": 1.0, "notes": "admit authorized execution lane"},
-      {"name": "bridge", "weight": 0.8, "notes": "allow constrained handoff"},
-      {"name": "chapel", "weight": 0.7, "notes": "retain local reserve and no-export memory"},
-      {"name": "seal", "weight": 0.6, "notes": "finalize with evidence"}
+      {"name": "gate", "weight": 1.0},
+      {"name": "neck", "weight": 0.8},
+      {"name": "chapel", "weight": 0.7}
     ],
     "runtimeProjection": {
       "lane": "staging",
       "plannerBranchBudget": 3,
-      "toolBudget": 5,
+      "toolBudget": 3,
       "memoryScope": "local-only",
-      "disclosureScope": "restricted",
+      "disclosureScope": "bounded",
       "handoffPolicy": "mediated",
-      "interruptPolicy": "graceful-escalate",
-      "humanGateRequired": true,
-      "maxRunSeconds": 900
+      "interruptPolicy": "standard",
+      "humanGateRequired": false,
+      "breakGlassAllowed": false,
+      "maxRunSeconds": 600,
+      "auditMode": "strict"
     },
     "delivery": {
-      "mode": "a2a-envelope",
-      "authorizedAudience": ["agentplane/authorized-executors"],
+      "mode": "mcp-sidecar",
+      "authorizedAudience": [
+        "agentplane-ci",
+        "agentplane-runtime"
+      ],
       "failClosed": true,
-      "redactionMode": "withhold-profile"
+      "redactionMode": "hash-only"
     },
     "deconfliction": {
       "breakGlassAllowed": false,
-      "breakGlassReasonRequired": true,
+      "breakGlassReasonRequired": false,
       "unauthorizedTelemetry": true,
       "replayBindProfileHash": true
+    },
+    "replayPolicy": {
+      "bindSameHash": true,
+      "allowAuthorizedSuccessor": false,
+      "successorProofRequired": true
     },
     "failMode": "deny"
   }
