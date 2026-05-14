@@ -1,6 +1,6 @@
-.PHONY: validate test validate-governance-context validate-lattice-data-governai-execution-refs validate-lattice-runtime-profile-refs validate-network-native-assistant-evidence validate-guardrail-evidence-artifacts validate-stop-gate-evaluator validate-guarded-workcell-artifact validate-guarded-workcell-executor validate-guarded-invocation-artifact validate-guarded-invocation validate-agentic-pr-work-order validate-semantic-enterprise-agent-boundary validate-ops-history-contracts agentplane-evidence-receipt-composition-tier2-binding-ci
+.PHONY: validate test validate-governance-context validate-lattice-data-governai-execution-refs validate-lattice-runtime-profile-refs validate-network-native-assistant-evidence validate-guardrail-evidence-artifacts validate-stop-gate-evaluator validate-guarded-workcell-artifact validate-guarded-workcell-executor validate-guarded-invocation-artifact validate-guarded-invocation validate-agentic-pr-work-order validate-semantic-enterprise-agent-boundary validate-ops-history-contracts agentplane-evidence-receipt-composition-tier2-binding-ci lawful-learning-phase9-contract-ci
 
-validate: validate-governance-context validate-lattice-data-governai-execution-refs validate-lattice-runtime-profile-refs validate-network-native-assistant-evidence validate-guardrail-evidence-artifacts validate-stop-gate-evaluator validate-guarded-workcell-artifact validate-guarded-workcell-executor validate-guarded-invocation-artifact validate-guarded-invocation validate-agentic-pr-work-order validate-semantic-enterprise-agent-boundary validate-ops-history-contracts agentplane-evidence-receipt-composition-tier2-binding-ci
+validate: validate-governance-context validate-lattice-data-governai-execution-refs validate-lattice-runtime-profile-refs validate-network-native-assistant-evidence validate-guardrail-evidence-artifacts validate-stop-gate-evaluator validate-guarded-workcell-artifact validate-guarded-workcell-executor validate-guarded-invocation-artifact validate-guarded-invocation validate-agentic-pr-work-order validate-semantic-enterprise-agent-boundary validate-ops-history-contracts agentplane-evidence-receipt-composition-tier2-binding-ci lawful-learning-phase9-contract-ci
 	python3 tools/validate_execution_timing.py
 
 validate-governance-context:
@@ -48,6 +48,23 @@ agentplane-evidence-receipt-composition-tier2-binding-ci:
 	python3 -m json.tool tests/fixtures/composition/agentplane-evidence-receipt-composition-tier2-binding.runtime-field.invalid.synthetic.json >/dev/null
 	python3 tools/check_agentplane_evidence_receipt_composition_tier2_binding.py tests/fixtures/composition/agentplane-evidence-receipt-composition-tier2-binding.synthetic.json
 	! python3 tools/check_agentplane_evidence_receipt_composition_tier2_binding.py tests/fixtures/composition/agentplane-evidence-receipt-composition-tier2-binding.runtime-field.invalid.synthetic.json
+
+lawful-learning-phase9-contract-ci:
+	python3 -m json.tool schemas/receipts/lawful-learning-receipt-classes.v1.json >/dev/null
+	python3 -m json.tool tests/fixtures/receipts/lawful-learning-alignment-check.valid.json >/dev/null
+	python3 -m json.tool tests/fixtures/receipts/lawful-learning-circuit-admission.valid.json >/dev/null
+	python3 -m json.tool tests/fixtures/receipts/lawful-learning-decision-emission.valid.json >/dev/null
+	python3 -m json.tool tests/fixtures/receipts/lawful-learning-replay-blackboxing.valid.json >/dev/null
+	python3 -m json.tool tests/fixtures/receipts/lawful-learning-alignment-check.missing-replay-seal.invalid.json >/dev/null
+	python3 -m json.tool tests/fixtures/receipts/lawful-learning-alignment-check.semantic-verification.invalid.json >/dev/null
+	python3 -m json.tool tests/fixtures/receipts/lawful-learning-alignment-check.policy-overwrite.invalid.json >/dev/null
+	python3 tools/check_lawful_learning_phase9_receipts.py tests/fixtures/receipts/lawful-learning-alignment-check.valid.json
+	python3 tools/check_lawful_learning_phase9_receipts.py tests/fixtures/receipts/lawful-learning-circuit-admission.valid.json
+	python3 tools/check_lawful_learning_phase9_receipts.py tests/fixtures/receipts/lawful-learning-decision-emission.valid.json
+	python3 tools/check_lawful_learning_phase9_receipts.py tests/fixtures/receipts/lawful-learning-replay-blackboxing.valid.json
+	! python3 tools/check_lawful_learning_phase9_receipts.py tests/fixtures/receipts/lawful-learning-alignment-check.missing-replay-seal.invalid.json
+	! python3 tools/check_lawful_learning_phase9_receipts.py tests/fixtures/receipts/lawful-learning-alignment-check.semantic-verification.invalid.json
+	! python3 tools/check_lawful_learning_phase9_receipts.py tests/fixtures/receipts/lawful-learning-alignment-check.policy-overwrite.invalid.json
 
 test:
 	python3 -m pytest -q tools/tests
