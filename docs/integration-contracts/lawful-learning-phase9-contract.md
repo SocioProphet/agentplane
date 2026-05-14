@@ -6,7 +6,9 @@
 
 **Scope:** Defines the runtime-evidence integration boundary between `SocioProphet/superconscious` lawful-learning artifacts and `SocioProphet/agentplane` evidence receipts.
 
-**Boundary:** This document is doctrine/specification only. It defines receipt classes and structural validation expectations. It does not add runtime replay execution, semantic verification of lawful-learning invariant outcomes, cross-plane evidence dereferencing, or cryptographic authenticity verification.
+**Categorical substrate:** `docs/integration-contracts/lawful-learning-categorical-substrate.md`
+
+**Boundary:** This document is doctrine/specification only. It defines receipt classes, structural validation expectations, and an optional Ω-valued truth-record surface. It does not add runtime replay execution, semantic verification of lawful-learning invariant outcomes, truth-annealing execution, cross-plane evidence dereferencing, or cryptographic authenticity verification.
 
 ## 1. Upstream producer
 
@@ -43,6 +45,8 @@ artifact_ref
 replay_seal
 invariants_checked
 overall_result
+truth_record optional
+policy_threshold_ref optional
 non_claims
 ```
 
@@ -59,6 +63,8 @@ circuit_id
 discovery_evidence_ref
 ablation_evidence_ref
 replay_seal
+truth_record optional
+policy_threshold_ref optional
 non_claims
 ```
 
@@ -75,6 +81,8 @@ decision_id
 decision_type
 evidence_status_refs
 replay_seal
+truth_record optional
+policy_threshold_ref optional
 non_claims
 ```
 
@@ -92,12 +100,51 @@ seal_a_ref
 seal_b_ref
 composition_rule
 boundary_hash
+truth_record optional
+policy_threshold_ref optional
 non_claims
 ```
 
 At Phase 9, AgentPlane validates the declared fields and the doctrine boundary. It does not execute constituent adapters and does not claim cryptographic authenticity of the seals.
 
-## 3. What AgentPlane validates at Phase 9
+## 3. Categorical truth substrate
+
+Phase 9 receipts may carry an optional `truth_record` grounded in the categorical substrate document.
+
+A `truth_record` may declare:
+
+```text
+omega_value             one of F_v, T_v, bottom_e, sigma_hat, tau_hat, partial, top_e
+sieve_state             declared provenance-closure state
+edge_contract_ref       optional E01-E22 edge contract reference
+provenance_refs         opaque provenance/evidence references
+adversary_model_refs    optional adversary model references
+categorical_substrate_ref
+```
+
+AgentPlane validates only the shape and boundary of this record. It does not compute Grothendieck closure, execute truth annealing, or semantically verify the declared truth value.
+
+## 4. Policy threshold separation
+
+Phase 9 permits a `policy_threshold_ref` to appear beside a `truth_record`.
+
+Legal coupling:
+
+```text
+policy compares policy_threshold_ref with truth_record.omega_value
+```
+
+Forbidden coupling:
+
+```text
+policy_writes_truth_record
+policy_overwrite_omega
+policy_overwrites_sieve_state
+```
+
+The checker rejects those fields. Policy/telos may set an acceptance threshold; it may not mutate `truth_record.omega_value`.
+
+## 5. What AgentPlane validates at Phase 9
 
 AgentPlane validates the following structural properties:
 
@@ -106,12 +153,15 @@ receipt_class is one of the four lawful-learning classes
 required fields are present for the receipt class
 replay_seal or composed_seal is present where required
 non_claims preserve the Phase 9 boundary
+truth_record, if present, uses the seven Ω values and valid E01-E22 edge refs
 receipts do not claim semantic verification
 receipts do not claim runtime replay execution
+receipts do not claim runtime truth annealing
 receipts do not claim cross-plane evidence resolution
+policy does not overwrite truth_record.omega_value
 ```
 
-## 4. What AgentPlane does not validate at Phase 9
+## 6. What AgentPlane does not validate at Phase 9
 
 AgentPlane does not validate:
 
@@ -120,6 +170,8 @@ substantive correctness of invariant outcomes
 substantive correctness of claim promotion decisions
 runtime circuit discovery
 runtime ablation verification
+runtime truth annealing
+Grothendieck topology closure
 cryptographic authenticity of replay seals
 empirical_measurement_ref existence or accuracy
 cross-plane evidence resolution
@@ -129,7 +181,7 @@ Tier 2 verified modes
 
 These remain deferred.
 
-## 5. Receipt class schema
+## 7. Receipt class schema
 
 The receipt classes are specified in:
 
@@ -139,19 +191,21 @@ schemas/receipts/lawful-learning-receipt-classes.v1.json
 
 The schema is repo-local to AgentPlane at Phase 9. It is not promoted to a shared standard in this PR.
 
-## 6. Fixture discipline
+## 8. Fixture discipline
 
 Phase 9 includes:
 
 ```text
 positive fixture per receipt class
+positive truth_record fixture coverage
 negative fixture: missing replay seal
 negative fixture: semantic verification claim
+negative fixture: policy overwrite of omega_value
 ```
 
-The negative fixtures are the load-bearing enforcement surface. They prevent a future refactor from treating Phase 9 receipts as semantic verification or runtime execution receipts.
+The negative fixtures are the load-bearing enforcement surface. They prevent a future refactor from treating Phase 9 receipts as semantic verification, runtime execution, truth annealing, or policy mutation of truth records.
 
-## 7. Non-claims
+## 9. Non-claims
 
 The Phase 9 contract itself carries these non-claims:
 
@@ -165,14 +219,17 @@ no_runtime_ablation_verification
 no_cross_plane_evidence_resolution
 no_cryptographic_authenticity_verification
 no_sourceos_spec_promotion
+no_runtime_truth_annealing
 ```
 
-## 8. Future work
+## 10. Future work
 
 Future work may introduce:
 
 ```text
 verified replay execution receipts
+runtime truth-annealing receipts
+computed Grothendieck topology closure
 cryptographic timestamp/authenticity proofs
 cross-plane evidence resolvers
 empirical measurement resolvers
