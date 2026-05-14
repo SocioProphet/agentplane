@@ -1,0 +1,42 @@
+{
+  "apiVersion": "agentplane.socioprophet.org/v0.1",
+  "kind": "AgenticOpsTrajectoryEvent",
+  "metadata": {
+    "eventId": "urn:agentplane:event:agentic-ops-runtime-budget-control-v0.1:0001",
+    "runId": "urn:agentplane:run:agentic-ops-runtime-budget-control-v0.1:example",
+    "sequence": 1,
+    "capturedAt": "2026-05-13T12:00:05Z"
+  },
+  "spec": {
+    "stepKind": "model_call",
+    "actorRef": "implementation-agent",
+    "modelTier": "consistent_evidence_model",
+    "uco": {
+      "tokensIn": 4000,
+      "tokensOut": 300,
+      "cachedTokens": 0,
+      "verificationTokens": 0,
+      "toolCalls": 0,
+      "wallClockSeconds": 8.2,
+      "dollars": 0.10
+    },
+    "cache": {
+      "cacheablePrefixTokens": 3200,
+      "cacheHitTokens": 0,
+      "cacheHitRatio": 0.0
+    },
+    "hashes": {
+      "previousEventHash": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+      "eventHash": "sha256:29d96d33696891f96eb6fa7943404e78c31ce7031857b188ae43cd924a231168",
+      "promptDigest": "sha256:3fc92f2e9bcf983be7b820177eeb86b9c6044b28e9dd660737d171a9e14932e8",
+      "outputDigest": "sha256:ee479bd1d8b6150bbee5d31c862494892e358c4fb1cf67cb0e0a0b3b44f7b139"
+    },
+    "decisions": {
+      "admissionDecision": "admit",
+      "guardrailDecisionRef": "guardrail-fabric://decision/example-allow",
+      "policyDecisionRefs": [
+        "policy-fabric://agentic-ops/runtime-budget-control.v0.1/example-admit"
+      ]
+    }
+  }
+}
