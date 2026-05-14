@@ -1,0 +1,54 @@
+{
+  "apiVersion": "agentplane.socioprophet.org/v0.1",
+  "kind": "AgentPlaneEvidenceReceiptBinding",
+  "artifactRef": "artifacts/example-agent/run-artifact.json",
+  "artifactKind": "RunArtifact",
+  "receiptId": "urn:srcos:receipt:execution:example-agent-run-0001",
+  "receiptKind": "ExecutionReceipt",
+  "subjectRef": "bundle:example-agent@0.1.0",
+  "issuedTimeUtc": "2026-05-04T21:30:00Z",
+  "standardsRefs": {
+    "receiptSpine": "SocioProphet/socioprophet-standards-storage:docs/standards/138-evidence-receipt-spine.md",
+    "knowledgeLifecycle": "SocioProphet/socioprophet-standards-knowledge:docs/standards/040-knowledge-state-lifecycle.md"
+  },
+  "fieldMappings": [
+    {
+      "artifactField": "kind",
+      "receiptField": "kind",
+      "required": true,
+      "notes": "RunArtifact maps to ExecutionReceipt at the binding layer."
+    },
+    {
+      "artifactField": "bundle",
+      "receiptField": "subjectRef",
+      "required": true,
+      "notes": "Bundle identity becomes the receipt subject reference."
+    },
+    {
+      "artifactField": "capturedAt",
+      "receiptField": "issuedTimeUtc",
+      "required": true,
+      "notes": "AgentPlane artifact capture time becomes the receipt issue time."
+    },
+    {
+      "artifactField": "backendIntent",
+      "receiptField": "backendIntent",
+      "required": true,
+      "notes": "Execution backend intent is preserved for ExecutionReceipt consumers."
+    },
+    {
+      "artifactField": "upstreamArtifacts",
+      "receiptField": "evidenceRefs",
+      "required": false,
+      "notes": "Upstream artifacts can be flattened or referenced as evidence refs."
+    }
+  ],
+  "upstreamArtifactRefs": [
+    "artifacts/example-agent/validation-artifact.json",
+    "artifacts/example-agent/placement-decision.json"
+  ],
+  "policyRefs": [
+    "policy/imports/control-matrix/compiled_policy_bundle_v3.json"
+  ],
+  "notes": "Example binding only. It does not claim runtime receipt emission is implemented."
+}
