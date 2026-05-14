@@ -16,7 +16,7 @@ import sys
 from pathlib import Path
 from typing import Any
 
-ALLOWED_MOTIFS = {"gate", "river", "fork", "neck", "chapel", "bridge", "rupture", "seal"}
+ALLOWED_MOTIFS = {"gate", "channel", "river", "bridge", "neck", "fork", "seal", "rupture", "chapel", "court"}
 ALLOWED_DELIVERY = {"mcp-sidecar", "a2a-envelope", "local-host-context", "zero-trust-selective-delivery"}
 ALLOWED_FAIL_MODES = {"deny", "degrade", "human-escalate", "audit-only"}
 ALLOWED_MEMORY_SCOPES = {"none", "local-only", "session", "workspace"}
@@ -164,8 +164,8 @@ def validate_profile(
         require(projection.get("disclosureScope", "minimal") in {"minimal", "bounded"}, "neck motif must not expand disclosureScope")
     if "fork" in motif_names:
         require(projection.get("plannerBranchBudget", 0) <= 8, "fork motif plannerBranchBudget must be bounded at <= 8")
-    if "river" in motif_names:
-        require(projection.get("maxRunSeconds", 5) <= 3600, "river motif maxRunSeconds must remain bounded")
+    if "river" in motif_names or "channel" in motif_names:
+        require(projection.get("maxRunSeconds", 5) <= 3600, "river/channel motif maxRunSeconds must remain bounded")
     if "rupture" in motif_names:
         require(projection.get("humanGateRequired") is True, "rupture motif requires humanGateRequired projection")
         require(deconfliction.get("breakGlassReasonRequired") is True, "rupture motif requires breakGlassReasonRequired")
