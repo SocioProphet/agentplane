@@ -1,0 +1,173 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://socioprophet.org/schemas/receipts/lawful-learning-receipt-classes.v1.json",
+  "title": "Lawful Learning Receipt Classes",
+  "description": "Phase 9 doctrine-only AgentPlane receipt classes for lawful-learning artifacts. Structural receipts only; no runtime replay execution, semantic verification, truth-annealing execution, or cross-plane evidence resolution.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "receipt_id",
+    "receipt_class",
+    "source_repo",
+    "artifact_ref",
+    "non_claims"
+  ],
+  "properties": {
+    "schema_version": {"const": "1.0.0"},
+    "receipt_id": {
+      "type": "string",
+      "pattern": "^receipt\\.lawful_learning\\.[a-z0-9_.-]+$"
+    },
+    "receipt_class": {
+      "type": "string",
+      "enum": [
+        "lawful_learning_alignment_check",
+        "lawful_learning_circuit_admission",
+        "lawful_learning_decision_emission",
+        "lawful_learning_replay_blackboxing"
+      ]
+    },
+    "source_repo": {"const": "SocioProphet/superconscious"},
+    "artifact_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["artifact_class", "opaque_hash"],
+      "properties": {
+        "artifact_class": {
+          "type": "string",
+          "enum": [
+            "AlignmentCheckArtifact",
+            "CircuitRegistryArtifact",
+            "LawfulLearningDecisionArtifact",
+            "ReplayBlackBoxingArtifact"
+          ]
+        },
+        "artifact_id": {"type": "string"},
+        "opaque_hash": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
+      }
+    },
+    "replay_seal": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "invariants_checked": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"type": "string"}
+    },
+    "overall_result": {"type": "string", "enum": ["pass", "fail", "partial", "deferred"]},
+    "circuit_id": {"type": "string", "pattern": "^circuit\\.[a-z0-9_.-]+$"},
+    "discovery_evidence_ref": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "ablation_evidence_ref": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "decision_id": {"type": "string"},
+    "decision_type": {"type": "string"},
+    "evidence_status_refs": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"type": "string"}
+    },
+    "composed_seal": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "seal_a_ref": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "seal_b_ref": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "composition_rule": {"type": "string", "minLength": 1},
+    "boundary_hash": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "truth_record": {"$ref": "#/$defs/truth_record"},
+    "policy_threshold_ref": {
+      "type": "string",
+      "description": "Optional policy/telos threshold reference. This may be compared against truth_record.omega_value by future policy logic, but this schema forbids policy overwrite of truth_record.omega_value."
+    },
+    "non_claims": {
+      "type": "array",
+      "minItems": 10,
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "no_runtime_replay_execution",
+          "no_runtime_evidence_validation",
+          "no_semantic_invariant_verification",
+          "no_tag_promotion_decision",
+          "no_runtime_circuit_discovery",
+          "no_runtime_ablation_verification",
+          "no_cross_plane_evidence_resolution",
+          "no_cryptographic_authenticity_verification",
+          "no_sourceos_spec_promotion",
+          "no_runtime_truth_annealing"
+        ]
+      }
+    }
+  },
+  "$defs": {
+    "truth_record": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["omega_value", "sieve_state"],
+      "properties": {
+        "omega_value": {
+          "type": "string",
+          "enum": [
+            "F_v",
+            "T_v",
+            "bottom_e",
+            "sigma_hat",
+            "tau_hat",
+            "partial",
+            "top_e"
+          ]
+        },
+        "sieve_state": {
+          "type": "string",
+          "enum": [
+            "no_valid_chain",
+            "source_anchored_only",
+            "target_anchored_only",
+            "endpoints_supported_no_chain",
+            "full_traversal_declared"
+          ]
+        },
+        "edge_contract_ref": {
+          "type": "string",
+          "pattern": "^E(0[1-9]|1[0-9]|2[0-2])$"
+        },
+        "provenance_refs": {
+          "type": "array",
+          "items": {"type": "string"}
+        },
+        "adversary_model_refs": {
+          "type": "array",
+          "items": {"type": "string"}
+        },
+        "categorical_substrate_ref": {
+          "const": "docs/integration-contracts/lawful-learning-categorical-substrate.md"
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"receipt_class": {"const": "lawful_learning_alignment_check"}}},
+      "then": {
+        "required": ["replay_seal", "invariants_checked", "overall_result"],
+        "properties": {"artifact_ref": {"properties": {"artifact_class": {"const": "AlignmentCheckArtifact"}}}}
+      }
+    },
+    {
+      "if": {"properties": {"receipt_class": {"const": "lawful_learning_circuit_admission"}}},
+      "then": {
+        "required": ["circuit_id", "discovery_evidence_ref", "ablation_evidence_ref", "replay_seal"],
+        "properties": {"artifact_ref": {"properties": {"artifact_class": {"const": "CircuitRegistryArtifact"}}}}
+      }
+    },
+    {
+      "if": {"properties": {"receipt_class": {"const": "lawful_learning_decision_emission"}}},
+      "then": {
+        "required": ["decision_id", "decision_type", "evidence_status_refs", "replay_seal"],
+        "properties": {"artifact_ref": {"properties": {"artifact_class": {"const": "LawfulLearningDecisionArtifact"}}}}
+      }
+    },
+    {
+      "if": {"properties": {"receipt_class": {"const": "lawful_learning_replay_blackboxing"}}},
+      "then": {
+        "required": ["composed_seal", "seal_a_ref", "seal_b_ref", "composition_rule", "boundary_hash"],
+        "properties": {"artifact_ref": {"properties": {"artifact_class": {"const": "ReplayBlackBoxingArtifact"}}}}
+      }
+    }
+  ]
+}
