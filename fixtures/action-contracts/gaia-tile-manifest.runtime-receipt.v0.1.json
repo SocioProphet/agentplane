@@ -1,0 +1,26 @@
+{
+  "apiVersion": "agentplane.socioprophet.org/v0.1",
+  "kind": "RuntimeReceipt",
+  "receiptId": "urn:ap:receipt:gaia-tile-manifest-001",
+  "proposalRef": "urn:ap:proposal:gaia-tile-manifest-001",
+  "admissionRef": "urn:ap:admission:gaia-tile-manifest-001",
+  "policyDecisionRef": "urn:policy-decision:guardrail-fabric:gaia-tile-manifest-allow-001",
+  "agentIdentity": {
+    "agentId": "agentplane-gaia-manifest-bot",
+    "agentRef": "urn:agent:agentplane:gaia-manifest-bot"
+  },
+  "runtimeIdentity": {
+    "nodeRef": "urn:node:agentplane:gaia-exec-node-a",
+    "runtimeRef": "urn:runtime:agentplane:lima-process:v0.1"
+  },
+  "runtimeProfile": {
+    "runtimeProfileRef": "urn:runtime-profile:bounded-ingest:readonly-egress",
+    "sandboxProfileRef": "urn:sandbox-profile:gaia-manifest-publish:v2"
+  },
+  "inputHash": "sha256:3333333333333333333333333333333333333333333333333333333333333333",
+  "outputHash": "sha256:4444444444444444444444444444444444444444444444444444444444444444",
+  "logsRef": "urn:agentplane:logs:gaia-tile-manifest-001",
+  "startTime": "2026-05-09T08:45:12Z",
+  "endTime": "2026-05-09T08:46:04Z",
+  "status": "succeeded"
+}
