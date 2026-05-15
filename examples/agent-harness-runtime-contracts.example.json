@@ -1,0 +1,104 @@
+{
+  "schemaVersion": "v0.1",
+  "kind": "AgentHarnessRuntimeContracts",
+  "outcomeSpec": {
+    "outcomeId": "outcome-governed-agent-harness",
+    "title": "Governed agent harness absorption baseline",
+    "riskTier": "medium",
+    "budgetRef": "delivery-excellence://budget/agent-harness-baseline",
+    "successCriteria": [
+      "Runtime contracts are machine-readable",
+      "Evidence pack references Delivery Excellence metrics",
+      "Promotion gate is explicit and not automatic"
+    ],
+    "hardConstraints": [
+      "No live mutation without policy approval",
+      "No customer-sensitive payloads in Delivery Excellence projections"
+    ],
+    "evidenceRequirements": [
+      "runtime-contract-schema",
+      "runtime-contract-example",
+      "policy-decision-ref",
+      "delivery-metric-ref"
+    ],
+    "deliveryExcellenceRef": "github://SocioProphet/delivery-excellence/pull/9"
+  },
+  "graphSpec": {
+    "graphId": "graph-agent-harness-baseline-v0.1",
+    "outcomeRef": "outcome-governed-agent-harness",
+    "nodes": [
+      {
+        "nodeId": "validate-contracts",
+        "nodeType": "deterministic-task",
+        "purpose": "Validate runtime contract examples",
+        "evidenceRequirementRef": "runtime-contract-example"
+      },
+      {
+        "nodeId": "policy-check",
+        "nodeType": "policy-check",
+        "purpose": "Check whether promotion can proceed",
+        "policyGateRef": "policyfabric://gate/promotion"
+      },
+      {
+        "nodeId": "promotion-hold",
+        "nodeType": "promotion-gate",
+        "purpose": "Hold promotion until validation and replay exist",
+        "policyGateRef": "policyfabric://gate/promotion"
+      }
+    ],
+    "edges": [
+      {
+        "from": "validate-contracts",
+        "to": "policy-check",
+        "edgeType": "on-success"
+      },
+      {
+        "from": "policy-check",
+        "to": "promotion-hold",
+        "edgeType": "policy-decision"
+      }
+    ]
+  },
+  "sessionEnvelope": {
+    "sessionId": "session-agent-harness-baseline-v0.1",
+    "runId": "run-agent-harness-baseline-v0.1",
+    "workspaceRef": "github://SocioProphet/sociosphere",
+    "graphRef": "graph-agent-harness-baseline-v0.1",
+    "policyVersionRef": "github://SocioProphet/policy-fabric/pull/60",
+    "memorySnapshotRef": "github://SocioProphet/memory-mesh/pull/23",
+    "eventStreamRef": "agentplane://event-stream/agent-harness-baseline-v0.1",
+    "state": "planned"
+  },
+  "evidencePack": {
+    "evidencePackId": "evidence-agent-harness-baseline-v0.1",
+    "runRef": "run-agent-harness-baseline-v0.1",
+    "artifactRefs": [
+      "github://SocioProphet/agentplane/schemas/agent-harness-runtime-contracts.schema.v0.1.json",
+      "github://SocioProphet/agentplane/examples/agent-harness-runtime-contracts.example.json"
+    ],
+    "policyDecisionRefs": [
+      "github://SocioProphet/policy-fabric/pull/60"
+    ],
+    "humanControlEventRefs": [
+      "github://SocioProphet/delivery-excellence-automation/examples/agent-harness/human-control-event.example.json"
+    ],
+    "deliveryMetricRefs": [
+      "github://SocioProphet/delivery-excellence-automation/pull/7"
+    ],
+    "knownGaps": [
+      "Runtime emitters are not implemented in this schema tranche",
+      "Replay result is not yet generated"
+    ]
+  },
+  "promotionGate": {
+    "promotionId": "promotion-agent-harness-baseline-v0.1",
+    "subjectRef": "graph-agent-harness-baseline-v0.1",
+    "evidencePackRef": "evidence-agent-harness-baseline-v0.1",
+    "validationResult": "pass",
+    "replayResult": "not-run",
+    "policyResult": "not-run",
+    "securityResult": "not-run",
+    "decision": "hold",
+    "decisionActorRef": "github://mdheller"
+  }
+}
