@@ -1,0 +1,77 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ActionAdmission",
+  "type": "object",
+  "required": [
+    "apiVersion",
+    "kind",
+    "admissionId",
+    "proposalRef",
+    "policyDecision",
+    "status",
+    "recordedAt"
+  ],
+  "properties": {
+    "apiVersion": { "const": "agentplane.socioprophet.org/v0.1" },
+    "kind": { "const": "ActionAdmission" },
+    "admissionId": { "type": "string", "minLength": 1 },
+    "proposalRef": { "type": "string", "minLength": 1 },
+    "policyDecision": {
+      "type": "object",
+      "required": ["policyDecisionRef", "decision"],
+      "properties": {
+        "policyDecisionRef": { "type": "string", "minLength": 1 },
+        "decision": { "enum": ["allow", "allow_with_conditions", "deny"] },
+        "policyFabricEnvelopeRef": { "type": ["string", "null"] },
+        "policyDecisionArtifactRef": { "type": ["string", "null"] }
+      },
+      "additionalProperties": false
+    },
+    "runtimeBoundary": {
+      "type": "object",
+      "required": [
+        "nodeRef",
+        "runtimeRef",
+        "runtimeProfileRef",
+        "sandboxProfileRef"
+      ],
+      "properties": {
+        "nodeRef": { "type": "string", "minLength": 1 },
+        "runtimeRef": { "type": "string", "minLength": 1 },
+        "runtimeProfileRef": { "type": "string", "minLength": 1 },
+        "sandboxProfileRef": { "type": "string", "minLength": 1 }
+      },
+      "additionalProperties": false
+    },
+    "status": { "enum": ["admitted", "denied"] },
+    "conditions": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "reason": { "type": ["string", "null"] },
+    "recordedAt": { "type": "string", "format": "date-time" }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "status": { "const": "admitted" }
+        }
+      },
+      "then": {
+        "required": ["runtimeBoundary"]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status": { "const": "denied" }
+        }
+      },
+      "then": {
+        "required": ["reason"]
+      }
+    }
+  ],
+  "additionalProperties": false
+}
