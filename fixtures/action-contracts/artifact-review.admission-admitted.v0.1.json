@@ -1,0 +1,20 @@
+{
+  "apiVersion": "agentplane.socioprophet.org/v0.1",
+  "kind": "ActionAdmission",
+  "admissionId": "urn:ap:admission:artifact-review-001-admitted",
+  "proposalRef": "urn:ap:proposal:artifact-review-001",
+  "policyDecision": {
+    "policyDecisionRef": "urn:policy-decision:guardrail-fabric:artifact-review-allow-001",
+    "decision": "allow",
+    "policyFabricEnvelopeRef": "urn:policy-fabric:verdict-envelope:artifact-review-allow-001",
+    "policyDecisionArtifactRef": "urn:agentplane:artifact:policy-decision:artifact-review-allow-001"
+  },
+  "runtimeBoundary": {
+    "nodeRef": "urn:node:agentplane:office-review-node-a",
+    "runtimeRef": "urn:runtime:agentplane:lima-process:v0.1",
+    "runtimeProfileRef": "urn:runtime-profile:office-artifact-review:readwrite-workspace-only",
+    "sandboxProfileRef": "urn:sandbox-profile:office-review:v1"
+  },
+  "status": "admitted",
+  "recordedAt": "2026-05-09T09:10:05Z"
+}
