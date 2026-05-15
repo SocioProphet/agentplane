@@ -1,0 +1,129 @@
+{
+  "kind": "AgentOperationContract",
+  "operationId": "op-20260506-patch-propose-001",
+  "operationType": "agent.patch.propose",
+  "bundle": "example-agent@0.1.0",
+  "capturedAt": "2026-05-06T19:00:00Z",
+  "authority": {
+    "actingFor": "user:octocat",
+    "scope": ["workspace:write", "pr:propose", "artifacts:emit"],
+    "budget": {
+      "maxTokens": 100000,
+      "maxWallSeconds": 300,
+      "maxFilesMutated": 10
+    },
+    "policyProfileRef": "policy://agentplane/default-patch-propose",
+    "auditLevel": "full"
+  },
+  "lifecycle": {
+    "status": "completed",
+    "startedAt": "2026-05-06T19:00:01Z",
+    "completedAt": "2026-05-06T19:00:42Z",
+    "idempotencyKey": "op-20260506-patch-propose-001/attempt-1",
+    "retryable": true,
+    "retryCount": 0,
+    "cancellation": null,
+    "compensation": null
+  },
+  "tasks": [
+    {
+      "taskId": "task-001-read-context",
+      "taskType": "read-workspace-context",
+      "status": "completed",
+      "startedAt": "2026-05-06T19:00:01Z",
+      "completedAt": "2026-05-06T19:00:05Z",
+      "inputRef": "workspace://SocioProphet/agentplane/main",
+      "outputRef": null,
+      "notes": "Read issue context and repository state"
+    },
+    {
+      "taskId": "task-002-generate-patch",
+      "taskType": "generate-patch",
+      "status": "completed",
+      "startedAt": "2026-05-06T19:00:05Z",
+      "completedAt": "2026-05-06T19:00:38Z",
+      "inputRef": null,
+      "outputRef": "artifact://artifacts/patch/example-patch.diff",
+      "notes": "Generated patch for issue #1 via agent reasoning"
+    },
+    {
+      "taskId": "task-003-emit-artifact",
+      "taskType": "emit-artifact",
+      "status": "completed",
+      "startedAt": "2026-05-06T19:00:38Z",
+      "completedAt": "2026-05-06T19:00:42Z",
+      "inputRef": "artifact://artifacts/patch/example-patch.diff",
+      "outputRef": "artifacts/agent-operation-contract.json",
+      "notes": "Operation contract emitted to artifacts dir"
+    }
+  ],
+  "events": [
+    {
+      "eventId": "evt-001",
+      "eventType": "created",
+      "emittedAt": "2026-05-06T19:00:00Z",
+      "data": { "trigger": "issue-ref", "issueRef": "SocioProphet/agentplane#1" }
+    },
+    {
+      "eventId": "evt-002",
+      "eventType": "updated",
+      "emittedAt": "2026-05-06T19:00:05Z",
+      "data": { "statusTransition": "created -> in-progress" }
+    },
+    {
+      "eventId": "evt-003",
+      "eventType": "artifact_emitted",
+      "emittedAt": "2026-05-06T19:00:38Z",
+      "data": {
+        "artifactId": "artifact-001",
+        "artifactType": "patch",
+        "admissionStatus": "pending-review"
+      }
+    },
+    {
+      "eventId": "evt-004",
+      "eventType": "gate_evaluated",
+      "emittedAt": "2026-05-06T19:00:41Z",
+      "data": { "result": "allow", "policyRef": "policy://agentplane/default-patch-propose" }
+    },
+    {
+      "eventId": "evt-005",
+      "eventType": "completed",
+      "emittedAt": "2026-05-06T19:00:42Z",
+      "data": { "statusTransition": "in-progress -> completed" }
+    }
+  ],
+  "artifacts": [
+    {
+      "artifactId": "artifact-001",
+      "artifactType": "patch",
+      "admissionStatus": "pending-review",
+      "ref": "artifacts/patch/example-patch.diff",
+      "createdAt": "2026-05-06T19:00:38Z",
+      "admittedAt": null,
+      "admittedBy": null
+    }
+  ],
+  "decisionCard": {
+    "decision": "Propose a patch that adds agent operation contract routing to the repository",
+    "rationale": "The issue requires agent writes to flow through OperationContracts for observability and governance.",
+    "constraints": [
+      "Patch must be proposed, not applied directly",
+      "Artifact admission requires human review before activation",
+      "Side effects are recorded in this contract"
+    ],
+    "reviewRequired": true,
+    "reviewedBy": null,
+    "reviewedAt": null
+  },
+  "policyGate": {
+    "evaluated": true,
+    "result": "allow",
+    "policyRef": "policy://agentplane/default-patch-propose",
+    "evaluatedAt": "2026-05-06T19:00:41Z",
+    "reason": "Operation type allowed under delegated authority with full audit"
+  },
+  "replayRef": null,
+  "ledgerRef": null,
+  "governanceContext": null
+}
