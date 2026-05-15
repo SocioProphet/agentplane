@@ -1,6 +1,6 @@
-.PHONY: validate test validate-governance-context validate-lattice-data-governai-execution-refs validate-lattice-runtime-profile-refs validate-network-native-assistant-evidence validate-guardrail-evidence-artifacts validate-stop-gate-evaluator validate-guarded-workcell-artifact validate-guarded-workcell-executor validate-guarded-invocation-artifact validate-guarded-invocation validate-agentic-pr-work-order validate-semantic-enterprise-agent-boundary validate-ops-history-contracts validate-action-contracts validate-agent-operation-contract agentplane-evidence-receipt-composition-tier2-binding-ci lawful-learning-phase9-contract-ci validate-evidence-receipt-binding
+.PHONY: validate test validate-governance-context validate-lattice-data-governai-execution-refs validate-lattice-runtime-profile-refs validate-network-native-assistant-evidence validate-guardrail-evidence-artifacts validate-stop-gate-evaluator validate-guarded-workcell-artifact validate-guarded-workcell-executor validate-guarded-invocation-artifact validate-guarded-invocation validate-agentic-pr-work-order validate-semantic-enterprise-agent-boundary validate-ops-history-contracts validate-action-contracts validate-agent-operation-contract validate-superconscious-reasoning-import agentplane-evidence-receipt-composition-tier2-binding-ci lawful-learning-phase9-contract-ci validate-evidence-receipt-binding
 
-validate: validate-governance-context validate-lattice-data-governai-execution-refs validate-lattice-runtime-profile-refs validate-network-native-assistant-evidence validate-guardrail-evidence-artifacts validate-stop-gate-evaluator validate-guarded-workcell-artifact validate-guarded-workcell-executor validate-guarded-invocation-artifact validate-guarded-invocation validate-agentic-pr-work-order validate-semantic-enterprise-agent-boundary validate-ops-history-contracts validate-action-contracts validate-agent-operation-contract agentplane-evidence-receipt-composition-tier2-binding-ci lawful-learning-phase9-contract-ci validate-evidence-receipt-binding
+validate: validate-governance-context validate-lattice-data-governai-execution-refs validate-lattice-runtime-profile-refs validate-network-native-assistant-evidence validate-guardrail-evidence-artifacts validate-stop-gate-evaluator validate-guarded-workcell-artifact validate-guarded-workcell-executor validate-guarded-invocation-artifact validate-guarded-invocation validate-agentic-pr-work-order validate-semantic-enterprise-agent-boundary validate-ops-history-contracts validate-action-contracts validate-agent-operation-contract validate-superconscious-reasoning-import agentplane-evidence-receipt-composition-tier2-binding-ci lawful-learning-phase9-contract-ci validate-evidence-receipt-binding
 	python3 tools/validate_execution_timing.py
 
 validate-governance-context:
@@ -47,6 +47,9 @@ validate-action-contracts:
 
 validate-agent-operation-contract:
 	python3 tools/validate_agent_operation_contract.py
+
+validate-superconscious-reasoning-import:
+	python3 scripts/import_superconscious_reasoning.py examples/superconscious/deterministic
 
 agentplane-evidence-receipt-composition-tier2-binding-ci:
 	python3 -m json.tool schemas/composition/agentplane-evidence-receipt-composition-tier2-binding.v1.json >/dev/null
