@@ -1,0 +1,25 @@
+{
+  "apiVersion": "agentplane.socioprophet.ai/v1",
+  "kind": "Bundle",
+  "metadata": {
+    "name": "lawful-learning-toy",
+    "description": "Deterministic toy bundle for calibrated lawful learning worked examples",
+    "licensePolicy": {
+      "allowAGPL": false
+    }
+  },
+  "spec": {
+    "policy": {
+      "maxRunSeconds": 300
+    },
+    "artifacts": {
+      "outDir": "artifacts/lawful-learning-toy"
+    },
+    "entrypoint": "bash smoke.sh",
+    "evidence": [
+      "ValidationArtifact",
+      "RunArtifact",
+      "ReplayArtifact"
+    ]
+  }
+}
