@@ -1,0 +1,99 @@
+{
+  "apiVersion": "agentplane.socioprophet.org/v0.1",
+  "kind": "Bundle",
+  "metadata": {
+    "createdAt": "2026-05-06T00:00:00-04:00",
+    "licensePolicy": {
+      "allowAGPL": false,
+      "notes": "Regis ACR smoke bundle must remain permissive-friendly and fixture-backed."
+    },
+    "name": "regis-acr-service-smoke",
+    "source": {
+      "git": {
+        "dirty": true,
+        "rev": "UNSET"
+      }
+    },
+    "version": "0.1.0"
+  },
+  "spec": {
+    "artifacts": {
+      "outDir": "./artifacts/regis-acr-service-smoke"
+    },
+    "governanceContext": {
+      "principal": {
+        "spiffe_id": "spiffe://socioprophet.dev/agentplane/regis-acr-service-smoke",
+        "aum_digest": "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+        "session_id": "sess-regis-acr-smoke-01"
+      },
+      "protocolIdentityAliases": {
+        "a2a_agent_card_ref": "a2a://agents/regis-acr-service-smoke/card",
+        "a2a_task_ref": "a2a://tasks/regis-acr-service-smoke/demo-task-001",
+        "mcp_server_ref": "mcp://servers/regis-acr-service-smoke",
+        "mcp_tool_ref": "mcp://tools/regis-acr-service-smoke/smoke",
+        "anp_agent_ref": "anp://agents/regis-acr-service-smoke",
+        "anp_service_ref": "anp://services/regis-acr-service-smoke/smoke",
+        "agui_session_ref": "agui://sessions/regis-acr-service-smoke/session-001",
+        "agui_component_ref": "agui://components/regis-acr-service-smoke/run-button",
+        "agui_event_ref": "agui://events/regis-acr-service-smoke/run-click-001",
+        "aliases": []
+      },
+      "grantRef": "grant://mcp-a2a-zero-trust/regis-acr-service-smoke/staging",
+      "policyDecisionRef": "decision://policy-fabric/regis-acr-service-smoke/staging",
+      "policyHash": "sha256:dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+      "runtimeEvidence": {
+        "eventIrRef": "evidence://regis-acr/service-smoke/event-ir/2026-05-06",
+        "proofArtifactRef": "evidence://regis-acr/service-smoke/proof/2026-05-06",
+        "hdtDecisionSummaryRef": "evidence://hdt/regis-acr-service-smoke/decision/2026-05-06",
+        "attestationBundleRef": "attest://tsi/regis-acr-service-smoke/bundle/2026-05-06",
+        "transportReceiptRef": "receipt://tritrpc/regis-acr-service-smoke/session/2026-05-06"
+      },
+      "controlMatrix": {
+        "rowIds": [
+          "ACR-001",
+          "ID-PRIME-001"
+        ],
+        "exceptionRefs": [],
+        "incidentRefs": []
+      }
+    },
+    "policy": {
+      "failOnTimeout": true,
+      "humanGateRequired": false,
+      "lane": "staging",
+      "maxRunSeconds": 60,
+      "policyPackHash": "UNSET",
+      "policyPackRef": "policy-packs/regis-acr/default"
+    },
+    "secrets": {
+      "required": [],
+      "secretRefRoot": "secrets://none"
+    },
+    "smoke": {
+      "script": "bundles/regis-acr-service-smoke/smoke.sh"
+    },
+    "vm": {
+      "backendIntent": "lima-process",
+      "modulePath": "bundles/regis-acr-service-smoke/vm.nix",
+      "mounts": [
+        {
+          "ro": false,
+          "source": "./artifacts/regis-acr-service-smoke",
+          "target": "/mnt/artifacts",
+          "type": "9p"
+        }
+      ],
+      "network": {
+        "egressAllowlist": [
+          "dns"
+        ],
+        "mode": "nat"
+      },
+      "resources": {
+        "diskGiB": 8,
+        "memMiB": 2048,
+        "vcpu": 2
+      }
+    }
+  }
+}
