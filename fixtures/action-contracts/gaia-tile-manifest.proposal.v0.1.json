@@ -1,0 +1,41 @@
+{
+  "apiVersion": "agentplane.socioprophet.org/v0.1",
+  "kind": "ActionProposal",
+  "proposalId": "urn:ap:proposal:gaia-tile-manifest-001",
+  "agentIntentRef": "urn:claim:agent-intent:gaia-tile-manifest-publish",
+  "actionType": "gaia.tile_manifest.publish",
+  "targetRef": "urn:gaia:tile-manifest:planetary/v2026.05.09",
+  "parametersHash": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+  "claims": [
+    {
+      "claimRef": "urn:claim:action-intent:gaia:tile-manifest:publish",
+      "role": "intent"
+    },
+    {
+      "claimRef": "urn:claim:expected-effect:gaia:tile-manifest-index-updated",
+      "role": "expected_effect"
+    }
+  ],
+  "evidence": [
+    {
+      "evidenceRef": "urn:sherlock:evidence:gaia-dataset-integrity:v17",
+      "digest": "sha256:2222222222222222222222222222222222222222222222222222222222222222"
+    }
+  ],
+  "expectedEffects": [
+    "manifest index includes 2026-05-09 tile set",
+    "tile retrieval map points at bounded ingest artifact hashes"
+  ],
+  "priorActionSimilarity": {
+    "reEvaluationRequired": true,
+    "vectorCandidates": [
+      {
+        "candidateRef": "urn:ap:receipt:gaia-tile-manifest-2026-05-02",
+        "score": 0.94,
+        "candidateOnly": true,
+        "admissionAuthority": false
+      }
+    ]
+  },
+  "createdAt": "2026-05-09T08:45:00Z"
+}
