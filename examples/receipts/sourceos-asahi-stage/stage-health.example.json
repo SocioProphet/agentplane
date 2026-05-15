@@ -1,0 +1,17 @@
+{
+  "kind": "SourceOSStageHealth",
+  "bundle": "sourceos-asahi-stage",
+  "generatedAt": "2026-04-22T12:00:00Z",
+  "status": "ok",
+  "checks": [
+    { "name": "config-mount", "status": "ok" },
+    { "name": "evidence-mount", "status": "ok" },
+    { "name": "secret-file-presence", "status": "ok" }
+  ],
+  "refs": {
+    "workstationContract": "fedora-asahi-m2-nix-control-plane",
+    "bootSurface": "urn:srcos:boot-surface:fedora-asahi-m2-main",
+    "storageSurface": "urn:srcos:storage-surface:fedora-asahi-m2-main",
+    "stagedDeployment": "urn:srcos:staged-deployment:fedora-asahi-m2-2026-04-15-a"
+  }
+}
