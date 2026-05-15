@@ -1,0 +1,46 @@
+{
+  "apiVersion": "agentplane.socioprophet.org/v0.1",
+  "kind": "AgenticOpsBudgetLedger",
+  "metadata": {
+    "runId": "urn:agentplane:run:agentic-ops-runtime-budget-control-v0.1:example",
+    "personaPolicyRef": "examples/agentic-ops/regulated-persona-policy.example.json",
+    "workloadSignatureRef": "examples/agentic-ops/regulated-workload-signature.example.json",
+    "createdAt": "2026-05-13T12:00:00Z"
+  },
+  "spec": {
+    "admissionDecision": "admit",
+    "caps": {
+      "tokensIn": 200000,
+      "tokensOut": 10000,
+      "cachedTokens": 150000,
+      "verificationTokens": 15000,
+      "toolCalls": 40,
+      "wallClockSeconds": 300,
+      "dollars": 5.0
+    },
+    "observed": {
+      "tokensIn": 4000,
+      "tokensOut": 300,
+      "cachedTokens": 0,
+      "verificationTokens": 0,
+      "toolCalls": 1,
+      "wallClockSeconds": 12.5,
+      "dollars": 0.12
+    },
+    "remaining": {
+      "tokensIn": 196000,
+      "tokensOut": 9700,
+      "cachedTokens": 150000,
+      "verificationTokens": 15000,
+      "toolCalls": 39,
+      "wallClockSeconds": 287.5,
+      "dollars": 4.88
+    },
+    "degradationState": "normal",
+    "degradationActions": [],
+    "policyRefs": [
+      "policy-fabric://agentic-ops/runtime-budget-control.v0.1",
+      "guardrail-fabric://sourceos.guardrail.decision.v0.1"
+    ]
+  }
+}
