@@ -1,0 +1,61 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.socioprophet.org/agentplane/agentic-ops-workload-signature.schema.v0.1.json",
+  "title": "Agentic Ops Workload Signature",
+  "description": "Expected workload-shape contract for AgentPlane runtime budget admission.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["apiVersion", "kind", "metadata", "spec"],
+  "properties": {
+    "apiVersion": {"const": "agentplane.socioprophet.org/v0.1"},
+    "kind": {"const": "AgenticOpsWorkloadSignature"},
+    "metadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "taskRef", "createdAt"],
+      "properties": {
+        "name": {"type": "string", "minLength": 1},
+        "personaId": {"type": "string", "minLength": 1},
+        "taskRef": {"type": "string", "minLength": 1},
+        "repository": {"type": "string", "minLength": 1},
+        "runId": {"type": "string", "minLength": 1},
+        "eventId": {"type": "string", "minLength": 1},
+        "sequence": {"type": "integer", "minimum": 0},
+        "createdAt": {"type": "string", "format": "date-time"},
+        "capturedAt": {"type": "string", "format": "date-time"},
+        "ownerRef": {"type": "string", "minLength": 1},
+        "labels": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+        "personaPolicyRef": {"type": "string", "minLength": 1},
+        "workloadSignatureRef": {"type": "string", "minLength": 1}
+      }
+    },
+    "spec": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "scenario",
+        "dataClass",
+        "sensitivityClass",
+        "expectedTrajectoryLength",
+        "expectedToolCalls",
+        "readWriteRatio",
+        "hotnessSkew",
+        "actionReversibilityRequired",
+        "humanCheckpointRequired",
+        "expectedValidationCommands"
+      ],
+      "properties": {
+        "scenario": {"enum": ["interactive_qa", "plan_then_execute", "react_exploration", "multi_agent_pipeline", "long_horizon_assistant", "agentic_pr"]},
+        "dataClass": {"enum": ["public", "internal", "sensitive", "regulated", "forensic"]},
+        "sensitivityClass": {"enum": ["public", "internal", "sensitive", "regulated", "forensic"]},
+        "expectedTrajectoryLength": {"type": "integer", "minimum": 1},
+        "expectedToolCalls": {"type": "integer", "minimum": 0},
+        "readWriteRatio": {"type": "number", "minimum": 0, "maximum": 1},
+        "hotnessSkew": {"type": "number", "minimum": 0, "maximum": 1},
+        "actionReversibilityRequired": {"enum": ["none", "idempotent_only", "compensable", "unrestricted"]},
+        "humanCheckpointRequired": {"type": "boolean"},
+        "expectedValidationCommands": {"type": "array", "items": {"type": "string"}, "uniqueItems": true}
+      }
+    }
+  }
+}
