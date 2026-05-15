@@ -1,0 +1,22 @@
+{
+  "id": "urn:srcos:reasoning-replay-plan:agentplane-fixture",
+  "type": "ReasoningReplayPlan",
+  "specVersion": "2.0.0",
+  "runRef": "urn:srcos:reasoning-run:agentplane-fixture",
+  "replayClass": "exact",
+  "inputs": {
+    "taskRef": "urn:srcos:reasoning-task:agentplane-fixture",
+    "taskHash": "sha256:agentplane-fixture-task",
+    "mode": "deterministic-local"
+  },
+  "constraints": {
+    "network": "denied",
+    "modelCalls": "denied",
+    "hostState": "unchanged"
+  },
+  "stepRefs": [
+    "urn:srcos:reasoning-event:agentplane-fixture-created",
+    "urn:srcos:reasoning-event:agentplane-fixture-completed"
+  ],
+  "capturedAt": "2026-05-05T00:00:01Z"
+}
