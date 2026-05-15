@@ -1,0 +1,59 @@
+flowchart LR
+  subgraph Clients[Clients and operator surfaces]
+    B[Browser client]
+    N[Native app client]
+    A[Admin and operator UI]
+    API[External API consumers]
+  end
+
+  FE[Front-end / API gateway]
+
+  B --> FE
+  N --> FE
+  A --> FE
+  API --> FE
+
+  subgraph ACP[The Agentic Control Plane]
+    UM[User management / auth]
+    ST[Session and thread management]
+    TW[Task and workload management]
+    AD[Agent directory]
+    MB[Message bus / eventing]
+    SM[State management / datastore]
+    PS[Persistence and storage]
+  end
+
+  FE --> ACP
+
+  subgraph SEC[Security, governance, and compliance]
+    RBAC[RBAC / ABAC]
+    AUDIT[Audit / logging]
+    SECRETS[Secrets management]
+    OBS[Observability]
+    POLICY[Policy engine]
+    DG[Data governance]
+  end
+
+  subgraph INT[Integrations and adaptors]
+    CHAT[Slack / Teams / chat]
+    COMMS[Email / SMS / voice]
+    CAL[Calendar / docs]
+    SYS[CRM / ERP / databases]
+    RPA[RPA / browsers / legacy]
+    IOT[IoT / robotics]
+  end
+
+  subgraph CAP[Capabilities and execution]
+    SKILL[Skill registry]
+    WF[Workflows / automation]
+    RULES[Rules / expert systems]
+    MODELS[ML / AI models]
+    WORKERS[Agent workers]
+    TOOLS[APIs and tools]
+  end
+
+  ACP --> INT
+  ACP --> CAP
+  SEC -. guards .-> ACP
+  SEC -. governs .-> INT
+  SEC -. constrains .-> CAP
