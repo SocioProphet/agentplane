@@ -1,0 +1,80 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ActionProposal",
+  "type": "object",
+  "required": [
+    "apiVersion",
+    "kind",
+    "proposalId",
+    "agentIntentRef",
+    "actionType",
+    "targetRef",
+    "claims",
+    "evidence",
+    "expectedEffects",
+    "createdAt"
+  ],
+  "properties": {
+    "apiVersion": { "const": "agentplane.socioprophet.org/v0.1" },
+    "kind": { "const": "ActionProposal" },
+    "proposalId": { "type": "string", "minLength": 1 },
+    "agentIntentRef": { "type": "string", "minLength": 1 },
+    "actionType": { "type": "string", "minLength": 1 },
+    "targetRef": { "type": "string", "minLength": 1 },
+    "parametersHash": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+    "claims": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["claimRef", "role"],
+        "properties": {
+          "claimRef": { "type": "string", "minLength": 1 },
+          "role": { "enum": ["intent", "expected_effect", "precondition"] }
+        },
+        "additionalProperties": false
+      }
+    },
+    "evidence": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["evidenceRef"],
+        "properties": {
+          "evidenceRef": { "type": "string", "minLength": 1 },
+          "digest": { "type": ["string", "null"], "pattern": "^sha256:[a-f0-9]{64}$" }
+        },
+        "additionalProperties": false
+      }
+    },
+    "expectedEffects": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "priorActionSimilarity": {
+      "type": "object",
+      "required": ["reEvaluationRequired", "vectorCandidates"],
+      "properties": {
+        "reEvaluationRequired": { "const": true },
+        "vectorCandidates": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["candidateRef", "score", "candidateOnly", "admissionAuthority"],
+            "properties": {
+              "candidateRef": { "type": "string", "minLength": 1 },
+              "score": { "type": "number", "minimum": 0, "maximum": 1 },
+              "candidateOnly": { "const": true },
+              "admissionAuthority": { "const": false }
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "createdAt": { "type": "string", "format": "date-time" }
+  },
+  "additionalProperties": false
+}
