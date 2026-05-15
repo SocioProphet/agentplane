@@ -1,0 +1,24 @@
+{
+  "apiVersion": "agentplane.socioprophet.org/v0.1",
+  "kind": "ActionAdmission",
+  "admissionId": "urn:ap:admission:gaia-tile-manifest-001",
+  "proposalRef": "urn:ap:proposal:gaia-tile-manifest-001",
+  "policyDecision": {
+    "policyDecisionRef": "urn:policy-decision:guardrail-fabric:gaia-tile-manifest-allow-001",
+    "decision": "allow_with_conditions",
+    "policyFabricEnvelopeRef": "urn:policy-fabric:verdict-envelope:gaia-tile-manifest-001",
+    "policyDecisionArtifactRef": "urn:agentplane:artifact:policy-decision:gaia-tile-manifest-001"
+  },
+  "runtimeBoundary": {
+    "nodeRef": "urn:node:agentplane:gaia-exec-node-a",
+    "runtimeRef": "urn:runtime:agentplane:lima-process:v0.1",
+    "runtimeProfileRef": "urn:runtime-profile:bounded-ingest:readonly-egress",
+    "sandboxProfileRef": "urn:sandbox-profile:gaia-manifest-publish:v2"
+  },
+  "status": "admitted",
+  "conditions": [
+    "write scope limited to gaia tile-manifest workspace",
+    "all output artifacts must be hash-logged"
+  ],
+  "recordedAt": "2026-05-09T08:45:04Z"
+}
