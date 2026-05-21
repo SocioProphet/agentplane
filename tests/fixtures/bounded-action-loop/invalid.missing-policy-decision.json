@@ -1,0 +1,26 @@
+{
+  "schema_version": "0.1",
+  "kind": "bounded_action_loop",
+  "loop_id": "loop-invalid-missing-policy",
+  "action_proposal": {
+    "proposal_id": "proposal-invalid-missing-policy",
+    "action_type": "record_event_instance",
+    "risk_class": "low",
+    "evidence_refs": ["SocioProphet/sherlock-search#58:valid.confirmed-bibliographic"],
+    "requested_result": "record bounded synthetic event instance"
+  },
+  "policy_decision_ref": "",
+  "runtime_trace": {
+    "trace_id": "trace-invalid-missing-policy",
+    "proposal_ref": "proposal-invalid-missing-policy",
+    "policy_decision_ref": "",
+    "trace_status": "recorded",
+    "no_external_side_effects": true
+  },
+  "outcome_record": {
+    "outcome_id": "outcome-invalid-missing-policy",
+    "proposal_ref": "proposal-invalid-missing-policy",
+    "policy_decision_ref": "",
+    "result": "recorded"
+  }
+}

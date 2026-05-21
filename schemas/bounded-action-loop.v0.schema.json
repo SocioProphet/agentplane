@@ -1,0 +1,89 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/SocioProphet/agentplane/schemas/bounded-action-loop.v0.schema.json",
+  "title": "Bounded Action Loop v0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "kind",
+    "loop_id",
+    "action_proposal",
+    "policy_decision_ref",
+    "runtime_trace",
+    "outcome_record"
+  ],
+  "properties": {
+    "schema_version": {"const": "0.1"},
+    "kind": {"const": "bounded_action_loop"},
+    "loop_id": {"type": "string", "minLength": 3},
+    "action_proposal": {"$ref": "#/$defs/actionProposal"},
+    "policy_decision_ref": {"type": "string", "minLength": 1},
+    "runtime_trace": {"$ref": "#/$defs/runtimeTrace"},
+    "outcome_record": {"$ref": "#/$defs/outcomeRecord"},
+    "trait_baseline": {"$ref": "#/$defs/traitBaseline"},
+    "trait_drift_metric": {"$ref": "#/$defs/traitDriftMetric"}
+  },
+  "$defs": {
+    "actionProposal": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["proposal_id", "action_type", "risk_class", "evidence_refs", "requested_result"],
+      "properties": {
+        "proposal_id": {"type": "string", "minLength": 1},
+        "action_type": {"enum": ["record_event_instance", "record_diagnostic_finding", "emit_audit_packet"]},
+        "risk_class": {"enum": ["low", "moderate", "high", "critical"]},
+        "evidence_refs": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"type": "string", "minLength": 1}
+        },
+        "requested_result": {"type": "string", "minLength": 1}
+      }
+    },
+    "runtimeTrace": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["trace_id", "proposal_ref", "policy_decision_ref", "trace_status", "no_external_side_effects"],
+      "properties": {
+        "trace_id": {"type": "string", "minLength": 1},
+        "proposal_ref": {"type": "string", "minLength": 1},
+        "policy_decision_ref": {"type": "string", "minLength": 1},
+        "trace_status": {"enum": ["recorded", "blocked", "modified", "escalated"]},
+        "no_external_side_effects": {"const": true},
+        "audit_ref": {"type": "string"}
+      }
+    },
+    "outcomeRecord": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["outcome_id", "proposal_ref", "policy_decision_ref", "result"],
+      "properties": {
+        "outcome_id": {"type": "string", "minLength": 1},
+        "proposal_ref": {"type": "string", "minLength": 1},
+        "policy_decision_ref": {"type": "string", "minLength": 1},
+        "result": {"enum": ["recorded", "blocked", "modified", "escalated"]},
+        "audit_ref": {"type": "string"}
+      }
+    },
+    "traitBaseline": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["baseline_id", "observational_only"],
+      "properties": {
+        "baseline_id": {"type": "string", "minLength": 1},
+        "observational_only": {"const": true}
+      }
+    },
+    "traitDriftMetric": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["metric_id", "observational_only", "value"],
+      "properties": {
+        "metric_id": {"type": "string", "minLength": 1},
+        "observational_only": {"const": true},
+        "value": {"type": "number"}
+      }
+    }
+  }
+}
