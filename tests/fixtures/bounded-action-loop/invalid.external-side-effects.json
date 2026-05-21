@@ -1,0 +1,26 @@
+{
+  "schema_version": "0.1",
+  "kind": "bounded_action_loop",
+  "loop_id": "loop-invalid-side-effects",
+  "action_proposal": {
+    "proposal_id": "proposal-invalid-side-effects",
+    "action_type": "record_event_instance",
+    "risk_class": "low",
+    "evidence_refs": ["SocioProphet/sherlock-search#58:valid.confirmed-bibliographic"],
+    "requested_result": "record bounded synthetic event instance"
+  },
+  "policy_decision_ref": "SocioProphet/policy-fabric#85:pd-synthetic-allow-001",
+  "runtime_trace": {
+    "trace_id": "trace-invalid-side-effects",
+    "proposal_ref": "proposal-invalid-side-effects",
+    "policy_decision_ref": "SocioProphet/policy-fabric#85:pd-synthetic-allow-001",
+    "trace_status": "recorded",
+    "no_external_side_effects": false
+  },
+  "outcome_record": {
+    "outcome_id": "outcome-invalid-side-effects",
+    "proposal_ref": "proposal-invalid-side-effects",
+    "policy_decision_ref": "SocioProphet/policy-fabric#85:pd-synthetic-allow-001",
+    "result": "recorded"
+  }
+}
