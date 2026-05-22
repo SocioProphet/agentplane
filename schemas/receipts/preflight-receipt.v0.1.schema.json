@@ -1,0 +1,62 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.socioprophet.org/agentplane/receipts/preflight-receipt.v0.1.schema.json",
+  "title": "PreflightReceipt v0.1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "recordType",
+    "receipt_id",
+    "run_id",
+    "governed_run_contract_ref",
+    "mode",
+    "authoritative_safety_owner",
+    "outcome",
+    "runtime_action",
+    "safety_preflight_input",
+    "findings",
+    "generated_at",
+    "receipt_hash"
+  ],
+  "properties": {
+    "schemaVersion": {"const": "agentplane.preflight-receipt.v0.1"},
+    "recordType": {"const": "PreflightReceipt"},
+    "receipt_id": {"type": "string"},
+    "run_id": {"type": "string"},
+    "governed_run_contract_ref": {"type": "string"},
+    "mode": {"type": "string", "enum": ["readonly_projection"]},
+    "authoritative_safety_owner": {"type": "string"},
+    "outcome": {"type": "string", "enum": ["pass", "require-review", "block"]},
+    "runtime_action": {"type": "string", "enum": ["allow", "require-review", "block"]},
+    "safety_preflight_input": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["verification_commands", "allowed_paths", "denied_paths", "network_mode", "allowed_network_domains", "approval_policy"],
+      "properties": {
+        "verification_commands": {"type": "array", "items": {"type": "string"}},
+        "allowed_paths": {"type": "array", "items": {"type": "string"}},
+        "denied_paths": {"type": "array", "items": {"type": "string"}},
+        "network_mode": {"type": "string"},
+        "allowed_network_domains": {"type": "array", "items": {"type": "string"}},
+        "approval_policy": {"type": "object", "additionalProperties": {"type": "boolean"}}
+      }
+    },
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["kind", "severity", "message"],
+        "properties": {
+          "kind": {"type": "string"},
+          "severity": {"type": "string", "enum": ["info", "require-review", "block"]},
+          "message": {"type": "string"}
+        }
+      }
+    },
+    "generated_at": {"type": "string"},
+    "receipt_hash": {"type": "string", "pattern": "^sha256:"},
+    "labels": {"type": "object", "additionalProperties": {"type": "string"}}
+  }
+}
