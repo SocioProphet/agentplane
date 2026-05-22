@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "AgentPlane Workroom Context Evidence v0.1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["kind", "capturedAt", "workspaceId", "workroomRef", "contextGraphRef", "agentPlaneRefs", "platformRefs", "policyRefs", "evidenceRefs", "nonGoals"],
+  "properties": {
+    "kind": { "const": "WorkroomContextEvidence" },
+    "capturedAt": { "type": "string", "format": "date-time" },
+    "workspaceId": { "type": "string" },
+    "workroomRef": { "type": "string" },
+    "professionalWorkroomRef": { "type": ["string", "null"] },
+    "contextGraphRef": { "type": "string" },
+    "runtimeBindingRef": { "type": ["string", "null"] },
+    "agentRefs": { "type": "array", "items": { "type": "string" } },
+    "registryRefs": { "type": "array", "items": { "type": "string" } },
+    "recallRefs": { "type": "array", "items": { "type": "string" } },
+    "agentPlaneRefs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["bundleRef", "runRef", "replayRef"],
+      "properties": {
+        "bundleRef": { "type": "string" },
+        "runRef": { "type": "string" },
+        "replayRef": { "type": "string" }
+      }
+    },
+    "platformRefs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["eventEnvelopeRefs", "evidenceReceiptRefs"],
+      "properties": {
+        "eventEnvelopeRefs": { "type": "array", "items": { "type": "string" } },
+        "evidenceReceiptRefs": { "type": "array", "items": { "type": "string" } },
+        "decisionRefs": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "policyRefs": { "type": "array", "items": { "type": "string" } },
+    "evidenceRefs": { "type": "array", "items": { "type": "string" } },
+    "nonGoals": { "type": "array", "items": { "type": "string" } }
+  }
+}
