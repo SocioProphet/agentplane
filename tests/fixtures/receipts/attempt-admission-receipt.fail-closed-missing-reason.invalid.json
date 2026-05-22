@@ -1,0 +1,26 @@
+{
+  "schemaVersion": "agentplane.attempt-admission-receipt.v0.1",
+  "recordType": "AttemptAdmissionReceipt",
+  "receipt_id": "attempt-admission-receipt:governed-run-alpha-001:attempt-006",
+  "attempt_id": "attempt:governed-run-alpha-001:006",
+  "run_id": "governed-run:alpha-001",
+  "governed_run_contract_ref": "governed-run-contract:alpha-001",
+  "admitted": false,
+  "admission_decision": "fail-closed",
+  "reason_code": "missing_required_evidence",
+  "safety_preflight_ref": "safety-preflight:alpha-006",
+  "safety_preflight_outcome": "pass",
+  "authority_state_ref": "agent-authority-current-state:governed-runner-stub",
+  "authority_decision": "unchanged",
+  "trustops_runtime_action_ref": "runtime-guardrail-decision:alpha-006",
+  "runtime_action": "allow",
+  "budget_estimate": {
+    "projected_cost_usd": 0.25,
+    "remaining_budget_usd": 2.75,
+    "remaining_iterations": 2,
+    "remaining_tokens": 18000,
+    "estimate_provenance": "estimated"
+  },
+  "issued_at": "2026-05-22T11:50:00Z",
+  "receipt_hash": "sha256:8888888888888888888888888888888888888888888888888888888888888888"
+}
