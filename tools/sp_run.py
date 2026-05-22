@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """Read-only sp-run CLI for governed-run evidence inspection.
 
-This CLI exposes operator-facing receipt inspection, preflight projection, and
-admission receipt construction. It does not run agents, execute verifier
-commands, mutate files, restore rollback state, settle budget, or change
-authority.
+This CLI exposes operator-facing receipt inspection, preflight projection,
+admission receipt construction, and smoke evidence generation. It does not run
+agents, execute verifier commands, mutate governed files, restore rollback
+state, settle budget, or change authority.
 """
 
 from __future__ import annotations
@@ -19,6 +19,7 @@ from pathlib import Path
 from typing import Any
 
 import build_run_dossier
+import run_governed_runner_smoke
 import validate_governed_run_contract
 import validate_run_dossier
 
@@ -31,6 +32,7 @@ REQUIRED_FILES = (
     "schemas/receipts/rollback-boundary.v0.1.schema.json",
     "schemas/receipts/rollback-result.v0.1.schema.json",
     "tools/build_run_dossier.py",
+    "tools/run_governed_runner_smoke.py",
     "tools/validate_run_dossier.py",
     "tools/validate_governed_run_contract.py",
 )
@@ -80,7 +82,7 @@ def command_doctor(_args: argparse.Namespace) -> int:
             "mode": "readonly",
             "ok": ok,
             "repo_root": str(ROOT),
-            "capabilities": ["doctor", "dossier", "validate-dossier", "preflight", "admit"],
+            "capabilities": ["doctor", "dossier", "validate-dossier", "preflight", "admit", "smoke"],
             "non_goals": ["execute", "mutate", "restore", "authority_update", "budget_settlement"],
             "files": files,
         }
@@ -149,6 +151,17 @@ def command_admit(args: argparse.Namespace) -> int:
     else:
         print(text, end="")
     return 0
+
+
+def command_smoke(args: argparse.Namespace) -> int:
+    return run_governed_runner_smoke.main(
+        [
+            "--output-dir",
+            args.output_dir,
+            "--generated-at",
+            args.generated_at,
+        ]
+    )
 
 
 def build_preflight_receipt(contract: dict[str, Any], generated_at: str | None = None) -> dict[str, Any]:
@@ -339,6 +352,11 @@ def build_parser() -> argparse.ArgumentParser:
 
     doctor = subparsers.add_parser("doctor", help="Check read-only governed-run evidence tooling.")
     doctor.set_defaults(func=command_doctor)
+
+    smoke = subparsers.add_parser("smoke", help="Build a deterministic governed-runner smoke evidence bundle.")
+    smoke.add_argument("--output-dir", default=".socioprophet/smoke/governed-runner")
+    smoke.add_argument("--generated-at", default="2026-05-22T12:45:00Z")
+    smoke.set_defaults(func=command_smoke)
 
     preflight = subparsers.add_parser("preflight", help="Project a governed run contract into a read-only preflight receipt.")
     preflight.add_argument("contract_json")
