@@ -10,6 +10,9 @@
   "executor_id": "agentplane-semantic-activation-executor",
   "executor_version": "0.1.0",
   "graph_snapshot_id": "hellgraph-snapshot:alpha-001",
+  "policy_decision_ref": "policy-decision:semantic-activation-fail-closed-alpha-003",
+  "admission_decision": "fail-closed",
+  "admission_reason_code": "missing_policy_bundle_id",
   "quality_snapshot_id": "quality-snapshot:alpha-001",
   "activation_edges": [
     {"edge_type": "declares", "subject_ref": "semantic-asset:alpha-001", "object_ref": "concept:regulated-service", "evidence_ref": "evidence:edge:declares"},
