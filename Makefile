@@ -1,6 +1,6 @@
-.PHONY: validate test validate-governance-context validate-lattice-data-governai-execution-refs validate-lattice-runtime-profile-refs validate-network-native-assistant-evidence validate-guardrail-evidence-artifacts validate-stop-gate-evaluator validate-guarded-workcell-artifact validate-guarded-workcell-executor validate-guarded-invocation-artifact validate-guarded-invocation validate-agentic-pr-work-order validate-semantic-enterprise-agent-boundary validate-ops-history-contracts validate-action-contracts validate-agent-operation-contract validate-superconscious-reasoning-import validate-agent-harness-runtime-contracts validate-bounded-action-loop agentplane-evidence-receipt-composition-tier2-binding-ci lawful-learning-phase9-contract-ci validate-evidence-receipt-binding
+.PHONY: validate test validate-governance-context validate-lattice-data-governai-execution-refs validate-lattice-runtime-profile-refs validate-network-native-assistant-evidence validate-guardrail-evidence-artifacts validate-stop-gate-evaluator validate-guarded-workcell-artifact validate-guarded-workcell-executor validate-guarded-invocation-artifact validate-guarded-invocation validate-agentic-pr-work-order validate-semantic-enterprise-agent-boundary validate-ops-history-contracts validate-action-contracts validate-agent-operation-contract validate-superconscious-reasoning-import validate-agent-harness-runtime-contracts validate-bounded-action-loop agentplane-evidence-receipt-composition-tier2-binding-ci lawful-learning-phase9-contract-ci validate-evidence-receipt-binding validate-semantic-activation-receipt
 
-validate: validate-governance-context validate-lattice-data-governai-execution-refs validate-lattice-runtime-profile-refs validate-network-native-assistant-evidence validate-guardrail-evidence-artifacts validate-stop-gate-evaluator validate-guarded-workcell-artifact validate-guarded-workcell-executor validate-guarded-invocation-artifact validate-guarded-invocation validate-agentic-pr-work-order validate-semantic-enterprise-agent-boundary validate-ops-history-contracts validate-action-contracts validate-agent-operation-contract validate-superconscious-reasoning-import validate-agent-harness-runtime-contracts validate-bounded-action-loop agentplane-evidence-receipt-composition-tier2-binding-ci lawful-learning-phase9-contract-ci validate-evidence-receipt-binding
+validate: validate-governance-context validate-lattice-data-governai-execution-refs validate-lattice-runtime-profile-refs validate-network-native-assistant-evidence validate-guardrail-evidence-artifacts validate-stop-gate-evaluator validate-guarded-workcell-artifact validate-guarded-workcell-executor validate-guarded-invocation-artifact validate-guarded-invocation validate-agentic-pr-work-order validate-semantic-enterprise-agent-boundary validate-ops-history-contracts validate-action-contracts validate-agent-operation-contract validate-superconscious-reasoning-import validate-agent-harness-runtime-contracts validate-bounded-action-loop agentplane-evidence-receipt-composition-tier2-binding-ci lawful-learning-phase9-contract-ci validate-evidence-receipt-binding validate-semantic-activation-receipt
 	python3 tools/validate_execution_timing.py
 
 validate-governance-context:
@@ -83,6 +83,21 @@ lawful-learning-phase9-contract-ci:
 
 validate-evidence-receipt-binding:
 	python3 tools/validate_evidence_receipt_binding.py
+
+validate-semantic-activation-receipt:
+	python3 -m json.tool schemas/receipts/semantic-activation-receipt.v0.1.schema.json >/dev/null
+	python3 -m json.tool tests/fixtures/receipts/semantic-activation-receipt.valid.json >/dev/null
+	python3 -m json.tool tests/fixtures/receipts/semantic-activation-receipt.missing-activation-bundle-hash.invalid.json >/dev/null
+	python3 -m json.tool tests/fixtures/receipts/semantic-activation-receipt.missing-graph-snapshot.invalid.json >/dev/null
+	python3 -m json.tool tests/fixtures/receipts/semantic-activation-receipt.missing-policy-bundle.invalid.json >/dev/null
+	python3 -m json.tool tests/fixtures/receipts/semantic-activation-receipt.missing-replay-artifact.invalid.json >/dev/null
+	python3 -m json.tool tests/fixtures/receipts/semantic-activation-receipt.missing-required-edge-evidence.invalid.json >/dev/null
+	python3 tools/validate_semantic_activation_receipt.py tests/fixtures/receipts/semantic-activation-receipt.valid.json
+	! python3 tools/validate_semantic_activation_receipt.py tests/fixtures/receipts/semantic-activation-receipt.missing-activation-bundle-hash.invalid.json
+	! python3 tools/validate_semantic_activation_receipt.py tests/fixtures/receipts/semantic-activation-receipt.missing-graph-snapshot.invalid.json
+	! python3 tools/validate_semantic_activation_receipt.py tests/fixtures/receipts/semantic-activation-receipt.missing-policy-bundle.invalid.json
+	! python3 tools/validate_semantic_activation_receipt.py tests/fixtures/receipts/semantic-activation-receipt.missing-replay-artifact.invalid.json
+	! python3 tools/validate_semantic_activation_receipt.py tests/fixtures/receipts/semantic-activation-receipt.missing-required-edge-evidence.invalid.json
 
 test:
 	python3 -m pytest -q tools/tests
