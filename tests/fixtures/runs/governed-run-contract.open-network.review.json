@@ -1,0 +1,51 @@
+{
+  "schemaVersion": "agentplane.governed-run-contract.v0.1",
+  "recordType": "GovernedRunContract",
+  "run_id": "governed-run:open-network-review-001",
+  "objective": "Run a stub governed execution with open network posture requiring review.",
+  "workspace_ref": "workspace:socioprophet-local",
+  "repo_root": ".",
+  "agent_ref": "agent-registry://governed-runner-stub",
+  "authority_grant_ref": "authority-grant://agent-registry/governed-runner-stub/v0.1",
+  "policy_bundle_ref": "policy-bundle://agentplane/governed-runner-v0.1",
+  "trustops_gate_policy_ref": "trustops-gate-policy://guardrail-fabric/safety-preflight-v0.1",
+  "budget": {
+    "max_usd": 3.0,
+    "soft_limit_usd": 2.25,
+    "max_iterations": 3,
+    "max_tokens": 20000
+  },
+  "verification_plan": [
+    {
+      "command": "python3 -m pytest tests/test_stub.py -q",
+      "kind": "test",
+      "required": true
+    }
+  ],
+  "allowed_paths": ["src/**", "tests/**"],
+  "denied_paths": [".env*", "secrets/**"],
+  "network_mode": "open",
+  "allowed_network_domains": [],
+  "execution_profile": "research_untrusted",
+  "mutation_mode": "mutation",
+  "approval_policy": {
+    "dependency_changes": false,
+    "migration_changes": false,
+    "config_changes": false,
+    "external_writes": false
+  },
+  "rollback_required": true,
+  "receipt_requirements": {
+    "safety_preflight": true,
+    "attempt_admission": true,
+    "runtime_attempt": true,
+    "verification_result": true,
+    "rollback_boundary": true,
+    "rollback_outcome": true,
+    "run_dossier": true
+  },
+  "labels": {
+    "plane": "governed-runner",
+    "mode": "review-fixture"
+  }
+}
