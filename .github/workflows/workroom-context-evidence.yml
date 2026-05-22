@@ -1,0 +1,37 @@
+name: Workroom Context Evidence
+
+on:
+  pull_request:
+    paths:
+      - 'docs/integration/workroom-context-evidence.md'
+      - 'schemas/workroom-context-evidence.schema.v0.1.json'
+      - 'examples/receipts/workroom-context-evidence.example.json'
+      - 'tools/validate_workroom_context_evidence.py'
+      - '.github/workflows/workroom-context-evidence.yml'
+  push:
+    branches:
+      - main
+    paths:
+      - 'docs/integration/workroom-context-evidence.md'
+      - 'schemas/workroom-context-evidence.schema.v0.1.json'
+      - 'examples/receipts/workroom-context-evidence.example.json'
+      - 'tools/validate_workroom_context_evidence.py'
+      - '.github/workflows/workroom-context-evidence.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  validate-workroom-context-evidence:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Validate WorkroomContextEvidence
+        run: python3 tools/validate_workroom_context_evidence.py
