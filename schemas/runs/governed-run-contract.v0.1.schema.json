@@ -1,0 +1,102 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.socioprophet.org/agentplane/runs/governed-run-contract.v0.1.schema.json",
+  "title": "GovernedRunContract v0.1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "recordType",
+    "run_id",
+    "objective",
+    "workspace_ref",
+    "repo_root",
+    "agent_ref",
+    "authority_grant_ref",
+    "policy_bundle_ref",
+    "trustops_gate_policy_ref",
+    "budget",
+    "verification_plan",
+    "allowed_paths",
+    "denied_paths",
+    "network_mode",
+    "execution_profile",
+    "mutation_mode",
+    "rollback_required",
+    "receipt_requirements"
+  ],
+  "properties": {
+    "schemaVersion": {"const": "agentplane.governed-run-contract.v0.1"},
+    "recordType": {"const": "GovernedRunContract"},
+    "run_id": {"type": "string"},
+    "objective": {"type": "string"},
+    "workspace_ref": {"type": "string"},
+    "repo_root": {"type": "string"},
+    "agent_ref": {"type": "string"},
+    "authority_grant_ref": {"type": "string"},
+    "policy_bundle_ref": {"type": "string"},
+    "trustops_gate_policy_ref": {"type": "string"},
+    "budget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["max_usd", "soft_limit_usd", "max_iterations", "max_tokens"],
+      "properties": {
+        "max_usd": {"type": "number", "exclusiveMinimum": 0},
+        "soft_limit_usd": {"type": "number", "exclusiveMinimum": 0},
+        "max_iterations": {"type": "integer", "minimum": 1},
+        "max_tokens": {"type": "integer", "minimum": 1}
+      }
+    },
+    "verification_plan": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["command", "kind"],
+        "properties": {
+          "command": {"type": "string"},
+          "kind": {"type": "string", "enum": ["lint", "typecheck", "test", "security", "custom"]},
+          "required": {"type": "boolean"}
+        }
+      }
+    },
+    "allowed_paths": {"type": "array", "items": {"type": "string"}},
+    "denied_paths": {"type": "array", "items": {"type": "string"}},
+    "network_mode": {"type": "string", "enum": ["off", "allowlisted", "open"]},
+    "allowed_network_domains": {"type": "array", "items": {"type": "string"}},
+    "execution_profile": {"type": "string", "enum": ["strict_local", "ci_safe", "staging_controlled", "research_untrusted"]},
+    "mutation_mode": {"type": "string", "enum": ["verify_only", "mutation"]},
+    "approval_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "dependency_changes": {"type": "boolean"},
+        "migration_changes": {"type": "boolean"},
+        "config_changes": {"type": "boolean"},
+        "external_writes": {"type": "boolean"}
+      }
+    },
+    "rollback_required": {"type": "boolean"},
+    "receipt_requirements": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "safety_preflight",
+        "attempt_admission",
+        "runtime_attempt",
+        "verification_result",
+        "run_dossier"
+      ],
+      "properties": {
+        "safety_preflight": {"type": "boolean"},
+        "attempt_admission": {"type": "boolean"},
+        "runtime_attempt": {"type": "boolean"},
+        "verification_result": {"type": "boolean"},
+        "rollback_boundary": {"type": "boolean"},
+        "rollback_outcome": {"type": "boolean"},
+        "run_dossier": {"type": "boolean"}
+      }
+    },
+    "labels": {"type": "object", "additionalProperties": {"type": "string"}}
+  }
+}
