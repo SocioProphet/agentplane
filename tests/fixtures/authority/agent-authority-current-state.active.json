@@ -1,0 +1,20 @@
+{
+  "schemaVersion": "agent-registry.agent-authority-current-state.v0.1",
+  "recordType": "AgentAuthorityCurrentState",
+  "stateId": "agent-authority-current-state:agent-alpha:active",
+  "agentRef": "agent-registry://agent-alpha",
+  "computed_at": "2026-05-22T12:30:00Z",
+  "authority_status": "active",
+  "effective_decision_ref": "trustops-agent-authority-decision:agent-alpha-pass-001",
+  "source_decision_refs": ["trustops-agent-authority-decision:agent-alpha-pass-001"],
+  "evidenceRefs": ["trustops-receipt:agent-alpha-pass-001", "policy://trustops/agent-authority-v0.1"],
+  "authorityEffects": {
+    "toolAccess": "unchanged",
+    "memoryAccess": "unchanged",
+    "autonomousExecution": "unchanged",
+    "routeEligibility": "unchanged",
+    "egressMode": "unchanged"
+  },
+  "restoration_required": false,
+  "receipt_hash": "sha256:1111111111111111111111111111111111111111111111111111111111111111"
+}

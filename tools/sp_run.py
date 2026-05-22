@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 """Read-only sp-run CLI for governed-run evidence inspection.
 
-This CLI exposes operator-facing receipt inspection and preflight projection.
-It does not run agents, execute verifier commands, mutate files, restore rollback
-state, settle budget, or change authority.
+This CLI exposes operator-facing receipt inspection, preflight projection, and
+admission receipt construction. It does not run agents, execute verifier
+commands, mutate files, restore rollback state, settle budget, or change
+authority.
 """
 
 from __future__ import annotations
@@ -79,7 +80,7 @@ def command_doctor(_args: argparse.Namespace) -> int:
             "mode": "readonly",
             "ok": ok,
             "repo_root": str(ROOT),
-            "capabilities": ["doctor", "dossier", "validate-dossier", "preflight"],
+            "capabilities": ["doctor", "dossier", "validate-dossier", "preflight", "admit"],
             "non_goals": ["execute", "mutate", "restore", "authority_update", "budget_settlement"],
             "files": files,
         }
@@ -127,6 +128,29 @@ def command_preflight(args: argparse.Namespace) -> int:
     return 0
 
 
+def command_admit(args: argparse.Namespace) -> int:
+    try:
+        contract = load_json_object(Path(args.contract_json))
+        preflight = load_json_object(Path(args.preflight_json))
+        authority = load_json_object(Path(args.authority_state_json))
+        receipt = build_attempt_admission_receipt(
+            contract,
+            preflight,
+            authority,
+            projected_cost_usd=args.projected_cost_usd,
+            generated_at=args.generated_at,
+        )
+    except (OSError, ValueError, json.JSONDecodeError) as exc:
+        print(f"ERROR: {exc}", file=sys.stderr)
+        return 1
+    text = json.dumps(receipt, indent=2, sort_keys=True) + "\n"
+    if args.output:
+        Path(args.output).write_text(text, encoding="utf-8")
+    else:
+        print(text, end="")
+    return 0
+
+
 def build_preflight_receipt(contract: dict[str, Any], generated_at: str | None = None) -> dict[str, Any]:
     findings: list[dict[str, str]] = []
     try:
@@ -135,91 +159,40 @@ def build_preflight_receipt(contract: dict[str, Any], generated_at: str | None =
         )
         validate_governed_run_contract.validate_contract(contract)
     except Exception as exc:  # noqa: BLE001
-        findings.append(
-            {
-                "kind": "contract_invalid",
-                "severity": "block",
-                "message": str(exc),
-            }
-        )
+        findings.append({"kind": "contract_invalid", "severity": "block", "message": str(exc)})
 
-    verification_commands = [
-        str(step.get("command", ""))
-        for step in contract.get("verification_plan", [])
-        if isinstance(step, dict)
-    ]
+    verification_commands = [str(step.get("command", "")) for step in contract.get("verification_plan", []) if isinstance(step, dict)]
     allowed_paths = [str(item) for item in contract.get("allowed_paths", [])]
     denied_paths = [str(item) for item in contract.get("denied_paths", [])]
     network_mode = str(contract.get("network_mode", "off"))
     allowed_network_domains = [str(item).lower() for item in contract.get("allowed_network_domains", [])]
-    approval_policy = {
-        key: bool(value)
-        for key, value in (contract.get("approval_policy", {}) or {}).items()
-        if isinstance(key, str)
-    }
+    approval_policy = {key: bool(value) for key, value in (contract.get("approval_policy", {}) or {}).items() if isinstance(key, str)}
 
     for command in verification_commands:
         if any(pattern.search(command) for pattern in BLOCK_PATTERNS):
-            findings.append(
-                {
-                    "kind": "unsafe_verifier_command",
-                    "severity": "block",
-                    "message": "verifier command matches a blocked command pattern",
-                }
-            )
+            findings.append({"kind": "unsafe_verifier_command", "severity": "block", "message": "verifier command matches a blocked command pattern"})
         if network_mode == "off" and NETWORK_TARGET.search(command):
-            findings.append(
-                {
-                    "kind": "network_blocked",
-                    "severity": "block",
-                    "message": "network target appears while network_mode=off",
-                }
-            )
+            findings.append({"kind": "network_blocked", "severity": "block", "message": "network target appears while network_mode=off"})
         if network_mode == "allowlisted":
             for target in NETWORK_TARGET.findall(command):
                 target = target.lower()
                 if not any(target == domain or target.endswith(f".{domain}") for domain in allowed_network_domains):
-                    findings.append(
-                        {
-                            "kind": "network_not_allowlisted",
-                            "severity": "block",
-                            "message": f"network target is not allowlisted: {target}",
-                        }
-                    )
+                    findings.append({"kind": "network_not_allowlisted", "severity": "block", "message": f"network target is not allowlisted: {target}"})
 
     if network_mode == "open":
-        findings.append(
-            {
-                "kind": "open_network_requires_review",
-                "severity": "require-review",
-                "message": "network_mode=open requires review before execution",
-            }
-        )
+        findings.append({"kind": "open_network_requires_review", "severity": "require-review", "message": "network_mode=open requires review before execution"})
 
     for path in allowed_paths + denied_paths:
         normalized = path.replace("\\", "/")
         if normalized.startswith("/") or normalized.startswith("../") or "/../" in normalized:
-            findings.append(
-                {
-                    "kind": "unsafe_path_pattern",
-                    "severity": "block",
-                    "message": f"path pattern is outside the governed workspace: {path}",
-                }
-            )
+            findings.append({"kind": "unsafe_path_pattern", "severity": "block", "message": f"path pattern is outside the governed workspace: {path}"})
 
     if approval_policy.get("external_writes"):
-        findings.append(
-            {
-                "kind": "external_writes_require_review",
-                "severity": "require-review",
-                "message": "external writes approval flag requires human review before execution",
-            }
-        )
+        findings.append({"kind": "external_writes_require_review", "severity": "require-review", "message": "external writes approval flag requires human review before execution"})
 
     outcome = outcome_from_findings(findings)
     runtime_action = {"pass": "allow", "require-review": "require-review", "block": "block"}[outcome]
     run_id = str(contract.get("run_id", "unknown-run"))
-    generated = generated_at or now_utc()
     receipt: dict[str, Any] = {
         "schemaVersion": "agentplane.preflight-receipt.v0.1",
         "recordType": "PreflightReceipt",
@@ -239,11 +212,116 @@ def build_preflight_receipt(contract: dict[str, Any], generated_at: str | None =
             "approval_policy": approval_policy,
         },
         "findings": findings,
-        "generated_at": generated,
+        "generated_at": generated_at or now_utc(),
         "labels": {"source": "sp-run-readonly-preflight"},
     }
     receipt["receipt_hash"] = stable_hash(receipt)
     return receipt
+
+
+def build_attempt_admission_receipt(
+    contract: dict[str, Any],
+    preflight: dict[str, Any],
+    authority: dict[str, Any],
+    *,
+    projected_cost_usd: float,
+    generated_at: str | None = None,
+) -> dict[str, Any]:
+    run_id = str(contract.get("run_id", preflight.get("run_id", "unknown-run")))
+    attempt_id = f"attempt:{run_id}:001"
+    authority_status = str(authority.get("authority_status", "suspended"))
+    authority_decision = map_authority_status(authority_status)
+    runtime_action = str(preflight.get("runtime_action", "block"))
+    safety_outcome = str(preflight.get("outcome", "block"))
+    budget = contract.get("budget", {}) if isinstance(contract.get("budget"), dict) else {}
+    remaining_budget = float(budget.get("max_usd", 0))
+    remaining_iterations = int(budget.get("max_iterations", 0))
+    remaining_tokens = int(budget.get("max_tokens", 0))
+
+    admitted, admission_decision, reason_code, fail_closed_reason = admission_result(
+        projected_cost_usd=projected_cost_usd,
+        remaining_budget_usd=remaining_budget,
+        remaining_iterations=remaining_iterations,
+        remaining_tokens=remaining_tokens,
+        safety_outcome=safety_outcome,
+        runtime_action=runtime_action,
+        authority_decision=authority_decision,
+    )
+
+    receipt: dict[str, Any] = {
+        "schemaVersion": "agentplane.attempt-admission-receipt.v0.1",
+        "recordType": "AttemptAdmissionReceipt",
+        "receipt_id": f"attempt-admission-receipt:{run_id}:001",
+        "attempt_id": attempt_id,
+        "run_id": run_id,
+        "governed_run_contract_ref": f"governed-run-contract:{run_id}",
+        "admitted": admitted,
+        "admission_decision": admission_decision,
+        "reason_code": reason_code,
+        "safety_preflight_ref": str(preflight.get("receipt_id", f"preflight-receipt:{run_id}")),
+        "safety_preflight_outcome": safety_outcome,
+        "authority_state_ref": str(authority.get("stateId", "missing:authority-state")),
+        "authority_decision": authority_decision,
+        "trustops_runtime_action_ref": str(preflight.get("receipt_id", f"preflight-receipt:{run_id}")),
+        "runtime_action": runtime_action,
+        "budget_estimate": {
+            "projected_cost_usd": projected_cost_usd,
+            "remaining_budget_usd": remaining_budget,
+            "remaining_iterations": remaining_iterations,
+            "remaining_tokens": remaining_tokens,
+            "estimate_provenance": "estimated",
+        },
+        "input_refs": {
+            "policy_bundle_ref": str(contract.get("policy_bundle_ref", "missing:policy-bundle")),
+            "authority_grant_ref": str(contract.get("authority_grant_ref", "missing:authority-grant")),
+            "trustops_gate_policy_ref": str(contract.get("trustops_gate_policy_ref", "missing:trustops-gate-policy")),
+            "verification_plan_ref": f"verification-plan:{run_id}",
+        },
+        "issued_at": generated_at or now_utc(),
+        "labels": {"source": "sp-run-readonly-admit"},
+    }
+    if fail_closed_reason:
+        receipt["fail_closed_reason"] = fail_closed_reason
+    receipt["receipt_hash"] = stable_hash(receipt)
+    return receipt
+
+
+def map_authority_status(status: str) -> str:
+    return {
+        "active": "unchanged",
+        "reduced": "reduced",
+        "suspended": "suspended",
+        "revoked": "revoked",
+    }.get(status, "suspended")
+
+
+def admission_result(
+    *,
+    projected_cost_usd: float,
+    remaining_budget_usd: float,
+    remaining_iterations: int,
+    remaining_tokens: int,
+    safety_outcome: str,
+    runtime_action: str,
+    authority_decision: str,
+) -> tuple[bool, str, str, str | None]:
+    if remaining_iterations <= 0:
+        return False, "reject", "no_remaining_iterations", None
+    if remaining_tokens <= 0:
+        return False, "reject", "no_remaining_tokens", None
+    if projected_cost_usd > remaining_budget_usd:
+        return False, "reject", "projected_cost_exceeds_remaining_budget", None
+    if authority_decision in {"suspended", "revoked"}:
+        return False, "reject", f"authority_{authority_decision}", None
+    if safety_outcome in {"quarantine", "block", "rollback", "revoke"}:
+        return False, "reject", f"safety_{safety_outcome}", None
+    if runtime_action in {"quarantine", "block", "rollback", "revoke"}:
+        return False, "reject", f"runtime_action_{runtime_action}", None
+    if safety_outcome == "require-review" or runtime_action == "require-review":
+        return False, "require-review", "review_required_before_admission", None
+    if runtime_action not in {"allow", "warn"}:
+        return False, "fail-closed", "unknown_runtime_action", "runtime action could not be mapped to an admission decision"
+    return True, "admit", "all_pre_execution_gates_passed", None
 
 
 def outcome_from_findings(findings: list[dict[str, str]]) -> str:
@@ -267,6 +345,15 @@ def build_parser() -> argparse.ArgumentParser:
     preflight.add_argument("--generated-at")
     preflight.add_argument("--output")
     preflight.set_defaults(func=command_preflight)
+
+    admit = subparsers.add_parser("admit", help="Build a read-only AttemptAdmissionReceipt from contract, preflight, and authority state.")
+    admit.add_argument("contract_json")
+    admit.add_argument("--preflight", dest="preflight_json", required=True)
+    admit.add_argument("--authority-state", dest="authority_state_json", required=True)
+    admit.add_argument("--projected-cost-usd", type=float, default=0.0)
+    admit.add_argument("--generated-at")
+    admit.add_argument("--output")
+    admit.set_defaults(func=command_admit)
 
     dossier = subparsers.add_parser("dossier", help="Build a RunDossier from a governed run folder.")
     dossier.add_argument("run_dir")
