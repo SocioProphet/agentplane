@@ -1,0 +1,44 @@
+{
+  "schemaVersion": "agentplane.run-dossier.v0.1",
+  "recordType": "RunDossier",
+  "dossier_id": "run-dossier:governed-run-alpha-001",
+  "run_id": "governed-run:alpha-001",
+  "generated_at": "2026-05-22T12:10:00Z",
+  "source_run_dir": "tests/fixtures/runs/run-dossier/run",
+  "overall_status": "ready",
+  "contract_ref": "governed-run:alpha-001",
+  "attempt_count": 1,
+  "budget_summary": {
+    "projected_cost_usd": 0.25,
+    "remaining_budget_usd": 2.75,
+    "remaining_iterations": 2,
+    "remaining_tokens": 18000
+  },
+  "latest_admission": {
+    "receipt_ref": "attempt-admission-receipt:governed-run-alpha-001:attempt-001",
+    "admitted": true,
+    "admission_decision": "admit",
+    "reason_code": "all_pre_execution_gates_passed",
+    "runtime_action": "allow",
+    "authority_decision": "unchanged"
+  },
+  "latest_rollback": {
+    "boundary_ref": "rollback-boundary:governed-run-alpha-001:attempt-001",
+    "result_ref": "rollback-result:governed-run-alpha-001:attempt-001",
+    "status": "restored"
+  },
+  "receipt_refs": [
+    "governed-run:alpha-001",
+    "attempt-admission-receipt:governed-run-alpha-001:attempt-001",
+    "runtime-attempt-receipt:governed-run-alpha-001:attempt-001",
+    "verification-result:governed-run-alpha-001:attempt-001",
+    "rollback-boundary:governed-run-alpha-001:attempt-001",
+    "rollback-result:governed-run-alpha-001:attempt-001"
+  ],
+  "missing_receipts": [],
+  "recommended_next_action": "proceed_to_runtime_execution",
+  "dossier_hash": "sha256:1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef",
+  "labels": {
+    "source": "receipts"
+  }
+}

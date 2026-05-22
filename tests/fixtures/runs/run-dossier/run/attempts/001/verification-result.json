@@ -1,0 +1,11 @@
+{
+  "schemaVersion": "agentplane.verification-result.v0.1.synthetic",
+  "recordType": "VerificationResult",
+  "verification_id": "verification-result:governed-run-alpha-001:attempt-001",
+  "run_id": "governed-run:alpha-001",
+  "attempt_id": "attempt:governed-run-alpha-001:001",
+  "passed": true,
+  "summary": "Synthetic verifier passed.",
+  "command": "python3 -m pytest tests/test_stub.py -q",
+  "receipt_hash": "sha256:eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
+}
