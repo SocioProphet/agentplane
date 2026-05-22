@@ -3,7 +3,8 @@
 
 The validator is stdlib-only. It checks the schema, structural fixture shape,
 the required activation-input hash binding, the mandatory five semantic edge
-classes, and fail-closed behavior when evidence is missing or non-replayable.
+classes, admission decision binding, and fail-closed behavior when evidence is
+missing or non-replayable.
 """
 
 from __future__ import annotations
@@ -29,6 +30,9 @@ REQUIRED_FIELDS = {
     "executor_version",
     "graph_snapshot_id",
     "policy_bundle_id",
+    "policy_decision_ref",
+    "admission_decision",
+    "admission_reason_code",
     "quality_snapshot_id",
     "activation_edges",
     "run_artifact_refs",
@@ -43,6 +47,13 @@ REQUIRED_EDGE_TYPES = {
     "governed_by",
     "validated_by",
     "replayable_as",
+}
+
+ADMISSION_DECISIONS = {
+    "admitted",
+    "rejected",
+    "require-review",
+    "fail-closed",
 }
 
 FAIL_CLOSED_STATUSES = {
@@ -95,6 +106,9 @@ def validate_schema_contract(schema: dict[str, Any]) -> None:
         fail("schemaVersion const mismatch")
     if props.get("recordType", {}).get("const") != "SemanticActivationReceipt":
         fail("recordType const mismatch")
+    admission_enum = set(props.get("admission_decision", {}).get("enum", []))
+    if admission_enum != ADMISSION_DECISIONS:
+        fail("admission_decision enum mismatch")
 
 
 def validate_receipt(record: dict[str, Any]) -> None:
@@ -123,15 +137,33 @@ def validate_receipt(record: dict[str, Any]) -> None:
             fail(f"run_artifact_refs[{index}] must be a non-empty string")
 
     validate_activation_edges(record.get("activation_edges"))
+    validate_evidence_and_admission(record)
+    validate_lineage(record)
 
+
+def validate_evidence_and_admission(record: dict[str, Any]) -> None:
     evidence_status = record["evidence_status"]
     if evidence_status not in {"complete", "missing_evidence", "invalid_evidence", "non_replayable"}:
         fail(f"invalid evidence_status: {evidence_status}")
+
+    admission_decision = record["admission_decision"]
+    if admission_decision not in ADMISSION_DECISIONS:
+        fail(f"invalid admission_decision: {admission_decision}")
+
+    if admission_decision == "admitted" and evidence_status != "complete":
+        fail("admitted receipts require evidence_status=complete")
+
     if evidence_status in FAIL_CLOSED_STATUSES and not record.get("fail_closed_reason"):
         fail("fail_closed_reason is required when evidence is missing, invalid, or non-replayable")
-    if evidence_status == "complete" and record.get("fail_closed_reason"):
-        fail("complete evidence receipts must not carry fail_closed_reason")
 
+    if admission_decision == "fail-closed" and not record.get("fail_closed_reason"):
+        fail("fail_closed_reason is required when admission_decision=fail-closed")
+
+    if evidence_status == "complete" and admission_decision != "fail-closed" and record.get("fail_closed_reason"):
+        fail("complete non-fail-closed receipts must not carry fail_closed_reason")
+
+
+def validate_lineage(record: dict[str, Any]) -> None:
     lineage = record.get("lineage", {})
     if lineage:
         if not isinstance(lineage, dict):
