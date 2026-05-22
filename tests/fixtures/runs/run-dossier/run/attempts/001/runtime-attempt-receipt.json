@@ -1,0 +1,11 @@
+{
+  "schemaVersion": "agentplane.runtime-attempt-receipt.v0.1.synthetic",
+  "recordType": "RuntimeAttemptReceipt",
+  "receipt_id": "runtime-attempt-receipt:governed-run-alpha-001:attempt-001",
+  "run_id": "governed-run:alpha-001",
+  "attempt_id": "attempt:governed-run-alpha-001:001",
+  "status": "completed",
+  "summary": "Synthetic governed runtime attempt completed under stub execution.",
+  "artifact_refs": ["artifact:stub-output-alpha-001"],
+  "receipt_hash": "sha256:dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
+}
