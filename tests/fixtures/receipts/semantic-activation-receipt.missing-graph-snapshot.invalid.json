@@ -1,0 +1,26 @@
+{
+  "schemaVersion": "agentplane.semantic-activation-receipt.v0.1",
+  "recordType": "SemanticActivationReceipt",
+  "receipt_id": "semantic-activation-receipt:asset-alpha-001",
+  "asset_id": "semantic-asset:alpha-001",
+  "ingestion_run_id": "ingestion-run:alpha-2026-05-21",
+  "activation_bundle_hash": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+  "activation_bundle_canonicalization_id": "semantic-activation-bundle-c14n:v0.1",
+  "validator_bundle_ref": "validator-bundle:semantic-edge-v0.1",
+  "executor_id": "agentplane-semantic-activation-executor",
+  "executor_version": "0.1.0",
+  "policy_bundle_id": "policy-bundle:semantic-governance-v0.1",
+  "quality_snapshot_id": "quality-snapshot:alpha-001",
+  "activation_edges": [
+    {"edge_type": "declares", "subject_ref": "semantic-asset:alpha-001", "object_ref": "concept:regulated-service", "evidence_ref": "evidence:edge:declares"},
+    {"edge_type": "depends_on", "subject_ref": "semantic-asset:alpha-001", "object_ref": "knowledge-base:alpha-source", "evidence_ref": "evidence:edge:depends-on"},
+    {"edge_type": "governed_by", "subject_ref": "semantic-asset:alpha-001", "object_ref": "policy-bundle:semantic-governance-v0.1", "evidence_ref": "evidence:edge:governed-by"},
+    {"edge_type": "validated_by", "subject_ref": "semantic-asset:alpha-001", "object_ref": "validator-bundle:semantic-edge-v0.1", "evidence_ref": "evidence:edge:validated-by"},
+    {"edge_type": "replayable_as", "subject_ref": "semantic-asset:alpha-001", "object_ref": "replay-artifact:semantic-activation-alpha-001", "evidence_ref": "evidence:edge:replayable-as"}
+  ],
+  "run_artifact_refs": ["run-artifact:semantic-activation-alpha-001"],
+  "replay_artifact_ref": "replay-artifact:semantic-activation-alpha-001",
+  "evidence_status": "missing_evidence",
+  "fail_closed_reason": "missing graph_snapshot_id",
+  "receipt_hash": "sha256:2222222222222222222222222222222222222222222222222222222222222222"
+}
