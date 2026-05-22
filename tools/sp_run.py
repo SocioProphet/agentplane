@@ -2,9 +2,9 @@
 """Read-only sp-run CLI for governed-run evidence inspection.
 
 This CLI exposes operator-facing receipt inspection, preflight projection,
-admission receipt construction, and smoke evidence generation. It does not run
-agents, execute verifier commands, mutate governed files, restore rollback
-state, settle budget, or change authority.
+admission receipt construction, smoke evidence generation, and run-store
+inspection. It does not run agents, execute verifier commands, mutate governed
+files, restore rollback state, settle budget, or change authority.
 """
 
 from __future__ import annotations
@@ -20,6 +20,7 @@ from typing import Any
 
 import build_run_dossier
 import run_governed_runner_smoke
+import run_store_inspection
 import validate_governed_run_contract
 import validate_run_dossier
 
@@ -33,6 +34,7 @@ REQUIRED_FILES = (
     "schemas/receipts/rollback-result.v0.1.schema.json",
     "tools/build_run_dossier.py",
     "tools/run_governed_runner_smoke.py",
+    "tools/run_store_inspection.py",
     "tools/validate_run_dossier.py",
     "tools/validate_governed_run_contract.py",
 )
@@ -82,12 +84,49 @@ def command_doctor(_args: argparse.Namespace) -> int:
             "mode": "readonly",
             "ok": ok,
             "repo_root": str(ROOT),
-            "capabilities": ["doctor", "dossier", "validate-dossier", "preflight", "admit", "smoke"],
+            "capabilities": [
+                "doctor",
+                "smoke",
+                "list",
+                "status",
+                "inspect",
+                "dossier",
+                "validate-dossier",
+                "preflight",
+                "admit",
+            ],
             "non_goals": ["execute", "mutate", "restore", "authority_update", "budget_settlement"],
             "files": files,
         }
     )
     return 0 if ok else 1
+
+
+def command_list(args: argparse.Namespace) -> int:
+    try:
+        emit(run_store_inspection.list_runs(Path(args.runs_root)))
+    except (OSError, ValueError, json.JSONDecodeError) as exc:
+        print(f"ERROR: {exc}", file=sys.stderr)
+        return 1
+    return 0
+
+
+def command_status(args: argparse.Namespace) -> int:
+    try:
+        emit(run_store_inspection.status_for_run(Path(args.run_dir)))
+    except (OSError, ValueError, json.JSONDecodeError) as exc:
+        print(f"ERROR: {exc}", file=sys.stderr)
+        return 1
+    return 0
+
+
+def command_inspect(args: argparse.Namespace) -> int:
+    try:
+        emit(run_store_inspection.inspect_run(Path(args.run_dir)))
+    except (OSError, ValueError, json.JSONDecodeError) as exc:
+        print(f"ERROR: {exc}", file=sys.stderr)
+        return 1
+    return 0
 
 
 def command_dossier(args: argparse.Namespace) -> int:
@@ -357,6 +396,18 @@ def build_parser() -> argparse.ArgumentParser:
     smoke.add_argument("--output-dir", default=".socioprophet/smoke/governed-runner")
     smoke.add_argument("--generated-at", default="2026-05-22T12:45:00Z")
     smoke.set_defaults(func=command_smoke)
+
+    list_cmd = subparsers.add_parser("list", help="List governed-run evidence folders.")
+    list_cmd.add_argument("--runs-root", default=".socioprophet/runs")
+    list_cmd.set_defaults(func=command_list)
+
+    status = subparsers.add_parser("status", help="Summarize one governed-run evidence folder.")
+    status.add_argument("run_dir")
+    status.set_defaults(func=command_status)
+
+    inspect = subparsers.add_parser("inspect", help="Inspect one governed-run evidence folder and receipt set.")
+    inspect.add_argument("run_dir")
+    inspect.set_defaults(func=command_inspect)
 
     preflight = subparsers.add_parser("preflight", help="Project a governed run contract into a read-only preflight receipt.")
     preflight.add_argument("contract_json")
