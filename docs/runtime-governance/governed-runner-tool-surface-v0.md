@@ -6,23 +6,33 @@
 
 It is intended as the safe precursor to a future tool-server / MCP-like surface. It reuses AgentPlane-owned implementation and exposes only operations that are already read-only or evidence-generation only.
 
-## Tool listing
+## Stable delegate path
+
+The preferred operator path is through the AgentPlane-owned `sp-run` delegate:
+
+```bash
+sp-run tool list-tools
+sp-run tool call governed_runner.doctor --args-json '{}'
+sp-run tool call governed_runner.smoke --args-json '{"output_dir":".socioprophet/smoke/governed-runner"}'
+```
+
+Through the Prophet facade:
+
+```bash
+prophet governed-runner tool list-tools
+prophet governed-runner tool call governed_runner.doctor --args-json '{}'
+```
+
+## Direct adapter path
+
+The adapter can also be called directly from a source checkout:
 
 ```bash
 python3 tools/governed_runner_tool_surface.py list-tools
-```
-
-The result is `GovernedRunnerToolList` with tool descriptors.
-
-## Tool calls
-
-Tool calls use:
-
-```bash
 python3 tools/governed_runner_tool_surface.py call <tool-name> --args-json '<json-object>'
 ```
 
-Supported tools:
+## Supported tools
 
 - `governed_runner.doctor`
 - `governed_runner.smoke`
@@ -39,35 +49,35 @@ Supported tools:
 Smoke evidence bundle:
 
 ```bash
-python3 tools/governed_runner_tool_surface.py call governed_runner.smoke \
+sp-run tool call governed_runner.smoke \
   --args-json '{"output_dir":".socioprophet/smoke/governed-runner","generated_at":"2026-05-22T12:45:00Z"}'
 ```
 
 List runs:
 
 ```bash
-python3 tools/governed_runner_tool_surface.py call governed_runner.list \
+sp-run tool call governed_runner.list \
   --args-json '{"runs_root":".socioprophet/smoke/governed-runner"}'
 ```
 
 Inspect a run:
 
 ```bash
-python3 tools/governed_runner_tool_surface.py call governed_runner.inspect \
+sp-run tool call governed_runner.inspect \
   --args-json '{"run_dir":".socioprophet/smoke/governed-runner/run"}'
 ```
 
 Preflight projection:
 
 ```bash
-python3 tools/governed_runner_tool_surface.py call governed_runner.preflight \
+sp-run tool call governed_runner.preflight \
   --args-json '{"contract_json":"tests/fixtures/runs/governed-run-contract.valid.json","generated_at":"2026-05-22T12:20:00Z"}'
 ```
 
 Admission receipt construction:
 
 ```bash
-python3 tools/governed_runner_tool_surface.py call governed_runner.admit \
+sp-run tool call governed_runner.admit \
   --args-json '{"contract_json":"tests/fixtures/runs/governed-run-contract.valid.json","preflight_json":"/tmp/preflight.json","authority_state_json":"tests/fixtures/authority/agent-authority-current-state.active.json","projected_cost_usd":0.25}'
 ```
 
@@ -98,6 +108,7 @@ Missing required arguments return `GovernedRunnerToolError` and non-zero exit.
 
 ```bash
 python3 -m pytest -q tools/tests/test_governed_runner_tool_surface.py
+python3 -m pytest -q tools/tests/test_sp_run_tool_adapter.py
 ```
 
 The tests cover:
@@ -108,6 +119,7 @@ The tests cover:
 - preflight projection
 - admission receipt construction
 - unknown tool rejection
+- stable `sp-run tool` delegation
 
 ## Future surface
 
