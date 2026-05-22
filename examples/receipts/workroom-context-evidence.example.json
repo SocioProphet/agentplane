@@ -1,0 +1,48 @@
+{
+  "kind": "WorkroomContextEvidence",
+  "capturedAt": "2026-05-22T16:50:00Z",
+  "workspaceId": "workroom-demo-0001",
+  "workroomRef": "workroom://workroom-demo-0001",
+  "professionalWorkroomRef": "professional-workroom://workroom-demo-0001",
+  "contextGraphRef": "ctxgraph-demo-0001",
+  "runtimeBindingRef": "runtime-binding-demo-0001",
+  "agentRefs": [
+    "agent-registry://agents/context-fabric-reviewer"
+  ],
+  "registryRefs": [
+    "agent-registry://grants/context-fabric-demo-0001"
+  ],
+  "recallRefs": [
+    "memory-mesh://context-packs/pi-demo-0001",
+    "recall-candidate-demo-0001"
+  ],
+  "agentPlaneRefs": {
+    "bundleRef": "agentplane://bundles/context-fabric-demo-0001",
+    "runRef": "agentplane://runs/pi-demo-0001",
+    "replayRef": "agentplane://replay/pi-demo-0001"
+  },
+  "platformRefs": {
+    "eventEnvelopeRefs": [
+      "event://workspace-context/demo-0001"
+    ],
+    "evidenceReceiptRefs": [
+      "evidence://workspace-context/demo-0001"
+    ],
+    "decisionRefs": [
+      "policy-decision://policy-demo-ai-use/decision-0001"
+    ]
+  },
+  "policyRefs": [
+    "policy-decision://policy-demo-ai-use/decision-0001"
+  ],
+  "evidenceRefs": [
+    "evidence://context-fabric/demo-0001"
+  ],
+  "nonGoals": [
+    "workspace_graph_storage",
+    "provider_invocation",
+    "durable_recall_writeback",
+    "policy_adjudication",
+    "platform_event_storage"
+  ]
+}
