@@ -22,7 +22,7 @@ def run_cmd(*args: str) -> subprocess.CompletedProcess[str]:
 
 
 def test_bin_sp_run_doctor_delegates_to_agentplane_tooling() -> None:
-    result = run_cmd(str(BIN_SP_RUN), "doctor")
+    result = run_cmd("bash", str(BIN_SP_RUN), "doctor")
 
     assert result.returncode == 0, result.stderr
     payload = json.loads(result.stdout)
