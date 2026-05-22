@@ -17,6 +17,9 @@
     "executor_version",
     "graph_snapshot_id",
     "policy_bundle_id",
+    "policy_decision_ref",
+    "admission_decision",
+    "admission_reason_code",
     "quality_snapshot_id",
     "activation_edges",
     "run_artifact_refs",
@@ -60,6 +63,21 @@
       "type": "string"
     },
     "policy_bundle_id": {
+      "type": "string"
+    },
+    "policy_decision_ref": {
+      "type": "string"
+    },
+    "admission_decision": {
+      "type": "string",
+      "enum": [
+        "admitted",
+        "rejected",
+        "require-review",
+        "fail-closed"
+      ]
+    },
+    "admission_reason_code": {
       "type": "string"
     },
     "quality_snapshot_id": {
