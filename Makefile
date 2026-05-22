@@ -1,6 +1,6 @@
-.PHONY: validate test validate-governance-context validate-lattice-data-governai-execution-refs validate-lattice-runtime-profile-refs validate-network-native-assistant-evidence validate-guardrail-evidence-artifacts validate-stop-gate-evaluator validate-guarded-workcell-artifact validate-guarded-workcell-executor validate-guarded-invocation-artifact validate-guarded-invocation validate-agentic-pr-work-order validate-semantic-enterprise-agent-boundary validate-ops-history-contracts validate-action-contracts validate-agent-operation-contract validate-superconscious-reasoning-import validate-agent-harness-runtime-contracts validate-bounded-action-loop agentplane-evidence-receipt-composition-tier2-binding-ci lawful-learning-phase9-contract-ci validate-evidence-receipt-binding validate-semantic-activation-receipt validate-governed-run-contract
+.PHONY: validate test validate-governance-context validate-lattice-data-governai-execution-refs validate-lattice-runtime-profile-refs validate-network-native-assistant-evidence validate-guardrail-evidence-artifacts validate-stop-gate-evaluator validate-guarded-workcell-artifact validate-guarded-workcell-executor validate-guarded-invocation-artifact validate-guarded-invocation validate-agentic-pr-work-order validate-semantic-enterprise-agent-boundary validate-ops-history-contracts validate-action-contracts validate-agent-operation-contract validate-superconscious-reasoning-import validate-agent-harness-runtime-contracts validate-bounded-action-loop agentplane-evidence-receipt-composition-tier2-binding-ci lawful-learning-phase9-contract-ci validate-evidence-receipt-binding validate-semantic-activation-receipt validate-governed-run-contract validate-attempt-admission-receipt
 
-validate: validate-governance-context validate-lattice-data-governai-execution-refs validate-lattice-runtime-profile-refs validate-network-native-assistant-evidence validate-guardrail-evidence-artifacts validate-stop-gate-evaluator validate-guarded-workcell-artifact validate-guarded-workcell-executor validate-guarded-invocation-artifact validate-guarded-invocation validate-agentic-pr-work-order validate-semantic-enterprise-agent-boundary validate-ops-history-contracts validate-action-contracts validate-agent-operation-contract validate-superconscious-reasoning-import validate-agent-harness-runtime-contracts validate-bounded-action-loop agentplane-evidence-receipt-composition-tier2-binding-ci lawful-learning-phase9-contract-ci validate-evidence-receipt-binding validate-semantic-activation-receipt validate-governed-run-contract
+validate: validate-governance-context validate-lattice-data-governai-execution-refs validate-lattice-runtime-profile-refs validate-network-native-assistant-evidence validate-guardrail-evidence-artifacts validate-stop-gate-evaluator validate-guarded-workcell-artifact validate-guarded-workcell-executor validate-guarded-invocation-artifact validate-guarded-invocation validate-agentic-pr-work-order validate-semantic-enterprise-agent-boundary validate-ops-history-contracts validate-action-contracts validate-agent-operation-contract validate-superconscious-reasoning-import validate-agent-harness-runtime-contracts validate-bounded-action-loop agentplane-evidence-receipt-composition-tier2-binding-ci lawful-learning-phase9-contract-ci validate-evidence-receipt-binding validate-semantic-activation-receipt validate-governed-run-contract validate-attempt-admission-receipt
 	python3 tools/validate_execution_timing.py
 
 validate-governance-context:
@@ -115,6 +115,21 @@ validate-governed-run-contract:
 	! python3 tools/validate_governed_run_contract.py tests/fixtures/runs/governed-run-contract.verifierless-mutation.invalid.json
 	! python3 tools/validate_governed_run_contract.py tests/fixtures/runs/governed-run-contract.absolute-path.invalid.json
 	! python3 tools/validate_governed_run_contract.py tests/fixtures/runs/governed-run-contract.missing-authority-grant.invalid.json
+
+validate-attempt-admission-receipt:
+	python3 -m json.tool schemas/receipts/attempt-admission-receipt.v0.1.schema.json >/dev/null
+	python3 -m json.tool tests/fixtures/receipts/attempt-admission-receipt.valid.json >/dev/null
+	python3 -m json.tool tests/fixtures/receipts/attempt-admission-receipt.budget-exceeded.invalid.json >/dev/null
+	python3 -m json.tool tests/fixtures/receipts/attempt-admission-receipt.safety-block.invalid.json >/dev/null
+	python3 -m json.tool tests/fixtures/receipts/attempt-admission-receipt.authority-suspended.invalid.json >/dev/null
+	python3 -m json.tool tests/fixtures/receipts/attempt-admission-receipt.require-review-invalid-admit.invalid.json >/dev/null
+	python3 -m json.tool tests/fixtures/receipts/attempt-admission-receipt.fail-closed-missing-reason.invalid.json >/dev/null
+	python3 tools/validate_attempt_admission_receipt.py tests/fixtures/receipts/attempt-admission-receipt.valid.json
+	! python3 tools/validate_attempt_admission_receipt.py tests/fixtures/receipts/attempt-admission-receipt.budget-exceeded.invalid.json
+	! python3 tools/validate_attempt_admission_receipt.py tests/fixtures/receipts/attempt-admission-receipt.safety-block.invalid.json
+	! python3 tools/validate_attempt_admission_receipt.py tests/fixtures/receipts/attempt-admission-receipt.authority-suspended.invalid.json
+	! python3 tools/validate_attempt_admission_receipt.py tests/fixtures/receipts/attempt-admission-receipt.require-review-invalid-admit.invalid.json
+	! python3 tools/validate_attempt_admission_receipt.py tests/fixtures/receipts/attempt-admission-receipt.fail-closed-missing-reason.invalid.json
 
 test:
 	python3 -m pytest -q tools/tests
