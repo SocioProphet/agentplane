@@ -1,6 +1,6 @@
-.PHONY: validate test validate-governance-context validate-lattice-data-governai-execution-refs validate-lattice-runtime-profile-refs validate-network-native-assistant-evidence validate-guardrail-evidence-artifacts validate-stop-gate-evaluator validate-guarded-workcell-artifact validate-guarded-workcell-executor validate-guarded-invocation-artifact validate-guarded-invocation validate-agentic-pr-work-order validate-semantic-enterprise-agent-boundary validate-ops-history-contracts validate-action-contracts validate-agent-operation-contract validate-superconscious-reasoning-import validate-agent-harness-runtime-contracts validate-bounded-action-loop agentplane-evidence-receipt-composition-tier2-binding-ci lawful-learning-phase9-contract-ci validate-evidence-receipt-binding validate-semantic-activation-receipt validate-governed-run-contract validate-attempt-admission-receipt
+.PHONY: validate test validate-governance-context validate-lattice-data-governai-execution-refs validate-lattice-runtime-profile-refs validate-network-native-assistant-evidence validate-guardrail-evidence-artifacts validate-stop-gate-evaluator validate-guarded-workcell-artifact validate-guarded-workcell-executor validate-guarded-invocation-artifact validate-guarded-invocation validate-agentic-pr-work-order validate-semantic-enterprise-agent-boundary validate-ops-history-contracts validate-action-contracts validate-agent-operation-contract validate-superconscious-reasoning-import validate-agent-harness-runtime-contracts validate-bounded-action-loop agentplane-evidence-receipt-composition-tier2-binding-ci lawful-learning-phase9-contract-ci validate-evidence-receipt-binding validate-semantic-activation-receipt validate-governed-run-contract validate-preflight-receipt validate-attempt-admission-receipt validate-rollback-receipts validate-run-dossier validate-governed-runner-readonly validate-workroom-context-evidence
 
-validate: validate-governance-context validate-lattice-data-governai-execution-refs validate-lattice-runtime-profile-refs validate-network-native-assistant-evidence validate-guardrail-evidence-artifacts validate-stop-gate-evaluator validate-guarded-workcell-artifact validate-guarded-workcell-executor validate-guarded-invocation-artifact validate-guarded-invocation validate-agentic-pr-work-order validate-semantic-enterprise-agent-boundary validate-ops-history-contracts validate-action-contracts validate-agent-operation-contract validate-superconscious-reasoning-import validate-agent-harness-runtime-contracts validate-bounded-action-loop agentplane-evidence-receipt-composition-tier2-binding-ci lawful-learning-phase9-contract-ci validate-evidence-receipt-binding validate-semantic-activation-receipt validate-governed-run-contract validate-attempt-admission-receipt
+validate: validate-governance-context validate-lattice-data-governai-execution-refs validate-lattice-runtime-profile-refs validate-network-native-assistant-evidence validate-guardrail-evidence-artifacts validate-stop-gate-evaluator validate-guarded-workcell-artifact validate-guarded-workcell-executor validate-guarded-invocation-artifact validate-guarded-invocation validate-agentic-pr-work-order validate-semantic-enterprise-agent-boundary validate-ops-history-contracts validate-action-contracts validate-agent-operation-contract validate-superconscious-reasoning-import validate-agent-harness-runtime-contracts validate-bounded-action-loop agentplane-evidence-receipt-composition-tier2-binding-ci lawful-learning-phase9-contract-ci validate-evidence-receipt-binding validate-semantic-activation-receipt validate-governed-run-contract validate-preflight-receipt validate-attempt-admission-receipt validate-rollback-receipts validate-run-dossier validate-governed-runner-readonly validate-workroom-context-evidence
 	python3 tools/validate_execution_timing.py
 
 validate-governance-context:
@@ -116,6 +116,13 @@ validate-governed-run-contract:
 	! python3 tools/validate_governed_run_contract.py tests/fixtures/runs/governed-run-contract.absolute-path.invalid.json
 	! python3 tools/validate_governed_run_contract.py tests/fixtures/runs/governed-run-contract.missing-authority-grant.invalid.json
 
+validate-preflight-receipt:
+	python3 -m json.tool schemas/receipts/preflight-receipt.v0.1.schema.json >/dev/null
+	python3 tools/sp_run.py preflight tests/fixtures/runs/governed-run-contract.valid.json --generated-at 2026-05-22T12:20:00Z --output /tmp/agentplane-preflight-pass.json
+	python3 tools/validate_preflight_receipt.py /tmp/agentplane-preflight-pass.json
+	python3 tools/sp_run.py preflight tests/fixtures/runs/governed-run-contract.open-network.review.json --generated-at 2026-05-22T12:21:00Z --output /tmp/agentplane-preflight-review.json
+	python3 tools/validate_preflight_receipt.py /tmp/agentplane-preflight-review.json
+
 validate-attempt-admission-receipt:
 	python3 -m json.tool schemas/receipts/attempt-admission-receipt.v0.1.schema.json >/dev/null
 	python3 -m json.tool tests/fixtures/receipts/attempt-admission-receipt.valid.json >/dev/null
@@ -130,6 +137,39 @@ validate-attempt-admission-receipt:
 	! python3 tools/validate_attempt_admission_receipt.py tests/fixtures/receipts/attempt-admission-receipt.authority-suspended.invalid.json
 	! python3 tools/validate_attempt_admission_receipt.py tests/fixtures/receipts/attempt-admission-receipt.require-review-invalid-admit.invalid.json
 	! python3 tools/validate_attempt_admission_receipt.py tests/fixtures/receipts/attempt-admission-receipt.fail-closed-missing-reason.invalid.json
+
+validate-rollback-receipts:
+	python3 -m json.tool schemas/receipts/rollback-boundary.v0.1.schema.json >/dev/null
+	python3 -m json.tool schemas/receipts/rollback-result.v0.1.schema.json >/dev/null
+	python3 -m json.tool tests/fixtures/receipts/rollback-boundary.valid.json >/dev/null
+	python3 -m json.tool tests/fixtures/receipts/rollback-boundary.path-escape.invalid.json >/dev/null
+	python3 -m json.tool tests/fixtures/receipts/rollback-result.valid.json >/dev/null
+	python3 -m json.tool tests/fixtures/receipts/rollback-result.failed-missing-error.invalid.json >/dev/null
+	python3 tools/validate_rollback_receipts.py boundary tests/fixtures/receipts/rollback-boundary.valid.json
+	! python3 tools/validate_rollback_receipts.py boundary tests/fixtures/receipts/rollback-boundary.path-escape.invalid.json
+	python3 tools/validate_rollback_receipts.py result tests/fixtures/receipts/rollback-result.valid.json
+	! python3 tools/validate_rollback_receipts.py result tests/fixtures/receipts/rollback-result.failed-missing-error.invalid.json
+
+validate-run-dossier:
+	python3 -m json.tool schemas/runs/run-dossier.v0.1.schema.json >/dev/null
+	python3 -m json.tool tests/fixtures/runs/run-dossier/run-dossier.valid.json >/dev/null
+	python3 -m json.tool tests/fixtures/runs/run-dossier/run-dossier.ready-missing.invalid.json >/dev/null
+	python3 tools/validate_run_dossier.py tests/fixtures/runs/run-dossier/run-dossier.valid.json
+	! python3 tools/validate_run_dossier.py tests/fixtures/runs/run-dossier/run-dossier.ready-missing.invalid.json
+	python3 tools/build_run_dossier.py tests/fixtures/runs/run-dossier/run --generated-at 2026-05-22T12:10:00Z --output /tmp/agentplane-run-dossier.generated.json
+	python3 tools/validate_run_dossier.py /tmp/agentplane-run-dossier.generated.json
+
+validate-governed-runner-readonly:
+	python3 tools/run_governed_runner_smoke.py --output-dir /tmp/agentplane-governed-runner-smoke --generated-at 2026-05-22T12:45:00Z
+	python3 tools/sp_run.py list --runs-root /tmp/agentplane-governed-runner-smoke >/tmp/agentplane-run-list.json
+	python3 tools/sp_run.py status /tmp/agentplane-governed-runner-smoke/run >/tmp/agentplane-run-status.json
+	python3 tools/sp_run.py inspect /tmp/agentplane-governed-runner-smoke/run >/tmp/agentplane-run-inspection.json
+	python3 tools/governed_runner_tool_surface.py list-tools >/tmp/agentplane-tool-list.json
+	python3 tools/governed_runner_tool_surface.py call governed_runner.doctor --args-json '{}' >/tmp/agentplane-tool-doctor.json
+	python3 tools/sp_run.py tool list-tools >/tmp/agentplane-sp-run-tool-list.json
+
+validate-workroom-context-evidence:
+	python3 tools/validate_workroom_context_evidence.py
 
 test:
 	python3 -m pytest -q tools/tests
