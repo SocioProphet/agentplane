@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.socioprophet.org/agentplane/receipts/rollback-boundary.v0.1.schema.json",
+  "title": "RollbackBoundary v0.1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "recordType",
+    "boundary_id",
+    "run_id",
+    "attempt_id",
+    "repo_root",
+    "captured_at",
+    "strategy",
+    "head_ref",
+    "tracked_dirty_files",
+    "untracked_files",
+    "snapshots",
+    "receipt_hash"
+  ],
+  "properties": {
+    "schemaVersion": {"const": "agentplane.rollback-boundary.v0.1"},
+    "recordType": {"const": "RollbackBoundary"},
+    "boundary_id": {"type": "string"},
+    "run_id": {"type": "string"},
+    "attempt_id": {"type": "string"},
+    "repo_root": {"type": "string"},
+    "captured_at": {"type": "string"},
+    "strategy": {"type": "string", "enum": ["git_head_plus_snapshot", "unavailable"]},
+    "head_ref": {"type": "string"},
+    "tracked_dirty_files": {"type": "array", "items": {"type": "string"}},
+    "untracked_files": {"type": "array", "items": {"type": "string"}},
+    "snapshots": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["path", "existed", "encoding"],
+        "properties": {
+          "path": {"type": "string"},
+          "existed": {"type": "boolean"},
+          "encoding": {"type": "string", "enum": ["base64"]},
+          "content_base64": {"type": "string"}
+        }
+      }
+    },
+    "receipt_hash": {"type": "string", "pattern": "^sha256:"},
+    "labels": {"type": "object", "additionalProperties": {"type": "string"}}
+  }
+}
