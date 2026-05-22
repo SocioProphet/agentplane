@@ -2,9 +2,10 @@
 """Read-only sp-run CLI for governed-run evidence inspection.
 
 This CLI exposes operator-facing receipt inspection, preflight projection,
-admission receipt construction, smoke evidence generation, and run-store
-inspection. It does not run agents, execute verifier commands, mutate governed
-files, restore rollback state, settle budget, or change authority.
+admission receipt construction, smoke evidence generation, run-store inspection,
+and the local JSON tool adapter. It does not run agents, execute verifier
+commands, mutate governed files, restore rollback state, settle budget, or
+change authority.
 """
 
 from __future__ import annotations
@@ -33,6 +34,7 @@ REQUIRED_FILES = (
     "schemas/receipts/rollback-boundary.v0.1.schema.json",
     "schemas/receipts/rollback-result.v0.1.schema.json",
     "tools/build_run_dossier.py",
+    "tools/governed_runner_tool_surface.py",
     "tools/run_governed_runner_smoke.py",
     "tools/run_store_inspection.py",
     "tools/validate_run_dossier.py",
@@ -94,12 +96,19 @@ def command_doctor(_args: argparse.Namespace) -> int:
                 "validate-dossier",
                 "preflight",
                 "admit",
+                "tool",
             ],
             "non_goals": ["execute", "mutate", "restore", "authority_update", "budget_settlement"],
             "files": files,
         }
     )
     return 0 if ok else 1
+
+
+def command_tool(args: argparse.Namespace) -> int:
+    import governed_runner_tool_surface
+
+    return governed_runner_tool_surface.main(list(args.args))
 
 
 def command_list(args: argparse.Namespace) -> int:
@@ -391,6 +400,10 @@ def build_parser() -> argparse.ArgumentParser:
 
     doctor = subparsers.add_parser("doctor", help="Check read-only governed-run evidence tooling.")
     doctor.set_defaults(func=command_doctor)
+
+    tool = subparsers.add_parser("tool", help="Access the read-only governed-runner JSON tool adapter.")
+    tool.add_argument("args", nargs=argparse.REMAINDER, help="Arguments passed to governed_runner_tool_surface.py")
+    tool.set_defaults(func=command_tool)
 
     smoke = subparsers.add_parser("smoke", help="Build a deterministic governed-runner smoke evidence bundle.")
     smoke.add_argument("--output-dir", default=".socioprophet/smoke/governed-runner")
