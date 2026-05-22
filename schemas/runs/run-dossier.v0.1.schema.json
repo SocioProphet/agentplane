@@ -1,0 +1,75 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.socioprophet.org/agentplane/runs/run-dossier.v0.1.schema.json",
+  "title": "RunDossier v0.1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "recordType",
+    "dossier_id",
+    "run_id",
+    "generated_at",
+    "source_run_dir",
+    "overall_status",
+    "contract_ref",
+    "attempt_count",
+    "budget_summary",
+    "latest_admission",
+    "latest_rollback",
+    "receipt_refs",
+    "missing_receipts",
+    "recommended_next_action",
+    "dossier_hash"
+  ],
+  "properties": {
+    "schemaVersion": {"const": "agentplane.run-dossier.v0.1"},
+    "recordType": {"const": "RunDossier"},
+    "dossier_id": {"type": "string"},
+    "run_id": {"type": "string"},
+    "generated_at": {"type": "string"},
+    "source_run_dir": {"type": "string"},
+    "overall_status": {"type": "string", "enum": ["ready", "blocked", "requires_review", "failed_closed", "incomplete"]},
+    "contract_ref": {"type": "string"},
+    "attempt_count": {"type": "integer", "minimum": 0},
+    "budget_summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["projected_cost_usd", "remaining_budget_usd", "remaining_iterations", "remaining_tokens"],
+      "properties": {
+        "projected_cost_usd": {"type": "number", "minimum": 0},
+        "remaining_budget_usd": {"type": "number", "minimum": 0},
+        "remaining_iterations": {"type": "integer", "minimum": 0},
+        "remaining_tokens": {"type": "integer", "minimum": 0}
+      }
+    },
+    "latest_admission": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["receipt_ref", "admitted", "admission_decision", "reason_code", "runtime_action", "authority_decision"],
+      "properties": {
+        "receipt_ref": {"type": "string"},
+        "admitted": {"type": "boolean"},
+        "admission_decision": {"type": "string"},
+        "reason_code": {"type": "string"},
+        "runtime_action": {"type": "string"},
+        "authority_decision": {"type": "string"}
+      }
+    },
+    "latest_rollback": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["boundary_ref", "result_ref", "status"],
+      "properties": {
+        "boundary_ref": {"type": "string"},
+        "result_ref": {"type": "string"},
+        "status": {"type": "string"}
+      }
+    },
+    "receipt_refs": {"type": "array", "items": {"type": "string"}},
+    "missing_receipts": {"type": "array", "items": {"type": "string"}},
+    "recommended_next_action": {"type": "string"},
+    "dossier_hash": {"type": "string", "pattern": "^sha256:"},
+    "labels": {"type": "object", "additionalProperties": {"type": "string"}}
+  }
+}
