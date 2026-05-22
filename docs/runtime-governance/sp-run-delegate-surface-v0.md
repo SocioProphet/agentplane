@@ -35,6 +35,10 @@ python3 -m pip install -e .
 sp-run doctor
 ```
 
+Current v0 install boundary: the console entry point delegates to `tools/sp_run.py` in an AgentPlane source checkout. If that delegate is unavailable, `sp-run` fails closed with a structured `SpRunInstallError` JSON payload and exit code `127`.
+
+That diagnostic means the caller should run from a `SocioProphet/agentplane` checkout or install AgentPlane in editable mode.
+
 ## Source-checkout wrapper
 
 For local development before packaging/install:
@@ -56,8 +60,12 @@ python3 tools/sp_run.py ...
 ```bash
 sp-run doctor
 sp-run smoke --output-dir .socioprophet/smoke/governed-runner
+sp-run tool list-tools
 sp-run preflight <governed-run-contract.json>
 sp-run admit <governed-run-contract.json> --preflight <preflight.json> --authority-state <authority-state.json>
+sp-run list --runs-root <runs-root>
+sp-run status <run-dir>
+sp-run inspect <run-dir>
 sp-run dossier <run_dir>
 sp-run validate-dossier <dossier.json>
 ```
@@ -79,6 +87,7 @@ It remains read-only and does not:
 
 ```bash
 python3 -m pytest -q tools/tests/test_sp_run_delegate_surface.py
+python3 -m pytest -q tools/tests/test_sp_run_install_mode.py
 ```
 
 The tests cover:
@@ -87,6 +96,8 @@ The tests cover:
 - Python entry-point delegation
 - read-only capability reporting
 - smoke evidence bundle generation through both delegate paths
+- install-mode diagnostic payloads
+- fail-closed behavior when the source delegate is missing
 
 ## prophet-cli integration
 
@@ -99,6 +110,7 @@ prophet agentplane admit <contract.json> --preflight <preflight.json> --authorit
 prophet agentplane dossier <run_dir>
 prophet agentplane validate-dossier <dossier.json>
 prophet governed-runner smoke --output-dir .socioprophet/smoke/governed-runner
+prophet governed-runner tool list-tools
 ```
 
 The owning implementation remains here in AgentPlane.
