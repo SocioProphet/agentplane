@@ -14,6 +14,7 @@ AgentPlane owns:
 - preflight projection
 - admission receipt construction
 - run dossier generation and validation
+- governed-runner smoke evidence generation
 - the `sp-run` delegate command
 
 `prophet-cli` should call `sp-run ...` once this delegate is available on `PATH`. It should not duplicate AgentPlane implementation logic.
@@ -41,6 +42,7 @@ For local development before packaging/install:
 ```bash
 bash bin/sp-run doctor
 bash bin/sp-run preflight tests/fixtures/runs/governed-run-contract.valid.json
+bash bin/sp-run smoke --output-dir .socioprophet/smoke/governed-runner
 ```
 
 The wrapper delegates to:
@@ -53,6 +55,7 @@ python3 tools/sp_run.py ...
 
 ```bash
 sp-run doctor
+sp-run smoke --output-dir .socioprophet/smoke/governed-runner
 sp-run preflight <governed-run-contract.json>
 sp-run admit <governed-run-contract.json> --preflight <preflight.json> --authority-state <authority-state.json>
 sp-run dossier <run_dir>
@@ -67,7 +70,7 @@ It remains read-only and does not:
 
 - execute agents
 - run verifier commands
-- mutate files
+- mutate governed workspace files
 - restore rollback state
 - update authority
 - settle budget
@@ -83,10 +86,11 @@ The tests cover:
 - source-checkout wrapper delegation
 - Python entry-point delegation
 - read-only capability reporting
+- smoke evidence bundle generation through both delegate paths
 
 ## prophet-cli integration
 
-After this surface lands, `prophet-cli` should delegate to `sp-run` through its existing façade model:
+`prophet-cli` delegates to `sp-run` through its existing façade model:
 
 ```bash
 prophet agentplane doctor
@@ -94,6 +98,7 @@ prophet agentplane preflight <contract.json>
 prophet agentplane admit <contract.json> --preflight <preflight.json> --authority-state <authority.json>
 prophet agentplane dossier <run_dir>
 prophet agentplane validate-dossier <dossier.json>
+prophet governed-runner smoke --output-dir .socioprophet/smoke/governed-runner
 ```
 
 The owning implementation remains here in AgentPlane.
