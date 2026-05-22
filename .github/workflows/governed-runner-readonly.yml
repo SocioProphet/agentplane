@@ -79,7 +79,8 @@ jobs:
 
       - name: Validate governed-runner receipts
         run: |
-          python3 tools/validate_preflight_receipt.py tests/fixtures/receipts/preflight-receipt.pass.valid.json || true
+          python3 tools/sp_run.py preflight tests/fixtures/runs/governed-run-contract.valid.json --generated-at 2026-05-22T12:20:00Z --output /tmp/preflight-receipt.json
+          python3 tools/validate_preflight_receipt.py /tmp/preflight-receipt.json
           python3 tools/validate_attempt_admission_receipt.py tests/fixtures/receipts/attempt-admission-receipt.valid.json
           python3 tools/validate_run_dossier.py tests/fixtures/runs/run-dossier/run-dossier.valid.json
           ! python3 tools/validate_run_dossier.py tests/fixtures/runs/run-dossier/run-dossier.ready-missing.invalid.json
