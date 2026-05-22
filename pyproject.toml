@@ -1,0 +1,18 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "agentplane"
+version = "0.1.0"
+description = "AgentPlane governed-runner evidence and read-only operator CLI."
+requires-python = ">=3.11"
+
+[project.scripts]
+sp-run = "agentplane_cli.sp_run:main"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
