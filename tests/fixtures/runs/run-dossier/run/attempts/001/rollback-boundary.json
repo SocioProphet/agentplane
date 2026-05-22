@@ -1,0 +1,18 @@
+{
+  "schemaVersion": "agentplane.rollback-boundary.v0.1",
+  "recordType": "RollbackBoundary",
+  "boundary_id": "rollback-boundary:governed-run-alpha-001:attempt-001",
+  "run_id": "governed-run:alpha-001",
+  "attempt_id": "attempt:governed-run-alpha-001:001",
+  "repo_root": ".",
+  "captured_at": "2026-05-22T12:00:00Z",
+  "strategy": "git_head_plus_snapshot",
+  "head_ref": "abcdef1234567890abcdef1234567890abcdef12",
+  "tracked_dirty_files": ["src/app.py"],
+  "untracked_files": ["tests/test_app.py"],
+  "snapshots": [
+    {"path": "src/app.py", "existed": true, "encoding": "base64", "content_base64": "cHJpbnQoJ2JlZm9yZScpCg=="},
+    {"path": "tests/test_app.py", "existed": false, "encoding": "base64"}
+  ],
+  "receipt_hash": "sha256:9999999999999999999999999999999999999999999999999999999999999999"
+}
