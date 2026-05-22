@@ -1,0 +1,171 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.socioprophet.org/agentplane/receipts/semantic-activation-receipt.v0.1.json",
+  "title": "SemanticActivationReceipt v0.1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "recordType",
+    "receipt_id",
+    "asset_id",
+    "ingestion_run_id",
+    "activation_bundle_hash",
+    "activation_bundle_canonicalization_id",
+    "validator_bundle_ref",
+    "executor_id",
+    "executor_version",
+    "graph_snapshot_id",
+    "policy_bundle_id",
+    "policy_decision_ref",
+    "admission_decision",
+    "admission_reason_code",
+    "quality_snapshot_id",
+    "activation_edges",
+    "run_artifact_refs",
+    "replay_artifact_ref",
+    "evidence_status",
+    "receipt_hash"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "agentplane.semantic-activation-receipt.v0.1"
+    },
+    "recordType": {
+      "const": "SemanticActivationReceipt"
+    },
+    "receipt_id": {
+      "type": "string"
+    },
+    "asset_id": {
+      "type": "string"
+    },
+    "ingestion_run_id": {
+      "type": "string"
+    },
+    "activation_bundle_hash": {
+      "type": "string",
+      "pattern": "^sha256:"
+    },
+    "activation_bundle_canonicalization_id": {
+      "type": "string"
+    },
+    "validator_bundle_ref": {
+      "type": "string"
+    },
+    "executor_id": {
+      "type": "string"
+    },
+    "executor_version": {
+      "type": "string"
+    },
+    "graph_snapshot_id": {
+      "type": "string"
+    },
+    "policy_bundle_id": {
+      "type": "string"
+    },
+    "policy_decision_ref": {
+      "type": "string"
+    },
+    "admission_decision": {
+      "type": "string",
+      "enum": [
+        "admitted",
+        "rejected",
+        "require-review",
+        "fail-closed"
+      ]
+    },
+    "admission_reason_code": {
+      "type": "string"
+    },
+    "quality_snapshot_id": {
+      "type": "string"
+    },
+    "activation_edges": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "edge_type",
+          "subject_ref",
+          "object_ref",
+          "evidence_ref"
+        ],
+        "properties": {
+          "edge_type": {
+            "type": "string",
+            "enum": [
+              "declares",
+              "depends_on",
+              "governed_by",
+              "validated_by",
+              "replayable_as"
+            ]
+          },
+          "subject_ref": {
+            "type": "string"
+          },
+          "object_ref": {
+            "type": "string"
+          },
+          "evidence_ref": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "run_artifact_refs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "replay_artifact_ref": {
+      "type": "string"
+    },
+    "evidence_status": {
+      "type": "string",
+      "enum": [
+        "complete",
+        "missing_evidence",
+        "invalid_evidence",
+        "non_replayable"
+      ]
+    },
+    "fail_closed_reason": {
+      "type": "string"
+    },
+    "receipt_hash": {
+      "type": "string",
+      "pattern": "^sha256:"
+    },
+    "lineage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "stable_across_reassessment",
+        "previous_receipt_refs"
+      ],
+      "properties": {
+        "stable_across_reassessment": {
+          "type": "boolean"
+        },
+        "previous_receipt_refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "labels": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string"
+      }
+    }
+  }
+}
