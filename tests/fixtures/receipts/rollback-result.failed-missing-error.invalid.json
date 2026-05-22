@@ -1,0 +1,21 @@
+{
+  "schemaVersion": "agentplane.rollback-result.v0.1",
+  "recordType": "RollbackResult",
+  "result_id": "rollback-result:governed-run-alpha-001:attempt-failed",
+  "boundary_ref": "rollback-boundary:governed-run-alpha-001:attempt-failed",
+  "run_id": "governed-run:alpha-001",
+  "attempt_id": "attempt:governed-run-alpha-001:failed",
+  "attempted": true,
+  "status": "failed",
+  "recorded_at": "2026-05-22T12:03:00Z",
+  "before": {
+    "tracked_dirty_files": ["src/app.py"],
+    "untracked_files": ["tests/test_app.py"]
+  },
+  "after": {
+    "tracked_dirty_files": ["src/app.py"],
+    "untracked_files": ["tests/test_app.py"]
+  },
+  "changed_paths": ["src/app.py", "tests/test_app.py"],
+  "receipt_hash": "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+}

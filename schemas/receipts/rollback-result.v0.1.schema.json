@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.socioprophet.org/agentplane/receipts/rollback-result.v0.1.schema.json",
+  "title": "RollbackResult v0.1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "recordType",
+    "result_id",
+    "boundary_ref",
+    "run_id",
+    "attempt_id",
+    "attempted",
+    "status",
+    "recorded_at",
+    "before",
+    "after",
+    "receipt_hash"
+  ],
+  "properties": {
+    "schemaVersion": {"const": "agentplane.rollback-result.v0.1"},
+    "recordType": {"const": "RollbackResult"},
+    "result_id": {"type": "string"},
+    "boundary_ref": {"type": "string"},
+    "run_id": {"type": "string"},
+    "attempt_id": {"type": "string"},
+    "attempted": {"type": "boolean"},
+    "status": {"type": "string", "enum": ["restored", "not_required", "failed", "unavailable"]},
+    "recorded_at": {"type": "string"},
+    "before": {"type": "object", "additionalProperties": {"type": "array", "items": {"type": "string"}}},
+    "after": {"type": "object", "additionalProperties": {"type": "array", "items": {"type": "string"}}},
+    "changed_paths": {"type": "array", "items": {"type": "string"}},
+    "error": {"type": "string"},
+    "receipt_hash": {"type": "string", "pattern": "^sha256:"},
+    "labels": {"type": "object", "additionalProperties": {"type": "string"}}
+  }
+}
