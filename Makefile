@@ -92,12 +92,14 @@ validate-semantic-activation-receipt:
 	python3 -m json.tool tests/fixtures/receipts/semantic-activation-receipt.missing-policy-bundle.invalid.json >/dev/null
 	python3 -m json.tool tests/fixtures/receipts/semantic-activation-receipt.missing-replay-artifact.invalid.json >/dev/null
 	python3 -m json.tool tests/fixtures/receipts/semantic-activation-receipt.missing-required-edge-evidence.invalid.json >/dev/null
+	python3 -m json.tool tests/fixtures/receipts/semantic-activation-receipt.missing-admission-decision.invalid.json >/dev/null
 	python3 tools/validate_semantic_activation_receipt.py tests/fixtures/receipts/semantic-activation-receipt.valid.json
 	! python3 tools/validate_semantic_activation_receipt.py tests/fixtures/receipts/semantic-activation-receipt.missing-activation-bundle-hash.invalid.json
 	! python3 tools/validate_semantic_activation_receipt.py tests/fixtures/receipts/semantic-activation-receipt.missing-graph-snapshot.invalid.json
 	! python3 tools/validate_semantic_activation_receipt.py tests/fixtures/receipts/semantic-activation-receipt.missing-policy-bundle.invalid.json
 	! python3 tools/validate_semantic_activation_receipt.py tests/fixtures/receipts/semantic-activation-receipt.missing-replay-artifact.invalid.json
 	! python3 tools/validate_semantic_activation_receipt.py tests/fixtures/receipts/semantic-activation-receipt.missing-required-edge-evidence.invalid.json
+	! python3 tools/validate_semantic_activation_receipt.py tests/fixtures/receipts/semantic-activation-receipt.missing-admission-decision.invalid.json
 
 test:
 	python3 -m pytest -q tools/tests
