@@ -11,6 +11,9 @@
   "executor_version": "0.1.0",
   "graph_snapshot_id": "hellgraph-snapshot:alpha-001",
   "policy_bundle_id": "policy-bundle:semantic-governance-v0.1",
+  "policy_decision_ref": "policy-decision:semantic-activation-admit-alpha-001",
+  "admission_decision": "admitted",
+  "admission_reason_code": "semantic_activation_evidence_complete",
   "quality_snapshot_id": "quality-snapshot:alpha-001",
   "activation_edges": [
     {
