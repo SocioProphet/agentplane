@@ -1,0 +1,88 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.socioprophet.org/agentplane/receipts/attempt-admission-receipt.v0.1.schema.json",
+  "title": "AttemptAdmissionReceipt v0.1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "recordType",
+    "receipt_id",
+    "attempt_id",
+    "run_id",
+    "governed_run_contract_ref",
+    "admitted",
+    "admission_decision",
+    "reason_code",
+    "safety_preflight_ref",
+    "safety_preflight_outcome",
+    "authority_state_ref",
+    "authority_decision",
+    "trustops_runtime_action_ref",
+    "runtime_action",
+    "budget_estimate",
+    "issued_at",
+    "receipt_hash"
+  ],
+  "properties": {
+    "schemaVersion": {"const": "agentplane.attempt-admission-receipt.v0.1"},
+    "recordType": {"const": "AttemptAdmissionReceipt"},
+    "receipt_id": {"type": "string"},
+    "attempt_id": {"type": "string"},
+    "run_id": {"type": "string"},
+    "governed_run_contract_ref": {"type": "string"},
+    "admitted": {"type": "boolean"},
+    "admission_decision": {
+      "type": "string",
+      "enum": ["admit", "reject", "require-review", "fail-closed"]
+    },
+    "reason_code": {"type": "string"},
+    "fail_closed_reason": {"type": "string"},
+    "safety_preflight_ref": {"type": "string"},
+    "safety_preflight_outcome": {
+      "type": "string",
+      "enum": ["pass", "warn", "require-review", "quarantine", "block", "rollback", "revoke"]
+    },
+    "authority_state_ref": {"type": "string"},
+    "authority_decision": {
+      "type": "string",
+      "enum": ["unchanged", "reduced", "suspended", "revoked"]
+    },
+    "trustops_runtime_action_ref": {"type": "string"},
+    "runtime_action": {
+      "type": "string",
+      "enum": ["allow", "warn", "require-review", "quarantine", "block", "rollback", "revoke"]
+    },
+    "budget_estimate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "projected_cost_usd",
+        "remaining_budget_usd",
+        "remaining_iterations",
+        "remaining_tokens",
+        "estimate_provenance"
+      ],
+      "properties": {
+        "projected_cost_usd": {"type": "number", "minimum": 0},
+        "remaining_budget_usd": {"type": "number", "minimum": 0},
+        "remaining_iterations": {"type": "integer", "minimum": 0},
+        "remaining_tokens": {"type": "integer", "minimum": 0},
+        "estimate_provenance": {"type": "string", "enum": ["actual", "estimated", "unavailable"]}
+      }
+    },
+    "input_refs": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "policy_bundle_ref": {"type": "string"},
+        "authority_grant_ref": {"type": "string"},
+        "trustops_gate_policy_ref": {"type": "string"},
+        "verification_plan_ref": {"type": "string"}
+      }
+    },
+    "issued_at": {"type": "string"},
+    "receipt_hash": {"type": "string", "pattern": "^sha256:"},
+    "labels": {"type": "object", "additionalProperties": {"type": "string"}}
+  }
+}
