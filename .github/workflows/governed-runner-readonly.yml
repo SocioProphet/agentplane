@@ -1,0 +1,98 @@
+name: Governed Runner Read-Only Surface
+
+on:
+  pull_request:
+    paths:
+      - 'tools/sp_run.py'
+      - 'tools/governed_runner_tool_surface.py'
+      - 'tools/run_governed_runner_smoke.py'
+      - 'tools/run_store_inspection.py'
+      - 'tools/build_run_dossier.py'
+      - 'tools/validate_run_dossier.py'
+      - 'tools/validate_preflight_receipt.py'
+      - 'tools/validate_attempt_admission_receipt.py'
+      - 'tools/tests/test_sp_run_cli.py'
+      - 'tools/tests/test_sp_run_preflight_cli.py'
+      - 'tools/tests/test_sp_run_admit_cli.py'
+      - 'tools/tests/test_sp_run_delegate_surface.py'
+      - 'tools/tests/test_governed_runner_smoke.py'
+      - 'tools/tests/test_sp_run_run_store_inspection.py'
+      - 'tools/tests/test_governed_runner_tool_surface.py'
+      - 'tools/tests/test_sp_run_tool_adapter.py'
+      - 'schemas/runs/governed-run-contract.v0.1.schema.json'
+      - 'schemas/runs/run-dossier.v0.1.schema.json'
+      - 'schemas/receipts/preflight-receipt.v0.1.schema.json'
+      - 'schemas/receipts/attempt-admission-receipt.v0.1.schema.json'
+      - 'schemas/receipts/rollback-boundary.v0.1.schema.json'
+      - 'schemas/receipts/rollback-result.v0.1.schema.json'
+      - 'tests/fixtures/runs/**'
+      - 'tests/fixtures/receipts/**'
+      - 'tests/fixtures/authority/**'
+      - 'docs/runtime-governance/**'
+      - '.github/workflows/governed-runner-readonly.yml'
+  push:
+    branches:
+      - main
+    paths:
+      - 'tools/sp_run.py'
+      - 'tools/governed_runner_tool_surface.py'
+      - 'tools/run_governed_runner_smoke.py'
+      - 'tools/run_store_inspection.py'
+      - 'tools/build_run_dossier.py'
+      - 'tools/validate_run_dossier.py'
+      - 'tools/validate_preflight_receipt.py'
+      - 'tools/validate_attempt_admission_receipt.py'
+      - 'tools/tests/test_sp_run_cli.py'
+      - 'tools/tests/test_sp_run_preflight_cli.py'
+      - 'tools/tests/test_sp_run_admit_cli.py'
+      - 'tools/tests/test_sp_run_delegate_surface.py'
+      - 'tools/tests/test_governed_runner_smoke.py'
+      - 'tools/tests/test_sp_run_run_store_inspection.py'
+      - 'tools/tests/test_governed_runner_tool_surface.py'
+      - 'tools/tests/test_sp_run_tool_adapter.py'
+      - 'schemas/runs/governed-run-contract.v0.1.schema.json'
+      - 'schemas/runs/run-dossier.v0.1.schema.json'
+      - 'schemas/receipts/preflight-receipt.v0.1.schema.json'
+      - 'schemas/receipts/attempt-admission-receipt.v0.1.schema.json'
+      - 'schemas/receipts/rollback-boundary.v0.1.schema.json'
+      - 'schemas/receipts/rollback-result.v0.1.schema.json'
+      - 'tests/fixtures/runs/**'
+      - 'tests/fixtures/receipts/**'
+      - 'tests/fixtures/authority/**'
+      - 'docs/runtime-governance/**'
+      - '.github/workflows/governed-runner-readonly.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  governed-runner-readonly:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Validate governed-runner receipts
+        run: |
+          python3 tools/sp_run.py preflight tests/fixtures/runs/governed-run-contract.valid.json --generated-at 2026-05-22T12:20:00Z --output /tmp/preflight-receipt.json
+          python3 tools/validate_preflight_receipt.py /tmp/preflight-receipt.json
+          python3 tools/validate_attempt_admission_receipt.py tests/fixtures/receipts/attempt-admission-receipt.valid.json
+          python3 tools/validate_run_dossier.py tests/fixtures/runs/run-dossier/run-dossier.valid.json
+          ! python3 tools/validate_run_dossier.py tests/fixtures/runs/run-dossier/run-dossier.ready-missing.invalid.json
+
+      - name: Exercise read-only governed-runner surface
+        run: |
+          python3 -m pytest -q \
+            tools/tests/test_sp_run_cli.py \
+            tools/tests/test_sp_run_preflight_cli.py \
+            tools/tests/test_sp_run_admit_cli.py \
+            tools/tests/test_sp_run_delegate_surface.py \
+            tools/tests/test_governed_runner_smoke.py \
+            tools/tests/test_sp_run_run_store_inspection.py \
+            tools/tests/test_governed_runner_tool_surface.py \
+            tools/tests/test_sp_run_tool_adapter.py
