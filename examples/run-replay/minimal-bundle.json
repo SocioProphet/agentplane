@@ -1,0 +1,26 @@
+{
+  "metadata": {
+    "name": "minimal-run-replay-fixture",
+    "version": "0.1.0"
+  },
+  "spec": {
+    "artifacts": {
+      "outDir": "/tmp/agentplane-run-replay-fixture"
+    },
+    "policy": {
+      "lane": "staging",
+      "policyPackRef": "policy-pack:synthetic-run-replay",
+      "policyPackHash": "sha256:1111111111111111111111111111111111111111111111111111111111111111"
+    },
+    "vm": {
+      "backendIntent": "qemu"
+    },
+    "secrets": {
+      "required": []
+    },
+    "governanceContext": {
+      "fixture": "run-replay-artifact-validation",
+      "nonProductionOnly": true
+    }
+  }
+}
