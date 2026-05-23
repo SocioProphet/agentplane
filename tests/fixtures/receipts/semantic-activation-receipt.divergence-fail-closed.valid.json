@@ -1,0 +1,69 @@
+{
+  "schemaVersion": "agentplane.semantic-activation-receipt.v0.1",
+  "recordType": "SemanticActivationReceipt",
+  "receipt_id": "semantic-activation-receipt:divergence-alpha-fail-closed",
+  "asset_id": "semantic-asset:divergence-alpha",
+  "ingestion_run_id": "ingestion-run:divergence-alpha-2026-05-22",
+  "activation_bundle_hash": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "activation_bundle_canonicalization_id": "semantic-activation-bundle-c14n:v0.1",
+  "validator_bundle_ref": "validator-bundle:semantic-edge-v0.2-requires-policy-proof",
+  "executor_id": "agentplane-semantic-activation-executor",
+  "executor_version": "0.2.0",
+  "graph_snapshot_id": "hellgraph-snapshot:divergence-alpha-002",
+  "policy_bundle_id": "policy-bundle:semantic-governance-v0.2-strict",
+  "policy_decision_ref": "policy-decision:semantic-activation-divergence-alpha-fail-closed",
+  "admission_decision": "fail-closed",
+  "admission_reason_code": "semantic_activation_policy_context_missing_required_proof",
+  "quality_snapshot_id": "quality-snapshot:divergence-alpha-fail-closed",
+  "activation_edges": [
+    {
+      "edge_type": "declares",
+      "subject_ref": "semantic-asset:divergence-alpha",
+      "object_ref": "concept:regulated-service",
+      "evidence_ref": "evidence:divergence-alpha:edge:declares"
+    },
+    {
+      "edge_type": "depends_on",
+      "subject_ref": "semantic-asset:divergence-alpha",
+      "object_ref": "knowledge-base:divergence-alpha-source",
+      "evidence_ref": "evidence:divergence-alpha:edge:depends-on"
+    },
+    {
+      "edge_type": "governed_by",
+      "subject_ref": "semantic-asset:divergence-alpha",
+      "object_ref": "policy-bundle:semantic-governance-v0.2-strict",
+      "evidence_ref": "evidence:divergence-alpha:edge:governed-by:strict"
+    },
+    {
+      "edge_type": "validated_by",
+      "subject_ref": "semantic-asset:divergence-alpha",
+      "object_ref": "validator-bundle:semantic-edge-v0.2-requires-policy-proof",
+      "evidence_ref": "evidence:divergence-alpha:edge:validated-by:strict"
+    },
+    {
+      "edge_type": "replayable_as",
+      "subject_ref": "semantic-asset:divergence-alpha",
+      "object_ref": "replay-artifact:semantic-activation-divergence-alpha-fail-closed",
+      "evidence_ref": "evidence:divergence-alpha:edge:replayable-as:fail-closed"
+    }
+  ],
+  "run_artifact_refs": [
+    "run-artifact:semantic-activation-divergence-alpha-fail-closed",
+    "run-artifact:validator-divergence-alpha-fail-closed"
+  ],
+  "replay_artifact_ref": "replay-artifact:semantic-activation-divergence-alpha-fail-closed",
+  "evidence_status": "invalid_evidence",
+  "fail_closed_reason": "same activation bundle was evaluated under stricter executor/policy context requiring policy-proof evidence not present in the admitted v0.1 context",
+  "receipt_hash": "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+  "lineage": {
+    "stable_across_reassessment": true,
+    "previous_receipt_refs": [
+      "semantic-activation-receipt:divergence-alpha-admitted"
+    ]
+  },
+  "labels": {
+    "issue": "SocioProphet/agentplane#156",
+    "fixture_class": "semantic_activation_context_divergence",
+    "divergence_role": "fail_closed_context"
+  }
+}
