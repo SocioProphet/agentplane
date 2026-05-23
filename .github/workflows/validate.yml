@@ -8,6 +8,9 @@ on:
 permissions:
   contents: read
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   validate:
     runs-on: ubuntu-latest
@@ -15,5 +18,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Set up validation Python tools
+        run: |
+          python3 -m venv .venv-ci
+          . .venv-ci/bin/activate
+          python -m pip install --upgrade pip
+          python -m pip install pytest
+
       - name: Validate timing telemetry
-        run: make validate
+        run: |
+          . .venv-ci/bin/activate
+          make validate
