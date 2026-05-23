@@ -1,0 +1,35 @@
+name: event-capability-admission
+
+on:
+  pull_request:
+    paths:
+      - "docs/integration/event-capability-admission.md"
+      - "examples/orchestration/event-capability.records.json"
+      - "scripts/validate_event_capability_admission.py"
+      - ".github/workflows/event-capability-admission.yml"
+  push:
+    branches:
+      - main
+    paths:
+      - "docs/integration/event-capability-admission.md"
+      - "examples/orchestration/event-capability.records.json"
+      - "scripts/validate_event_capability_admission.py"
+      - ".github/workflows/event-capability-admission.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-event-capability-admission:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Validate event capability admission fixture
+        run: |
+          python3 -m json.tool examples/orchestration/event-capability.records.json >/dev/null
+          python3 scripts/validate_event_capability_admission.py --input examples/orchestration/event-capability.records.json --out /tmp/event-capability-admission.json
+          python3 -m json.tool /tmp/event-capability-admission.json >/dev/null
