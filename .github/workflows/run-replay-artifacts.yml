@@ -1,0 +1,48 @@
+name: run-replay-artifacts
+
+on:
+  pull_request:
+    paths:
+      - "docs/sociosphere-bridge.md"
+      - "schemas/run-artifact.schema.v0.1.json"
+      - "schemas/replay-artifact.schema.v0.1.json"
+      - "scripts/emit_run_artifact.py"
+      - "scripts/emit_replay_artifact.py"
+      - "examples/run-replay/**"
+      - ".github/workflows/run-replay-artifacts.yml"
+  push:
+    branches:
+      - main
+    paths:
+      - "docs/sociosphere-bridge.md"
+      - "schemas/run-artifact.schema.v0.1.json"
+      - "schemas/replay-artifact.schema.v0.1.json"
+      - "scripts/emit_run_artifact.py"
+      - "scripts/emit_replay_artifact.py"
+      - "examples/run-replay/**"
+      - ".github/workflows/run-replay-artifacts.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-run-replay-artifacts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Validate run and replay artifact schemas
+        run: |
+          python3 -m json.tool schemas/run-artifact.schema.v0.1.json >/dev/null
+          python3 -m json.tool schemas/replay-artifact.schema.v0.1.json >/dev/null
+          python3 -m py_compile scripts/emit_run_artifact.py scripts/emit_replay_artifact.py
+      - name: Emit synthetic run and replay artifacts
+        run: |
+          rm -rf /tmp/agentplane-run-replay-fixture
+          python3 scripts/emit_run_artifact.py examples/run-replay/minimal-bundle.json qemu 0 --stdout artifact:stdout --stderr artifact:stderr
+          python3 scripts/emit_replay_artifact.py examples/run-replay/minimal-bundle.json qemu --bundle-rev synthetic-rev --bundle-path examples/run-replay/minimal-bundle.json
+          python3 -m json.tool /tmp/agentplane-run-replay-fixture/run-artifact.json >/dev/null
+          python3 -m json.tool /tmp/agentplane-run-replay-fixture/replay-artifact.json >/dev/null
