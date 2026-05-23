@@ -1,0 +1,32 @@
+{
+  "schemaVersion": "agentplane.verification-execution-receipt.v0.1",
+  "recordType": "VerificationExecutionReceipt",
+  "execution_id": "verification-execution-receipt:governed-run-invalid-001:001",
+  "run_id": "governed-run-invalid-001",
+  "attempt_id": "attempt:governed-run-invalid-001:001",
+  "governed_run_contract_ref": "governed-run-contract:governed-run-invalid-001",
+  "admission_receipt_ref": "",
+  "preflight_receipt_ref": "preflight-receipt:governed-run-invalid-001",
+  "authority_state_ref": "agent-authority-current-state:agent-alpha:active",
+  "verifier_command_ref": "verification-plan:governed-run-invalid-001:pytest-readonly",
+  "verifier_command": {
+    "command": "python3 -m pytest -q tools/tests/test_sp_run_cli.py",
+    "allowlisted": true,
+    "network_mode": "off",
+    "mutation_mode": "none"
+  },
+  "safety_context": {
+    "admission_decision": "admit",
+    "preflight_outcome": "pass",
+    "runtime_action": "allow",
+    "authority_decision": "unchanged"
+  },
+  "execution_status": "completed",
+  "started_at": "2026-05-22T13:31:00Z",
+  "ended_at": "2026-05-22T13:31:01Z",
+  "exit_code": 0,
+  "stdout_ref": "artifact:verification-execution:invalid-001:stdout",
+  "stderr_ref": "artifact:verification-execution:invalid-001:stderr",
+  "artifact_refs": ["artifact:verification-execution:invalid-001:stdout"],
+  "receipt_hash": "sha256:2222222222222222222222222222222222222222222222222222222222222222"
+}
