@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.socioprophet.org/agentplane/receipts/recovery-evidence-result.v0.1.json",
+  "title": "RecoveryEvidenceResult v0.1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "recordType",
+    "result_id",
+    "recovery_request_ref",
+    "run_id",
+    "attempt_id",
+    "boundary_ref",
+    "admission_ref",
+    "authority_state_ref",
+    "safe_root",
+    "status",
+    "path_results",
+    "recorded_at",
+    "receipt_hash"
+  ],
+  "properties": {
+    "schemaVersion": {"const": "agentplane.recovery-evidence-result.v0.1"},
+    "recordType": {"const": "RecoveryEvidenceResult"},
+    "result_id": {"type": "string"},
+    "recovery_request_ref": {"type": "string"},
+    "run_id": {"type": "string"},
+    "attempt_id": {"type": "string"},
+    "boundary_ref": {"type": "string"},
+    "admission_ref": {"type": "string"},
+    "authority_state_ref": {"type": "string"},
+    "safe_root": {"type": "string"},
+    "status": {"type": "string", "enum": ["recorded", "denied", "invalid", "fail-closed"]},
+    "path_results": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["path", "before_digest", "observed_digest", "expected_digest", "matches_expected"],
+        "properties": {
+          "path": {"type": "string"},
+          "before_digest": {"type": "string", "pattern": "^sha256:"},
+          "observed_digest": {"type": "string", "pattern": "^sha256:"},
+          "expected_digest": {"type": "string", "pattern": "^sha256:"},
+          "matches_expected": {"type": "boolean"}
+        }
+      }
+    },
+    "recorded_at": {"type": "string"},
+    "fail_closed_reason": {"type": "string"},
+    "labels": {"type": "object", "additionalProperties": {"type": "string"}},
+    "receipt_hash": {"type": "string", "pattern": "^sha256:"}
+  }
+}
