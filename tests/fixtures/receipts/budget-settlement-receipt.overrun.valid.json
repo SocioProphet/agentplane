@@ -1,0 +1,36 @@
+{
+  "schemaVersion": "agentplane.budget-settlement-receipt.v0.1",
+  "recordType": "BudgetSettlementReceipt",
+  "settlement_id": "budget-settlement-receipt:governed-run-alpha-002:001",
+  "run_id": "governed-run-alpha-002",
+  "attempt_id": "attempt:governed-run-alpha-002:001",
+  "admission_receipt_ref": "attempt-admission-receipt:governed-run-alpha-002:001",
+  "settled_at": "2026-05-22T13:10:00Z",
+  "estimate": {
+    "projected_cost_usd": 0.25,
+    "remaining_budget_usd": 0.30,
+    "remaining_iterations": 1,
+    "remaining_tokens": 1000,
+    "estimate_provenance": "attempt-admission-receipt:governed-run-alpha-002:001"
+  },
+  "actuals": {
+    "tokens_in": 900,
+    "tokens_out": 700,
+    "tool_calls": 4,
+    "wall_clock_ms": 3200,
+    "cost_usd": 0.42
+  },
+  "settlement_status": "overrun",
+  "overrun": {
+    "over_budget": true,
+    "estimated_cost_usd": 0.25,
+    "actual_cost_usd": 0.42,
+    "status": "overrun"
+  },
+  "settlement_provenance": "synthetic",
+  "receipt_hash": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+  "labels": {
+    "fixture": "overrun",
+    "issue": "SocioProphet/agentplane#207"
+  }
+}
