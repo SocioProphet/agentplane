@@ -1,0 +1,73 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.socioprophet.org/agentplane/receipts/verification-execution-receipt.v0.1.json",
+  "title": "VerificationExecutionReceipt v0.1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "recordType",
+    "execution_id",
+    "run_id",
+    "attempt_id",
+    "governed_run_contract_ref",
+    "admission_receipt_ref",
+    "preflight_receipt_ref",
+    "authority_state_ref",
+    "verifier_command_ref",
+    "verifier_command",
+    "safety_context",
+    "execution_status",
+    "started_at",
+    "ended_at",
+    "exit_code",
+    "stdout_ref",
+    "stderr_ref",
+    "artifact_refs",
+    "receipt_hash"
+  ],
+  "properties": {
+    "schemaVersion": {"const": "agentplane.verification-execution-receipt.v0.1"},
+    "recordType": {"const": "VerificationExecutionReceipt"},
+    "execution_id": {"type": "string"},
+    "run_id": {"type": "string"},
+    "attempt_id": {"type": "string"},
+    "governed_run_contract_ref": {"type": "string"},
+    "admission_receipt_ref": {"type": "string"},
+    "preflight_receipt_ref": {"type": "string"},
+    "authority_state_ref": {"type": "string"},
+    "verifier_command_ref": {"type": "string"},
+    "verifier_command": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["command", "allowlisted", "network_mode", "mutation_mode"],
+      "properties": {
+        "command": {"type": "string"},
+        "allowlisted": {"type": "boolean"},
+        "network_mode": {"type": "string", "enum": ["off", "allowlisted", "open"]},
+        "mutation_mode": {"type": "string", "enum": ["none", "proposed", "allowed"]}
+      }
+    },
+    "safety_context": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["admission_decision", "preflight_outcome", "runtime_action", "authority_decision"],
+      "properties": {
+        "admission_decision": {"type": "string", "enum": ["admit", "reject", "require-review", "fail-closed"]},
+        "preflight_outcome": {"type": "string", "enum": ["pass", "warn", "require-review", "quarantine", "block", "rollback", "revoke"]},
+        "runtime_action": {"type": "string", "enum": ["allow", "warn", "require-review", "quarantine", "block", "rollback", "revoke"]},
+        "authority_decision": {"type": "string", "enum": ["unchanged", "reduced", "suspended", "revoked"]}
+      }
+    },
+    "execution_status": {"type": "string", "enum": ["completed", "failed", "skipped", "fail-closed"]},
+    "started_at": {"type": "string"},
+    "ended_at": {"type": "string"},
+    "exit_code": {"type": "integer", "minimum": 0},
+    "stdout_ref": {"type": "string"},
+    "stderr_ref": {"type": "string"},
+    "artifact_refs": {"type": "array", "items": {"type": "string"}},
+    "fail_closed_reason": {"type": "string"},
+    "labels": {"type": "object", "additionalProperties": {"type": "string"}},
+    "receipt_hash": {"type": "string", "pattern": "^sha256:"}
+  }
+}
