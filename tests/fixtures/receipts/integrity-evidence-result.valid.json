@@ -1,0 +1,27 @@
+{
+  "schemaVersion": "agentplane.integrity-evidence-result.v0.1",
+  "recordType": "IntegrityEvidenceResult",
+  "result_id": "integrity-evidence-result:alpha-001",
+  "request_ref": "integrity-evidence-request:alpha-001",
+  "run_id": "governed-run-alpha-001",
+  "attempt_id": "attempt:governed-run-alpha-001:001",
+  "boundary_ref": "boundary-evidence:alpha-001",
+  "admission_ref": "attempt-admission-receipt:governed-run-alpha-001:001",
+  "authority_state_ref": "agent-authority-current-state:agent-alpha:active",
+  "safe_root": "repo",
+  "status": "recorded",
+  "path_results": [
+    {
+      "path": "docs/example.md",
+      "before_digest": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+      "observed_digest": "sha256:2222222222222222222222222222222222222222222222222222222222222222",
+      "expected_digest": "sha256:2222222222222222222222222222222222222222222222222222222222222222",
+      "matches_expected": true
+    }
+  ],
+  "recorded_at": "2026-05-22T14:01:00Z",
+  "receipt_hash": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+  "labels": {
+    "fixture": "valid"
+  }
+}
