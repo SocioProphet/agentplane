@@ -1,0 +1,40 @@
+{
+  "schemaVersion": "agentplane.verification-execution-receipt.v0.1",
+  "recordType": "VerificationExecutionReceipt",
+  "execution_id": "verification-execution-receipt:governed-run-alpha-001:001",
+  "run_id": "governed-run-alpha-001",
+  "attempt_id": "attempt:governed-run-alpha-001:001",
+  "governed_run_contract_ref": "governed-run-contract:governed-run-alpha-001",
+  "admission_receipt_ref": "attempt-admission-receipt:governed-run-alpha-001:001",
+  "preflight_receipt_ref": "preflight-receipt:governed-run-alpha-001",
+  "authority_state_ref": "agent-authority-current-state:agent-alpha:active",
+  "verifier_command_ref": "verification-plan:governed-run-alpha-001:pytest-readonly",
+  "verifier_command": {
+    "command": "python3 -m pytest -q tools/tests/test_sp_run_cli.py",
+    "allowlisted": true,
+    "network_mode": "off",
+    "mutation_mode": "none"
+  },
+  "safety_context": {
+    "admission_decision": "admit",
+    "preflight_outcome": "pass",
+    "runtime_action": "allow",
+    "authority_decision": "unchanged"
+  },
+  "execution_status": "completed",
+  "started_at": "2026-05-22T13:30:00Z",
+  "ended_at": "2026-05-22T13:30:02Z",
+  "exit_code": 0,
+  "stdout_ref": "artifact:verification-execution:governed-run-alpha-001:001:stdout",
+  "stderr_ref": "artifact:verification-execution:governed-run-alpha-001:001:stderr",
+  "artifact_refs": [
+    "artifact:verification-execution:governed-run-alpha-001:001:stdout",
+    "artifact:verification-execution:governed-run-alpha-001:001:stderr"
+  ],
+  "receipt_hash": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+  "labels": {
+    "fixture": "completed",
+    "issue": "SocioProphet/agentplane#205",
+    "mode": "synthetic"
+  }
+}
