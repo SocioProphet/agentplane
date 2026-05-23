@@ -87,6 +87,9 @@ validate-evidence-receipt-binding:
 validate-semantic-activation-receipt:
 	python3 -m json.tool schemas/receipts/semantic-activation-receipt.v0.1.schema.json >/dev/null
 	python3 -m json.tool tests/fixtures/receipts/semantic-activation-receipt.valid.json >/dev/null
+	python3 -m json.tool tests/fixtures/receipts/semantic-activation-receipt.divergence-admitted.valid.json >/dev/null
+	python3 -m json.tool tests/fixtures/receipts/semantic-activation-receipt.divergence-fail-closed.valid.json >/dev/null
+	python3 -m json.tool tests/fixtures/receipts/semantic-activation-context-divergence.chain.json >/dev/null
 	python3 -m json.tool tests/fixtures/receipts/semantic-activation-receipt.missing-activation-bundle-hash.invalid.json >/dev/null
 	python3 -m json.tool tests/fixtures/receipts/semantic-activation-receipt.missing-graph-snapshot.invalid.json >/dev/null
 	python3 -m json.tool tests/fixtures/receipts/semantic-activation-receipt.missing-policy-bundle.invalid.json >/dev/null
@@ -94,6 +97,9 @@ validate-semantic-activation-receipt:
 	python3 -m json.tool tests/fixtures/receipts/semantic-activation-receipt.missing-required-edge-evidence.invalid.json >/dev/null
 	python3 -m json.tool tests/fixtures/receipts/semantic-activation-receipt.missing-admission-decision.invalid.json >/dev/null
 	python3 tools/validate_semantic_activation_receipt.py tests/fixtures/receipts/semantic-activation-receipt.valid.json
+	python3 tools/validate_semantic_activation_receipt.py tests/fixtures/receipts/semantic-activation-receipt.divergence-admitted.valid.json
+	python3 tools/validate_semantic_activation_receipt.py tests/fixtures/receipts/semantic-activation-receipt.divergence-fail-closed.valid.json
+	python3 tools/validate_semantic_activation_context_divergence.py tests/fixtures/receipts/semantic-activation-context-divergence.chain.json
 	! python3 tools/validate_semantic_activation_receipt.py tests/fixtures/receipts/semantic-activation-receipt.missing-activation-bundle-hash.invalid.json
 	! python3 tools/validate_semantic_activation_receipt.py tests/fixtures/receipts/semantic-activation-receipt.missing-graph-snapshot.invalid.json
 	! python3 tools/validate_semantic_activation_receipt.py tests/fixtures/receipts/semantic-activation-receipt.missing-policy-bundle.invalid.json
