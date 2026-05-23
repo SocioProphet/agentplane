@@ -1,0 +1,109 @@
+{
+  "schemaVersion": "agentplane.governed-runner-v0.2-contract-chain.v0.1",
+  "recordType": "GovernedRunnerV02ContractChain",
+  "chain_id": "governed-runner-v0.2-contract-chain:synthetic-alpha-001",
+  "mode": "synthetic_contract_chain",
+  "run_id": "governed-run-alpha-001",
+  "attempt_id": "attempt:governed-run-alpha-001:001",
+  "artifacts": {
+    "authority_state": {
+      "owner": "SocioProphet/agent-registry",
+      "ref": "agent-authority-current-state:agent-alpha:active",
+      "status": "active"
+    },
+    "safety_handoff": {
+      "owner": "SocioProphet/guardrail-fabric",
+      "ref": "trustops-preflight-handoff:alpha-pass-001",
+      "outcome": "pass",
+      "runtime_action": "allow",
+      "authoritative_safety_owner": "SocioProphet/guardrail-fabric"
+    },
+    "governed_run_contract": {
+      "owner": "SocioProphet/agentplane",
+      "ref": "governed-run-contract:governed-run-alpha-001"
+    },
+    "attempt_admission": {
+      "owner": "SocioProphet/agentplane",
+      "ref": "attempt-admission-receipt:governed-run-alpha-001:001",
+      "decision": "admit",
+      "preflight_outcome": "pass",
+      "runtime_action": "allow",
+      "authority_decision": "unchanged"
+    },
+    "verification_receipt": {
+      "owner": "SocioProphet/agentplane",
+      "ref": "verification-execution-receipt:synthetic-alpha-001",
+      "producer": "synthetic",
+      "allowlisted": true,
+      "network_mode": "off",
+      "mutation_mode": "none",
+      "validates_with": "tools/validate_verification_execution_receipt.py"
+    },
+    "budget_settlement": {
+      "owner": "SocioProphet/agentplane",
+      "ref": "budget-settlement-receipt:governed-run-alpha-001:001",
+      "status": "settled",
+      "over_budget": false,
+      "estimated_cost_usd": 0.25,
+      "actual_cost_usd": 0.18
+    },
+    "run_dossier": {
+      "owner": "SocioProphet/agentplane",
+      "ref": "run-dossier:governed-run-alpha-001",
+      "status": "ready"
+    }
+  },
+  "required_edges": [
+    {
+      "from": "authority_state",
+      "to": "attempt_admission",
+      "relation": "authority_input"
+    },
+    {
+      "from": "safety_handoff",
+      "to": "attempt_admission",
+      "relation": "safety_input"
+    },
+    {
+      "from": "governed_run_contract",
+      "to": "attempt_admission",
+      "relation": "contract_input"
+    },
+    {
+      "from": "attempt_admission",
+      "to": "verification_receipt",
+      "relation": "admission_required"
+    },
+    {
+      "from": "verification_receipt",
+      "to": "budget_settlement",
+      "relation": "settlement_after_result"
+    },
+    {
+      "from": "attempt_admission",
+      "to": "run_dossier",
+      "relation": "dossier_summarizes"
+    },
+    {
+      "from": "budget_settlement",
+      "to": "run_dossier",
+      "relation": "dossier_summarizes"
+    }
+  ],
+  "blocked_capabilities": {
+    "real_verifier_runner": true,
+    "shell_passthrough": true,
+    "arbitrary_command_input": true,
+    "network_activity": true,
+    "workspace_mutation": true,
+    "provider_invocation": true,
+    "authority_update": true,
+    "recovery_action": true,
+    "budget_provider_integration": true
+  },
+  "labels": {
+    "plane": "governed-runner",
+    "tranche": "v0.2-contract-chain",
+    "fixture": "synthetic"
+  }
+}
