@@ -8,7 +8,7 @@ Owning repo: `SocioProphet/agentplane`
 
 This document records the governed-runner v0.2 boundary map after the cross-plane contract tranches landed.
 
-It is the canonical map for what is implemented as a contract, what is owned by adjacent planes, what remains evidence-only, and what must not be implemented without a separate policy-gated tranche.
+It is the canonical map for what is implemented as a contract or safe producer, what is owned by adjacent planes, what remains evidence-only, and what must not be implemented without a separate policy-gated tranche.
 
 ## Current cross-plane contracts
 
@@ -19,6 +19,7 @@ It is the canonical map for what is implemented as a contract, what is owned by 
 | Attempt admission | `SocioProphet/agentplane` | `AttemptAdmissionReceipt v0.1` | merged |
 | Budget settlement | `SocioProphet/agentplane` | `BudgetSettlementReceipt v0.1` | merged in `agentplane#209` |
 | Verifier result evidence | `SocioProphet/agentplane` | `VerificationExecutionReceipt v0.1` | merged in `agentplane#210` |
+| Synthetic verifier-result producer | `SocioProphet/agentplane` | `tools/build_synthetic_verification_receipt.py` | merged in `agentplane#214`; validation target added after merge |
 | Integrity evidence | `SocioProphet/agentplane` | `IntegrityEvidenceRequest v0.1` and `IntegrityEvidenceResult v0.1` | merged in `agentplane#211` |
 | Product facade | `SocioProphet/prophet-cli` | `prophet governed-runner ... -> sp-run ...` | merged |
 | Install path | `SocioProphet/homebrew-prophet` | `brew install prophet-cli agentplane` | merged |
@@ -109,7 +110,30 @@ network_mode = off
 mutation_mode = none
 ```
 
-This contract does not add a runner.
+This contract alone does not add a runner.
+
+### Synthetic verifier-result producer
+
+`tools/build_synthetic_verification_receipt.py` is the first safe producer for `VerificationExecutionReceipt v0.1`.
+
+It is fixture/ref-only. It writes a receipt and validates the result using `tools/validate_verification_execution_receipt.py`.
+
+Required invariants:
+
+```text
+no shell passthrough
+no arbitrary command input
+fixed allowlisted synthetic verifier plan
+network_mode = off
+mutation_mode = none
+admission_decision = admit
+preflight_outcome = pass
+runtime_action = allow
+authority_decision is not suspended or revoked
+generated receipt validates
+```
+
+This producer does not execute a verifier command and does not create live runtime behavior.
 
 ### Integrity evidence contract
 
@@ -132,7 +156,7 @@ This contract is evidence-only.
 
 The following remain blocked:
 
-- verifier-result production implementation;
+- real verifier runner implementation;
 - shell or arbitrary command execution;
 - workspace mutation;
 - integrity evidence production from live files;
@@ -146,22 +170,22 @@ The following remain blocked:
 - network activity for a governed run;
 - background daemon behavior.
 
-## Required next implementation issue before runtime work
+## Required next implementation issue before real verifier runner work
 
-Before any runtime-producing command is implemented, open a new issue with explicit acceptance criteria for a synthetic, non-mutating verifier-result producer.
+Before any real verifier runner is implemented, open a new issue with explicit acceptance criteria for a policy-gated verifier runner.
 
 That issue must require:
 
 - no shell passthrough;
 - no arbitrary command input;
-- fixture-only verifier plan;
-- network mode off;
-- mutation mode none;
+- allowlisted verifier plan only;
+- network mode off by default;
+- mutation mode none by default;
 - authority lookup consumed from Agent Registry output;
 - safety handoff consumed from Guardrail Fabric output;
 - `AttemptAdmissionReceipt` must admit;
 - emitted `VerificationExecutionReceipt` must validate;
-- no budget settlement integration in the first implementation tranche.
+- no budget settlement integration in the first runner tranche unless explicitly designed.
 
 ## Stopping rule
 
