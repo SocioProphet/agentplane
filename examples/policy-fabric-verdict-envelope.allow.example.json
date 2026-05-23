@@ -1,0 +1,23 @@
+{
+  "kind": "PolicyFabricVerdictEnvelope",
+  "capturedAt": "2026-05-04T22:30:00Z",
+  "policyBundle": {
+    "id": "intell_agency_companion_v0",
+    "version": "0.1.0"
+  },
+  "bundle": "example-agent@0.1.0",
+  "lane": "staging",
+  "domain": "governed-domain",
+  "promote": true,
+  "fit": "bijection",
+  "failedPredicates": [],
+  "reasons": ["passes configured gates"],
+  "summary": "Allowed under current Policy Fabric verdict semantics.",
+  "thresholds": {
+    "minBijectiveStability": 0.6,
+    "surjectionUpperBoundMultiplier": 0.7,
+    "injectionUpperBoundMultiplier": 0.98
+  },
+  "verdictArtifactRef": "urn:srcos:artifact:policy-fabric:verdict-report:allow-smoke-001",
+  "verdictExplanationRef": "urn:srcos:artifact:policy-fabric:verdict-explanations:allow-smoke-001"
+}
