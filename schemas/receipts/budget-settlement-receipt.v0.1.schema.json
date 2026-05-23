@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.socioprophet.org/agentplane/receipts/budget-settlement-receipt.v0.1.json",
+  "title": "BudgetSettlementReceipt v0.1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "recordType",
+    "settlement_id",
+    "run_id",
+    "attempt_id",
+    "admission_receipt_ref",
+    "settled_at",
+    "estimate",
+    "actuals",
+    "settlement_status",
+    "overrun",
+    "settlement_provenance",
+    "receipt_hash"
+  ],
+  "properties": {
+    "schemaVersion": {"const": "agentplane.budget-settlement-receipt.v0.1"},
+    "recordType": {"const": "BudgetSettlementReceipt"},
+    "settlement_id": {"type": "string"},
+    "run_id": {"type": "string"},
+    "attempt_id": {"type": "string"},
+    "admission_receipt_ref": {"type": "string"},
+    "settled_at": {"type": "string"},
+    "estimate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["projected_cost_usd", "remaining_budget_usd", "estimate_provenance"],
+      "properties": {
+        "projected_cost_usd": {"type": "number", "minimum": 0},
+        "remaining_budget_usd": {"type": "number", "minimum": 0},
+        "remaining_iterations": {"type": "integer", "minimum": 0},
+        "remaining_tokens": {"type": "integer", "minimum": 0},
+        "estimate_provenance": {"type": "string"}
+      }
+    },
+    "actuals": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["tokens_in", "tokens_out", "tool_calls", "wall_clock_ms", "cost_usd"],
+      "properties": {
+        "tokens_in": {"type": "integer", "minimum": 0},
+        "tokens_out": {"type": "integer", "minimum": 0},
+        "tool_calls": {"type": "integer", "minimum": 0},
+        "wall_clock_ms": {"type": "integer", "minimum": 0},
+        "cost_usd": {"type": "number", "minimum": 0}
+      }
+    },
+    "settlement_status": {"type": "string", "enum": ["settled", "overrun", "missing_actuals", "invalid_actuals", "fail-closed"]},
+    "overrun": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["over_budget", "estimated_cost_usd", "actual_cost_usd", "status"],
+      "properties": {
+        "over_budget": {"type": "boolean"},
+        "estimated_cost_usd": {"type": "number", "minimum": 0},
+        "actual_cost_usd": {"type": "number", "minimum": 0},
+        "status": {"type": "string", "enum": ["within_budget", "overrun"]}
+      }
+    },
+    "settlement_provenance": {"type": "string", "enum": ["synthetic", "measured", "estimated", "provider-reported", "missing"]},
+    "fail_closed_reason": {"type": "string"},
+    "labels": {"type": "object", "additionalProperties": {"type": "string"}},
+    "receipt_hash": {"type": "string", "pattern": "^sha256:"}
+  }
+}
