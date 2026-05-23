@@ -1,0 +1,22 @@
+{
+  "schemaVersion": "agentplane.integrity-evidence-request.v0.1",
+  "recordType": "IntegrityEvidenceRequest",
+  "request_id": "integrity-evidence-request:invalid-suspended-authority",
+  "run_id": "governed-run-alpha-001",
+  "attempt_id": "attempt:governed-run-alpha-001:001",
+  "boundary_ref": "boundary-evidence:alpha-001",
+  "admission_ref": "attempt-admission-receipt:governed-run-alpha-001:001",
+  "authority_state_ref": "agent-authority-current-state:agent-alpha:suspended",
+  "authority_status": "suspended",
+  "safe_root": "repo",
+  "path_set": [
+    {
+      "path": "docs/example.md",
+      "before_digest": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+      "expected_digest": "sha256:2222222222222222222222222222222222222222222222222222222222222222"
+    }
+  ],
+  "requested_by_ref": "reviewer:alpha",
+  "requested_at": "2026-05-22T14:00:00Z",
+  "receipt_hash": "sha256:ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
+}
