@@ -1,0 +1,22 @@
+{
+  "manifest_id": "sp-import-manifest-v0.1",
+  "source_repo": "SocioProphet/socioprophet-standards-storage",
+  "source_commit": "11c9edb33a421f2fbe3377515281f7e964aedc08",
+  "vocabulary_id": "sp:semantic-proof-core:1",
+  "schema_refs": [
+    "schemas/semantic-proof/v0/proof-common.schema.json",
+    "schemas/semantic-proof/v0/inclusion-proof.schema.json",
+    "schemas/semantic-proof/v0/verification-result.schema.json",
+    "schemas/semantic-proof/v0/shared-vocabulary-core-v1.json"
+  ],
+  "bundle_constraints": {
+    "treat_as_external": true,
+    "allow_local_redefinition": false,
+    "required_for_receipt_binding": true,
+    "required_for_replay_binding": true
+  },
+  "verifier_policy": {
+    "failure_codes_namespace": "semantic-proof-core:1",
+    "transport_failures_must_remain_separate": true
+  }
+}
