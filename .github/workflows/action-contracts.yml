@@ -1,0 +1,42 @@
+name: action-contracts
+
+on:
+  pull_request:
+    paths:
+      - "docs/integration/action-contracts.md"
+      - "fixtures/action-contracts/**"
+      - "schemas/action-proposal.schema.v0.1.json"
+      - "schemas/action-admission.schema.v0.1.json"
+      - "schemas/runtime-receipt.schema.v0.1.json"
+      - "tools/validate_action_contracts.py"
+      - ".github/workflows/action-contracts.yml"
+  push:
+    branches:
+      - main
+    paths:
+      - "docs/integration/action-contracts.md"
+      - "fixtures/action-contracts/**"
+      - "schemas/action-proposal.schema.v0.1.json"
+      - "schemas/action-admission.schema.v0.1.json"
+      - "schemas/runtime-receipt.schema.v0.1.json"
+      - "tools/validate_action_contracts.py"
+      - ".github/workflows/action-contracts.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-action-contracts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Validate action contract schemas and fixtures
+        run: |
+          python3 -m json.tool schemas/action-proposal.schema.v0.1.json >/dev/null
+          python3 -m json.tool schemas/action-admission.schema.v0.1.json >/dev/null
+          python3 -m json.tool schemas/runtime-receipt.schema.v0.1.json >/dev/null
+          python3 tools/validate_action_contracts.py
