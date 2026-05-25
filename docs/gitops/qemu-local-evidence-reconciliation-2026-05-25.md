@@ -28,6 +28,10 @@ This reconciliation PR adds the missing focused validation surface:
 
 The workflow syntax-checks the wrapper and compiles the evidence emitter.
 
+## Branch-protection note
+
+This branch intentionally includes this Markdown reconciliation note so the required `lint` validation path attaches to the PR validation surface.
+
 ## Boundary
 
 This replay adds validation coverage only.
