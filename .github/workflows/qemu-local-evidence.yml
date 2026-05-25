@@ -1,0 +1,36 @@
+name: qemu-local-evidence
+
+on:
+  pull_request:
+    paths:
+      - "runners/qemu-local-evidence.sh"
+      - "runners/qemu-local.sh"
+      - "scripts/emit_execution_evidence_artifacts.py"
+      - "docs/gitops/qemu-local-evidence-reconciliation-2026-05-25.md"
+      - ".github/workflows/qemu-local-evidence.yml"
+  push:
+    branches:
+      - main
+    paths:
+      - "runners/qemu-local-evidence.sh"
+      - "runners/qemu-local.sh"
+      - "scripts/emit_execution_evidence_artifacts.py"
+      - "docs/gitops/qemu-local-evidence-reconciliation-2026-05-25.md"
+      - ".github/workflows/qemu-local-evidence.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-qemu-local-evidence-wrapper:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Syntax-check wrapper and emitter
+        run: |
+          bash -n runners/qemu-local-evidence.sh
+          python3 -m py_compile scripts/emit_execution_evidence_artifacts.py
