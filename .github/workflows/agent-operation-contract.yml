@@ -1,0 +1,47 @@
+name: agent-operation-contract
+
+on:
+  pull_request:
+    paths:
+      - "docs/adr/0008-agent-operation-plane-routing.md"
+      - "docs/integration/workspace-operation-plane.md"
+      - "examples/agent-operation-contract.example.json"
+      - "schemas/agent-operation-contract.schema.v0.1.json"
+      - "scripts/emit_agent_operation_contract.py"
+      - "tools/validate_agent_operation_contract.py"
+      - "tools/tests/test_agent_operation_contract.py"
+      - "docs/gitops/workspace-operation-contract-reconciliation-2026-05-25.md"
+      - ".github/workflows/agent-operation-contract.yml"
+  push:
+    branches:
+      - main
+    paths:
+      - "docs/adr/0008-agent-operation-plane-routing.md"
+      - "docs/integration/workspace-operation-plane.md"
+      - "examples/agent-operation-contract.example.json"
+      - "schemas/agent-operation-contract.schema.v0.1.json"
+      - "scripts/emit_agent_operation_contract.py"
+      - "tools/validate_agent_operation_contract.py"
+      - "tools/tests/test_agent_operation_contract.py"
+      - "docs/gitops/workspace-operation-contract-reconciliation-2026-05-25.md"
+      - ".github/workflows/agent-operation-contract.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-agent-operation-contract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Validate agent operation contract surface
+        run: |
+          python3 -m json.tool schemas/agent-operation-contract.schema.v0.1.json >/dev/null
+          python3 -m json.tool examples/agent-operation-contract.example.json >/dev/null
+          python3 -m py_compile scripts/emit_agent_operation_contract.py tools/validate_agent_operation_contract.py
+          python3 tools/validate_agent_operation_contract.py
+          python3 -m pytest -q tools/tests/test_agent_operation_contract.py
