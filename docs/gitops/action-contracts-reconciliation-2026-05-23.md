@@ -33,6 +33,10 @@ This reconciliation PR adds the missing focused workflow gate:
 
 The workflow validates the three action contract schemas and runs the deterministic fixture validator.
 
+## Branch-protection note
+
+This branch intentionally changes a Markdown file in addition to the focused workflow so the required `lint` workflow attaches to the PR validation surface.
+
 ## Boundary
 
 This replay adds validation coverage only.
