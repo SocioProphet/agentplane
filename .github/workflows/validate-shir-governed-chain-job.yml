@@ -6,13 +6,18 @@ on:
       - "tools/shir_governed_chain_job.py"
       - "docs/integration/shir-governed-chain.md"
       - ".github/workflows/validate-shir-governed-chain-job.yml"
+      - "docs/gitops/shir-governed-chain-reconciliation-2026-05-25.md"
   push:
     branches: [ main ]
     paths:
       - "tools/shir_governed_chain_job.py"
       - "docs/integration/shir-governed-chain.md"
       - ".github/workflows/validate-shir-governed-chain-job.yml"
+      - "docs/gitops/shir-governed-chain-reconciliation-2026-05-25.md"
   workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
   validate-shir-governed-chain-job:
