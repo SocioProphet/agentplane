@@ -1,0 +1,19 @@
+{
+  "schemaVersion": "agentplane.original-attempt-context.v0.1",
+  "recordType": "OriginalAttemptContext",
+  "context_id": "original-attempt-context:confirmed-safe-retry-invalid-001",
+  "original_attempt_ref": "attempt:governed-run-alpha-invalid-003:001",
+  "original_attempt_phase": "started",
+  "original_admission_ref": "attempt-admission-receipt:governed-run-alpha-invalid-003:001",
+  "original_preflight_ref": "preflight-receipt:governed-run-alpha-invalid-003",
+  "original_execution_ref": "verification-execution-receipt:governed-run-alpha-invalid-003:001",
+  "original_runtime_receipt_ref": null,
+  "original_verification_receipt_ref": "verification-execution-receipt:governed-run-alpha-invalid-003:001",
+  "side_effect_boundary": "confirmed",
+  "retry_posture": "safe_retry",
+  "original_attempt_status_source": "verification_execution_receipt",
+  "recovery_policy_posture": "eligible_for_retry",
+  "review_reason": null,
+  "recorded_at": "2026-05-25T19:01:00Z",
+  "receipt_hash": "sha256:7777777777777777777777777777777777777777777777777777777777777777"
+}
