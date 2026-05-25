@@ -1,0 +1,52 @@
+name: original-attempt-context
+
+on:
+  pull_request:
+    paths:
+      - "schemas/receipts/original-attempt-context.v0.1.schema.json"
+      - "tests/fixtures/receipts/original-attempt-context.*.json"
+      - "tools/validate_original_attempt_context.py"
+      - "tools/tests/test_original_attempt_context.py"
+      - "docs/runtime-governance/original-attempt-context-v0.md"
+      - ".github/workflows/original-attempt-context.yml"
+  push:
+    branches:
+      - main
+    paths:
+      - "schemas/receipts/original-attempt-context.v0.1.schema.json"
+      - "tests/fixtures/receipts/original-attempt-context.*.json"
+      - "tools/validate_original_attempt_context.py"
+      - "tools/tests/test_original_attempt_context.py"
+      - "docs/runtime-governance/original-attempt-context-v0.md"
+      - ".github/workflows/original-attempt-context.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-original-attempt-context:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Validate OriginalAttemptContext contract
+        run: |
+          python3 -m json.tool schemas/receipts/original-attempt-context.v0.1.schema.json >/dev/null
+          python3 -m json.tool tests/fixtures/receipts/original-attempt-context.queued-safe.valid.json >/dev/null
+          python3 -m json.tool tests/fixtures/receipts/original-attempt-context.started-possible.valid.json >/dev/null
+          python3 -m json.tool tests/fixtures/receipts/original-attempt-context.completed-confirmed.valid.json >/dev/null
+          python3 -m json.tool tests/fixtures/receipts/original-attempt-context.unknown-review.valid.json >/dev/null
+          python3 -m json.tool tests/fixtures/receipts/original-attempt-context.completed-missing-execution.invalid.json >/dev/null
+          python3 -m json.tool tests/fixtures/receipts/original-attempt-context.queued-with-execution.invalid.json >/dev/null
+          python3 -m json.tool tests/fixtures/receipts/original-attempt-context.confirmed-safe-retry.invalid.json >/dev/null
+          python3 tools/validate_original_attempt_context.py tests/fixtures/receipts/original-attempt-context.queued-safe.valid.json
+          python3 tools/validate_original_attempt_context.py tests/fixtures/receipts/original-attempt-context.started-possible.valid.json
+          python3 tools/validate_original_attempt_context.py tests/fixtures/receipts/original-attempt-context.completed-confirmed.valid.json
+          python3 tools/validate_original_attempt_context.py tests/fixtures/receipts/original-attempt-context.unknown-review.valid.json
+          ! python3 tools/validate_original_attempt_context.py tests/fixtures/receipts/original-attempt-context.completed-missing-execution.invalid.json
+          ! python3 tools/validate_original_attempt_context.py tests/fixtures/receipts/original-attempt-context.queued-with-execution.invalid.json
+          ! python3 tools/validate_original_attempt_context.py tests/fixtures/receipts/original-attempt-context.confirmed-safe-retry.invalid.json
+          python3 -m pytest -q tools/tests/test_original_attempt_context.py
