@@ -40,6 +40,10 @@ Do not replay `agentplane-runtime-enforcement-code`.
 
 The payload is already captured, and stale replay would remove newer SourceOS/governance-context validation.
 
+## Branch-protection note
+
+This Markdown-only audit branch intentionally triggers the required `lint` validation path before merge.
+
 ## Boundary
 
 This audit adds no runtime enforcement code and no bundle validation behavior.
