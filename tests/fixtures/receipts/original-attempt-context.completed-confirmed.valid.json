@@ -1,0 +1,23 @@
+{
+  "schemaVersion": "agentplane.original-attempt-context.v0.1",
+  "recordType": "OriginalAttemptContext",
+  "context_id": "original-attempt-context:completed-confirmed-001",
+  "original_attempt_ref": "attempt:governed-run-alpha-002:001",
+  "original_attempt_phase": "completed",
+  "original_admission_ref": "attempt-admission-receipt:governed-run-alpha-002:001",
+  "original_preflight_ref": "preflight-receipt:governed-run-alpha-002",
+  "original_execution_ref": "verification-execution-receipt:governed-run-alpha-002:001",
+  "original_runtime_receipt_ref": "runtime-receipt:governed-run-alpha-002:001",
+  "original_verification_receipt_ref": "verification-execution-receipt:governed-run-alpha-002:001",
+  "side_effect_boundary": "confirmed",
+  "retry_posture": "do_not_retry",
+  "original_attempt_status_source": "runtime_receipt",
+  "recovery_policy_posture": "blocked",
+  "review_reason": "completed attempt with confirmed side-effect boundary requires compensating action policy rather than simple retry",
+  "recorded_at": "2026-05-25T18:56:00Z",
+  "receipt_hash": "sha256:2222222222222222222222222222222222222222222222222222222222222222",
+  "labels": {
+    "fixture": "completed-confirmed",
+    "issue": "SocioProphet/agentplane#206"
+  }
+}

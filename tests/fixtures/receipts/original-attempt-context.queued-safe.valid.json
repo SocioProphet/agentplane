@@ -1,0 +1,23 @@
+{
+  "schemaVersion": "agentplane.original-attempt-context.v0.1",
+  "recordType": "OriginalAttemptContext",
+  "context_id": "original-attempt-context:queued-safe-001",
+  "original_attempt_ref": "attempt:governed-run-alpha-001:001",
+  "original_attempt_phase": "queued",
+  "original_admission_ref": null,
+  "original_preflight_ref": null,
+  "original_execution_ref": null,
+  "original_runtime_receipt_ref": null,
+  "original_verification_receipt_ref": null,
+  "side_effect_boundary": "none",
+  "retry_posture": "safe_retry",
+  "original_attempt_status_source": "queue_state",
+  "recovery_policy_posture": "eligible_for_retry",
+  "review_reason": null,
+  "recorded_at": "2026-05-25T18:55:00Z",
+  "receipt_hash": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+  "labels": {
+    "fixture": "queued-safe",
+    "issue": "SocioProphet/agentplane#206"
+  }
+}

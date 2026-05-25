@@ -1,0 +1,23 @@
+{
+  "schemaVersion": "agentplane.original-attempt-context.v0.1",
+  "recordType": "OriginalAttemptContext",
+  "context_id": "original-attempt-context:unknown-review-001",
+  "original_attempt_ref": "attempt:governed-run-alpha-003:001",
+  "original_attempt_phase": "unknown",
+  "original_admission_ref": null,
+  "original_preflight_ref": null,
+  "original_execution_ref": null,
+  "original_runtime_receipt_ref": null,
+  "original_verification_receipt_ref": null,
+  "side_effect_boundary": "unknown",
+  "retry_posture": "review_required",
+  "original_attempt_status_source": "unknown",
+  "recovery_policy_posture": "requires_review",
+  "review_reason": "unknown original attempt posture requires review before retry or recovery",
+  "recorded_at": "2026-05-25T18:57:00Z",
+  "receipt_hash": "sha256:3333333333333333333333333333333333333333333333333333333333333333",
+  "labels": {
+    "fixture": "unknown-review",
+    "issue": "SocioProphet/agentplane#206"
+  }
+}

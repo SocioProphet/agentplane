@@ -1,0 +1,19 @@
+{
+  "schemaVersion": "agentplane.original-attempt-context.v0.1",
+  "recordType": "OriginalAttemptContext",
+  "context_id": "original-attempt-context:completed-missing-execution-001",
+  "original_attempt_ref": "attempt:governed-run-alpha-invalid-001:001",
+  "original_attempt_phase": "completed",
+  "original_admission_ref": "attempt-admission-receipt:governed-run-alpha-invalid-001:001",
+  "original_preflight_ref": "preflight-receipt:governed-run-alpha-invalid-001",
+  "original_execution_ref": null,
+  "original_runtime_receipt_ref": null,
+  "original_verification_receipt_ref": null,
+  "side_effect_boundary": "confirmed",
+  "retry_posture": "do_not_retry",
+  "original_attempt_status_source": "runtime_receipt",
+  "recovery_policy_posture": "blocked",
+  "review_reason": "invalid fixture: completed attempt lacks execution or runtime evidence",
+  "recorded_at": "2026-05-25T18:59:00Z",
+  "receipt_hash": "sha256:5555555555555555555555555555555555555555555555555555555555555555"
+}

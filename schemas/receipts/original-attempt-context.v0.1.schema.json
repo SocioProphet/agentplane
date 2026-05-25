@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.socioprophet.org/agentplane/receipts/original-attempt-context.v0.1.json",
+  "title": "OriginalAttemptContext v0.1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "recordType",
+    "context_id",
+    "original_attempt_ref",
+    "original_attempt_phase",
+    "side_effect_boundary",
+    "retry_posture",
+    "original_attempt_status_source",
+    "recovery_policy_posture",
+    "recorded_at",
+    "receipt_hash"
+  ],
+  "properties": {
+    "schemaVersion": {"const": "agentplane.original-attempt-context.v0.1"},
+    "recordType": {"const": "OriginalAttemptContext"},
+    "context_id": {"type": "string", "minLength": 1},
+    "original_attempt_ref": {"type": "string", "minLength": 1},
+    "original_attempt_phase": {
+      "type": "string",
+      "enum": ["queued", "admitted", "started", "completed", "failed", "skipped", "unknown"]
+    },
+    "original_admission_ref": {"type": ["string", "null"]},
+    "original_preflight_ref": {"type": ["string", "null"]},
+    "original_execution_ref": {"type": ["string", "null"]},
+    "original_runtime_receipt_ref": {"type": ["string", "null"]},
+    "original_verification_receipt_ref": {"type": ["string", "null"]},
+    "side_effect_boundary": {
+      "type": "string",
+      "enum": ["none", "possible", "confirmed", "unknown"]
+    },
+    "retry_posture": {
+      "type": "string",
+      "enum": ["safe_retry", "review_required", "do_not_retry"]
+    },
+    "original_attempt_status_source": {
+      "type": "string",
+      "enum": [
+        "queue_state",
+        "attempt_admission_receipt",
+        "verification_execution_receipt",
+        "runtime_receipt",
+        "run_dossier",
+        "operator_asserted",
+        "inferred_fallback",
+        "unknown"
+      ]
+    },
+    "recovery_policy_posture": {
+      "type": "string",
+      "enum": ["eligible_for_retry", "requires_review", "blocked"]
+    },
+    "review_reason": {"type": ["string", "null"]},
+    "recorded_at": {"type": "string"},
+    "labels": {"type": "object", "additionalProperties": {"type": "string"}},
+    "receipt_hash": {"type": "string", "pattern": "^sha256:"}
+  }
+}
