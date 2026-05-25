@@ -1,0 +1,23 @@
+{
+  "schemaVersion": "agentplane.original-attempt-context.v0.1",
+  "recordType": "OriginalAttemptContext",
+  "context_id": "original-attempt-context:started-possible-001",
+  "original_attempt_ref": "attempt:governed-run-alpha-004:001",
+  "original_attempt_phase": "started",
+  "original_admission_ref": "attempt-admission-receipt:governed-run-alpha-004:001",
+  "original_preflight_ref": "preflight-receipt:governed-run-alpha-004",
+  "original_execution_ref": "verification-execution-receipt:governed-run-alpha-004:001",
+  "original_runtime_receipt_ref": null,
+  "original_verification_receipt_ref": "verification-execution-receipt:governed-run-alpha-004:001",
+  "side_effect_boundary": "possible",
+  "retry_posture": "review_required",
+  "original_attempt_status_source": "verification_execution_receipt",
+  "recovery_policy_posture": "requires_review",
+  "review_reason": "started attempt with possible side effects requires review before retry",
+  "recorded_at": "2026-05-25T18:58:00Z",
+  "receipt_hash": "sha256:4444444444444444444444444444444444444444444444444444444444444444",
+  "labels": {
+    "fixture": "started-possible",
+    "issue": "SocioProphet/agentplane#206"
+  }
+}
