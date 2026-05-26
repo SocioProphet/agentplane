@@ -1,0 +1,151 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.socioprophet.org/agentplane/banking-bundle-staging-review.v0.1.schema.json",
+  "title": "BankingBundleStagingReview v0.1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "recordType",
+    "review_id",
+    "source_branch",
+    "issue_refs",
+    "nonProductionOnly",
+    "review_scope",
+    "overall_decision",
+    "bundle_count",
+    "bundles",
+    "non_goals",
+    "recorded_at",
+    "receipt_hash"
+  ],
+  "properties": {
+    "schemaVersion": {"const": "agentplane.banking-bundle-staging-review.v0.1"},
+    "recordType": {"const": "BankingBundleStagingReview"},
+    "review_id": {"type": "string", "minLength": 1},
+    "source_branch": {"type": "string", "minLength": 1},
+    "issue_refs": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"type": "string", "minLength": 1},
+      "uniqueItems": true
+    },
+    "nonProductionOnly": {"const": true},
+    "review_scope": {"const": "metadata_only_no_execution"},
+    "overall_decision": {
+      "type": "string",
+      "enum": ["metadata_only_capture", "hold_for_domain_review", "reject"]
+    },
+    "bundle_count": {"type": "integer", "minimum": 1},
+    "bundles": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "bundle_name",
+          "domain",
+          "purpose",
+          "source_files",
+          "classification",
+          "target_repo_question",
+          "network_posture",
+          "artifact_write_posture",
+          "policy_pack_status",
+          "smoke_script_posture",
+          "vm_definition_posture",
+          "claim_posture",
+          "bundle_admission",
+          "review_findings"
+        ],
+        "properties": {
+          "bundle_name": {"type": "string", "minLength": 1},
+          "domain": {"const": "banking-twin"},
+          "purpose": {"type": "string", "minLength": 1},
+          "source_files": {
+            "type": "array",
+            "minItems": 1,
+            "items": {"type": "string", "minLength": 1},
+            "uniqueItems": true
+          },
+          "classification": {
+            "type": "string",
+            "enum": ["staging_fixture", "design_example", "canonical_fixture", "out_of_scope"]
+          },
+          "target_repo_question": {
+            "type": "string",
+            "enum": ["agentplane", "banking-twin", "domain_specific_bundle_repo", "undecided"]
+          },
+          "network_posture": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["declared_network_mode", "dns_egress", "https_egress", "first_capture_allowed"],
+            "properties": {
+              "declared_network_mode": {"type": "string", "enum": ["network_off", "nat_dns_https", "unknown"]},
+              "dns_egress": {"type": "boolean"},
+              "https_egress": {"type": "boolean"},
+              "first_capture_allowed": {"type": "boolean"}
+            }
+          },
+          "artifact_write_posture": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["writes_artifacts", "writable_paths", "first_capture_allowed"],
+            "properties": {
+              "writes_artifacts": {"type": "boolean"},
+              "writable_paths": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+              "first_capture_allowed": {"type": "boolean"}
+            }
+          },
+          "policy_pack_status": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["policy_pack_ref", "hash_status", "first_capture_requires_pin"],
+            "properties": {
+              "policy_pack_ref": {"type": "string", "minLength": 1},
+              "hash_status": {"type": "string", "enum": ["pinned", "unset_placeholder", "unknown"]},
+              "first_capture_requires_pin": {"type": "boolean"}
+            }
+          },
+          "smoke_script_posture": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["present", "executable_in_first_capture"],
+            "properties": {
+              "present": {"type": "boolean"},
+              "executable_in_first_capture": {"const": false}
+            }
+          },
+          "vm_definition_posture": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["present", "bootable_in_first_capture"],
+            "properties": {
+              "present": {"type": "boolean"},
+              "bootable_in_first_capture": {"const": false}
+            }
+          },
+          "claim_posture": {
+            "type": "string",
+            "enum": ["domain_language_only", "no_production_claims", "requires_claim_review"]
+          },
+          "bundle_admission": {
+            "type": "string",
+            "enum": ["metadata_only", "hold", "reject"]
+          },
+          "review_findings": {"type": "array", "items": {"type": "string"}}
+        }
+      }
+    },
+    "non_goals": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"type": "string", "minLength": 1},
+      "uniqueItems": true
+    },
+    "recorded_at": {"type": "string", "minLength": 1},
+    "receipt_hash": {"type": "string", "pattern": "^sha256:"},
+    "labels": {"type": "object", "additionalProperties": {"type": "string"}}
+  }
+}
