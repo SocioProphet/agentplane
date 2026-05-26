@@ -56,6 +56,49 @@
         "authority_decision": {"type": "string"}
       }
     },
+    "latest_restore_admission": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "receipt_ref",
+        "admitted",
+        "admission_decision",
+        "requested_restore_action",
+        "halt_reason",
+        "verifier_state",
+        "side_effect_boundary",
+        "recovery_policy_posture",
+        "budget_remaining",
+        "admitted_actions",
+        "blocked_actions",
+        "operator_next_options"
+      ],
+      "properties": {
+        "receipt_ref": {"type": "string"},
+        "admitted": {"type": "boolean"},
+        "admission_decision": {"type": "string"},
+        "requested_restore_action": {"type": "string"},
+        "halt_reason": {"type": "string"},
+        "verifier_state": {"type": "string"},
+        "side_effect_boundary": {"type": "string"},
+        "recovery_policy_posture": {"type": "string"},
+        "budget_remaining": {
+          "type": "object",
+          "additionalProperties": true,
+          "required": ["remaining_budget_usd", "remaining_iterations", "remaining_tokens"],
+          "properties": {
+            "remaining_budget_usd": {"type": "number", "minimum": 0},
+            "remaining_iterations": {"type": "integer", "minimum": 0},
+            "remaining_tokens": {"type": "integer", "minimum": 0}
+          }
+        },
+        "admitted_actions": {"type": "array", "items": {"type": "string"}},
+        "blocked_actions": {"type": "array", "items": {"type": "string"}},
+        "operator_next_options": {"type": "array", "items": {"type": "string"}},
+        "review_reason": {"type": ["string", "null"]},
+        "fail_closed_reason": {"type": ["string", "null"]}
+      }
+    },
     "latest_rollback": {
       "type": "object",
       "additionalProperties": false,

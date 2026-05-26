@@ -29,8 +29,22 @@ REQUIRED = {
     "recommended_next_action",
     "dossier_hash",
 }
-
+RESTORE_PANEL_REQUIRED = {
+    "receipt_ref",
+    "admitted",
+    "admission_decision",
+    "requested_restore_action",
+    "halt_reason",
+    "verifier_state",
+    "side_effect_boundary",
+    "recovery_policy_posture",
+    "budget_remaining",
+    "admitted_actions",
+    "blocked_actions",
+    "operator_next_options",
+}
 STATUS = {"ready", "blocked", "requires_review", "failed_closed", "incomplete"}
+RESTORE_DECISIONS = {"admit", "require-review", "deny", "fail-closed"}
 
 
 class ValidationError(Exception):
@@ -90,6 +104,8 @@ def validate_schema(schema: dict[str, Any]) -> None:
         fail("schemaVersion const mismatch")
     if props.get("recordType", {}).get("const") != "RunDossier":
         fail("recordType const mismatch")
+    if "latest_restore_admission" not in props:
+        fail("schema missing latest_restore_admission operator panel")
 
 
 def validate_dossier(record: dict[str, Any]) -> None:
@@ -118,6 +134,8 @@ def validate_dossier(record: dict[str, Any]) -> None:
     require_int(record, "attempt_count")
     validate_budget(record.get("budget_summary"))
     validate_latest_admission(record.get("latest_admission"))
+    if "latest_restore_admission" in record:
+        validate_latest_restore_admission(record.get("latest_restore_admission"))
     validate_latest_rollback(record.get("latest_rollback"))
     validate_string_list(record, "receipt_refs", allow_empty=False)
     validate_string_list(record, "missing_receipts", allow_empty=True)
@@ -143,6 +161,43 @@ def validate_latest_admission(value: Any) -> None:
         require_string(value, key)
     if not isinstance(value.get("admitted"), bool):
         fail("latest_admission.admitted must be boolean")
+
+
+def validate_latest_restore_admission(value: Any) -> None:
+    if not isinstance(value, dict):
+        fail("latest_restore_admission must be an object")
+    missing = sorted(RESTORE_PANEL_REQUIRED - set(value))
+    if missing:
+        fail(f"latest_restore_admission missing required fields: {missing}")
+    for key in (
+        "receipt_ref",
+        "admission_decision",
+        "requested_restore_action",
+        "halt_reason",
+        "verifier_state",
+        "side_effect_boundary",
+        "recovery_policy_posture",
+    ):
+        require_string(value, key)
+    if value["admission_decision"] not in RESTORE_DECISIONS:
+        fail(f"unknown latest_restore_admission.admission_decision: {value['admission_decision']}")
+    if not isinstance(value.get("admitted"), bool):
+        fail("latest_restore_admission.admitted must be boolean")
+    if value["admission_decision"] == "admit" and value["admitted"] is not True:
+        fail("latest_restore_admission admission_decision=admit requires admitted=true")
+    if value["admission_decision"] != "admit" and value["admitted"] is True:
+        fail("non-admit latest_restore_admission cannot set admitted=true")
+    validate_restore_budget(value.get("budget_remaining"))
+    for key in ("admitted_actions", "blocked_actions", "operator_next_options"):
+        validate_string_list(value, key, allow_empty=(key != "operator_next_options"))
+
+
+def validate_restore_budget(value: Any) -> None:
+    if not isinstance(value, dict):
+        fail("latest_restore_admission.budget_remaining must be an object")
+    require_number(value, "remaining_budget_usd")
+    require_int(value, "remaining_iterations")
+    require_int(value, "remaining_tokens")
 
 
 def validate_latest_rollback(value: Any) -> None:
