@@ -1,0 +1,51 @@
+name: restore-admission-receipt
+
+on:
+  pull_request:
+    paths:
+      - "schemas/receipts/restore-admission-receipt.v0.1.schema.json"
+      - "tests/fixtures/receipts/restore-admission-receipt.*.json"
+      - "tools/validate_restore_admission_receipt.py"
+      - "docs/runtime-governance/restore-admission-receipt-v0.1.md"
+      - ".github/workflows/restore-admission-receipt.yml"
+  push:
+    branches:
+      - main
+    paths:
+      - "schemas/receipts/restore-admission-receipt.v0.1.schema.json"
+      - "tests/fixtures/receipts/restore-admission-receipt.*.json"
+      - "tools/validate_restore_admission_receipt.py"
+      - "docs/runtime-governance/restore-admission-receipt-v0.1.md"
+      - ".github/workflows/restore-admission-receipt.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-restore-admission-receipt:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Validate RestoreAdmissionReceipt contract
+        run: |
+          python3 -m json.tool schemas/receipts/restore-admission-receipt.v0.1.schema.json >/dev/null
+          python3 -m json.tool tests/fixtures/receipts/restore-admission-receipt.queued-none-admitted.valid.json >/dev/null
+          python3 -m json.tool tests/fixtures/receipts/restore-admission-receipt.started-possible-review.valid.json >/dev/null
+          python3 -m json.tool tests/fixtures/receipts/restore-admission-receipt.completed-confirmed-denied.valid.json >/dev/null
+          python3 -m json.tool tests/fixtures/receipts/restore-admission-receipt.missing-original-context.invalid.json >/dev/null
+          python3 -m json.tool tests/fixtures/receipts/restore-admission-receipt.stale-verifier-admitted.invalid.json >/dev/null
+          python3 -m json.tool tests/fixtures/receipts/restore-admission-receipt.insufficient-budget-admitted.invalid.json >/dev/null
+          python3 -m json.tool tests/fixtures/receipts/restore-admission-receipt.unknown-halt-no-review.invalid.json >/dev/null
+          python3 -m json.tool tests/fixtures/receipts/restore-admission-receipt.possible-side-effect-admitted.invalid.json >/dev/null
+          python3 tools/validate_restore_admission_receipt.py tests/fixtures/receipts/restore-admission-receipt.queued-none-admitted.valid.json
+          python3 tools/validate_restore_admission_receipt.py tests/fixtures/receipts/restore-admission-receipt.started-possible-review.valid.json
+          python3 tools/validate_restore_admission_receipt.py tests/fixtures/receipts/restore-admission-receipt.completed-confirmed-denied.valid.json
+          ! python3 tools/validate_restore_admission_receipt.py tests/fixtures/receipts/restore-admission-receipt.missing-original-context.invalid.json
+          ! python3 tools/validate_restore_admission_receipt.py tests/fixtures/receipts/restore-admission-receipt.stale-verifier-admitted.invalid.json
+          ! python3 tools/validate_restore_admission_receipt.py tests/fixtures/receipts/restore-admission-receipt.insufficient-budget-admitted.invalid.json
+          ! python3 tools/validate_restore_admission_receipt.py tests/fixtures/receipts/restore-admission-receipt.unknown-halt-no-review.invalid.json
+          ! python3 tools/validate_restore_admission_receipt.py tests/fixtures/receipts/restore-admission-receipt.possible-side-effect-admitted.invalid.json
