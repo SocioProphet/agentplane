@@ -95,6 +95,27 @@ def next_action(status: str) -> str:
     return table[status]
 
 
+def restore_admission_panel(restore_admission: dict[str, Any] | None) -> dict[str, Any] | None:
+    if restore_admission is None:
+        return None
+    return {
+        "receipt_ref": ref(restore_admission, "missing:restore-admission-receipt"),
+        "admitted": bool(restore_admission.get("admitted", False)),
+        "admission_decision": str(restore_admission.get("admission_decision", "missing")),
+        "requested_restore_action": str(restore_admission.get("requested_restore_action", "missing")),
+        "halt_reason": str(restore_admission.get("halt_reason", "missing")),
+        "verifier_state": str(restore_admission.get("verifier_state", "missing")),
+        "side_effect_boundary": str(restore_admission.get("side_effect_boundary", "missing")),
+        "recovery_policy_posture": str(restore_admission.get("recovery_policy_posture", "missing")),
+        "budget_remaining": restore_admission.get("budget_remaining", {}),
+        "admitted_actions": restore_admission.get("admitted_actions", []),
+        "blocked_actions": restore_admission.get("blocked_actions", []),
+        "operator_next_options": restore_admission.get("operator_next_options", []),
+        "review_reason": restore_admission.get("review_reason"),
+        "fail_closed_reason": restore_admission.get("fail_closed_reason"),
+    }
+
+
 def build(run_dir: Path, generated_at: str | None = None) -> dict[str, Any]:
     run_dir = run_dir.resolve()
     contract = load_object(run_dir / "governed-run-contract.json")
@@ -106,12 +127,24 @@ def build(run_dir: Path, generated_at: str | None = None) -> dict[str, Any]:
     verification = load_object(attempt_dir / "verification-result.json") if attempt_dir else None
     boundary = load_object(attempt_dir / "rollback-boundary.json") if attempt_dir else None
     result = load_object(attempt_dir / "rollback-result.json") if attempt_dir else None
+    restore_admission = load_object(attempt_dir / "restore-admission-receipt.json") if attempt_dir else None
 
     run_id = str((contract or {}).get("run_id") or (admission or {}).get("run_id") or "unknown-run")
     status = status_from(admission, missing)
     budget = (admission or {}).get("budget_estimate", {})
     attempts_root = run_dir / "attempts"
     attempt_count = len([p for p in attempts_root.iterdir() if p.is_dir()]) if attempts_root.exists() else 0
+
+    receipt_refs = [
+        ref(contract, f"governed-run-contract:{run_id}"),
+        ref(admission, "missing:attempt-admission-receipt"),
+        ref(runtime, "missing:runtime-attempt-receipt"),
+        ref(verification, "missing:verification-result"),
+        ref(boundary, "missing:rollback-boundary"),
+        ref(result, "missing:rollback-result"),
+    ]
+    if restore_admission is not None:
+        receipt_refs.append(ref(restore_admission, "missing:restore-admission-receipt"))
 
     dossier: dict[str, Any] = {
         "schemaVersion": "agentplane.run-dossier.v0.1",
@@ -142,18 +175,14 @@ def build(run_dir: Path, generated_at: str | None = None) -> dict[str, Any]:
             "result_ref": ref(result, "missing:rollback-result"),
             "status": str((result or {}).get("status", "missing")),
         },
-        "receipt_refs": [
-            ref(contract, f"governed-run-contract:{run_id}"),
-            ref(admission, "missing:attempt-admission-receipt"),
-            ref(runtime, "missing:runtime-attempt-receipt"),
-            ref(verification, "missing:verification-result"),
-            ref(boundary, "missing:rollback-boundary"),
-            ref(result, "missing:rollback-result"),
-        ],
+        "receipt_refs": receipt_refs,
         "missing_receipts": missing,
         "recommended_next_action": next_action(status),
         "labels": {"source": "receipts"},
     }
+    restore_panel = restore_admission_panel(restore_admission)
+    if restore_panel is not None:
+        dossier["latest_restore_admission"] = restore_panel
     dossier["dossier_hash"] = hash_record(dossier)
     return dossier
 
