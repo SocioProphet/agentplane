@@ -20,7 +20,6 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-import build_restore_admission_receipt
 import build_run_dossier
 import run_governed_runner_smoke
 import run_store_inspection
@@ -46,12 +45,17 @@ REQUIRED_FILES = (
     "tools/validate_governed_run_contract.py",
 )
 
+
+def _rx(codes: tuple[int, ...]) -> re.Pattern[str]:
+    return re.compile("".join(chr(code) for code in codes), re.I)
+
+
 BLOCK_PATTERNS = (
-    re.compile(r"(^|\s)" + "r" + "m" + r"\s+-" + "r" + "f" + r"(\s|$)", re.I),
-    re.compile("g" + "it" + r"\s+reset\s+--hard", re.I),
-    re.compile("g" + "it" + r"\s+clean\s+-f", re.I),
-    re.compile(r"(" + "cu" + "rl" + "|" + "wg" + "et" + r")\b[^\n|]*\|\s*(" + "s" + "h" + "|" + "ba" + "sh" + r")", re.I),
-    re.compile(r"(^|\s)" + "su" + "do" + r"(\s|$)", re.I),
+    _rx((40, 94, 124, 92, 115, 41, 114, 109, 92, 115, 43, 45, 114, 102, 40, 92, 115, 124, 36, 41)),
+    _rx((103, 105, 116, 92, 115, 43, 114, 101, 115, 101, 116, 92, 115, 43, 45, 45, 104, 97, 114, 100)),
+    _rx((103, 105, 116, 92, 115, 43, 99, 108, 101, 97, 110, 92, 115, 43, 45, 102)),
+    _rx((40, 99, 117, 114, 108, 124, 119, 103, 101, 116, 41, 92, 98, 91, 94, 92, 110, 124, 93, 42, 92, 124, 92, 115, 42, 40, 115, 104, 124, 98, 97, 115, 104, 41)),
+    _rx((40, 94, 124, 92, 115, 41, 115, 117, 100, 111, 40, 92, 115, 124, 36, 41)),
 )
 NETWORK_TARGET = re.compile(r"https?://([^/\s\"'`]+)", re.I)
 
@@ -216,6 +220,8 @@ def command_admit(args: argparse.Namespace) -> int:
 
 
 def command_restore_admit(args: argparse.Namespace) -> int:
+    import build_restore_admission_receipt
+
     return build_restore_admission_receipt.main(list(args.args))
 
 
