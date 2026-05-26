@@ -1,0 +1,65 @@
+{
+  "schemaVersion": "agentplane.banking-bundle-staging-review.v0.1",
+  "recordType": "BankingBundleStagingReview",
+  "review_id": "banking-bundle-staging-review:2026-05-26:network-invalid",
+  "source_branch": "banking-twin/agentplane-execution-bundles-v0-1",
+  "issue_refs": ["SocioProphet/agentplane#239"],
+  "nonProductionOnly": true,
+  "review_scope": "metadata_only_no_execution",
+  "overall_decision": "metadata_only_capture",
+  "bundle_count": 1,
+  "bundles": [
+    {
+      "bundle_name": "stress-runner",
+      "domain": "banking-twin",
+      "purpose": "Invalid fixture proving network egress cannot be enabled in first metadata-only capture.",
+      "source_files": [
+        "bundles/stress-runner/bundle.json",
+        "bundles/stress-runner/smoke.sh",
+        "bundles/stress-runner/vm.nix"
+      ],
+      "classification": "staging_fixture",
+      "target_repo_question": "undecided",
+      "network_posture": {
+        "declared_network_mode": "nat_dns_https",
+        "dns_egress": true,
+        "https_egress": true,
+        "first_capture_allowed": true
+      },
+      "artifact_write_posture": {
+        "writes_artifacts": true,
+        "writable_paths": ["/mnt/artifacts"],
+        "first_capture_allowed": false
+      },
+      "policy_pack_status": {
+        "policy_pack_ref": "UNSET",
+        "hash_status": "unset_placeholder",
+        "first_capture_requires_pin": true
+      },
+      "smoke_script_posture": {
+        "present": true,
+        "executable_in_first_capture": false
+      },
+      "vm_definition_posture": {
+        "present": true,
+        "bootable_in_first_capture": false
+      },
+      "claim_posture": "no_production_claims",
+      "bundle_admission": "metadata_only",
+      "review_findings": ["invalid: first capture cannot enable network egress"]
+    }
+  ],
+  "non_goals": [
+    "bundle_execution",
+    "smoke_script_execution",
+    "vm_boot",
+    "network_access",
+    "provider_integration",
+    "production_banking_claims",
+    "policy_pack_promotion",
+    "runtime_admission",
+    "workspace_mutation"
+  ],
+  "recorded_at": "2026-05-26T19:46:00Z",
+  "receipt_hash": "sha256:4444444444444444444444444444444444444444444444444444444444444444"
+}
