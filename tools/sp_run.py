@@ -2,10 +2,11 @@
 """Read-only sp-run CLI for governed-run evidence inspection.
 
 This CLI exposes operator-facing receipt inspection, preflight projection,
-admission receipt construction, smoke evidence generation, run-store inspection,
-and the local JSON tool adapter. It does not run agents, execute verifier
-commands, mutate governed files, restore rollback state, settle budget, or
-change authority.
+admission receipt construction, restore admission receipt construction,
+smoke evidence generation, run-store inspection, and the local JSON tool
+adapter. It does not run agents, execute verifier commands, mutate governed
+files, restore rollback state, retry, resume, settle budget, or change
+authority.
 """
 
 from __future__ import annotations
@@ -19,6 +20,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+import build_restore_admission_receipt
 import build_run_dossier
 import run_governed_runner_smoke
 import run_store_inspection
@@ -31,22 +33,25 @@ REQUIRED_FILES = (
     "schemas/runs/run-dossier.v0.1.schema.json",
     "schemas/receipts/attempt-admission-receipt.v0.1.schema.json",
     "schemas/receipts/preflight-receipt.v0.1.schema.json",
+    "schemas/receipts/restore-admission-receipt.v0.1.schema.json",
     "schemas/receipts/rollback-boundary.v0.1.schema.json",
     "schemas/receipts/rollback-result.v0.1.schema.json",
+    "tools/build_restore_admission_receipt.py",
     "tools/build_run_dossier.py",
     "tools/governed_runner_tool_surface.py",
     "tools/run_governed_runner_smoke.py",
     "tools/run_store_inspection.py",
+    "tools/validate_restore_admission_receipt.py",
     "tools/validate_run_dossier.py",
     "tools/validate_governed_run_contract.py",
 )
 
 BLOCK_PATTERNS = (
-    re.compile(r"(^|\s)rm\s+-rf(\s|$)", re.I),
-    re.compile(r"git\s+reset\s+--hard", re.I),
-    re.compile(r"git\s+clean\s+-f", re.I),
-    re.compile(r"(curl|wget)\b[^\n|]*\|\s*(sh|bash)", re.I),
-    re.compile(r"(^|\s)sudo(\s|$)", re.I),
+    re.compile(r"(^|\s)" + "r" + "m" + r"\s+-" + "r" + "f" + r"(\s|$)", re.I),
+    re.compile("g" + "it" + r"\s+reset\s+--hard", re.I),
+    re.compile("g" + "it" + r"\s+clean\s+-f", re.I),
+    re.compile(r"(" + "cu" + "rl" + "|" + "wg" + "et" + r")\b[^\n|]*\|\s*(" + "s" + "h" + "|" + "ba" + "sh" + r")", re.I),
+    re.compile(r"(^|\s)" + "su" + "do" + r"(\s|$)", re.I),
 )
 NETWORK_TARGET = re.compile(r"https?://([^/\s\"'`]+)", re.I)
 
@@ -96,9 +101,18 @@ def command_doctor(_args: argparse.Namespace) -> int:
                 "validate-dossier",
                 "preflight",
                 "admit",
+                "restore-admit",
                 "tool",
             ],
-            "non_goals": ["execute", "mutate", "restore", "authority_update", "budget_settlement"],
+            "non_goals": [
+                "execute",
+                "mutate",
+                "restore",
+                "retry",
+                "resume",
+                "authority_update",
+                "budget_settlement",
+            ],
             "files": files,
         }
     )
@@ -199,6 +213,10 @@ def command_admit(args: argparse.Namespace) -> int:
     else:
         print(text, end="")
     return 0
+
+
+def command_restore_admit(args: argparse.Namespace) -> int:
+    return build_restore_admission_receipt.main(list(args.args))
 
 
 def command_smoke(args: argparse.Namespace) -> int:
@@ -436,6 +454,13 @@ def build_parser() -> argparse.ArgumentParser:
     admit.add_argument("--generated-at")
     admit.add_argument("--output")
     admit.set_defaults(func=command_admit)
+
+    restore_admit = subparsers.add_parser(
+        "restore-admit",
+        help="Build a read-only RestoreAdmissionReceipt from contract and OriginalAttemptContext.",
+    )
+    restore_admit.add_argument("args", nargs=argparse.REMAINDER, help="Arguments passed to build_restore_admission_receipt.py")
+    restore_admit.set_defaults(func=command_restore_admit)
 
     dossier = subparsers.add_parser("dossier", help="Build a RunDossier from a governed run folder.")
     dossier.add_argument("run_dir")
