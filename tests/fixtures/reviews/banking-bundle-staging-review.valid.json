@@ -1,0 +1,201 @@
+{
+  "schemaVersion": "agentplane.banking-bundle-staging-review.v0.1",
+  "recordType": "BankingBundleStagingReview",
+  "review_id": "banking-bundle-staging-review:2026-05-26:001",
+  "source_branch": "banking-twin/agentplane-execution-bundles-v0-1",
+  "issue_refs": [
+    "SocioProphet/agentplane#168",
+    "SocioProphet/agentplane#239"
+  ],
+  "nonProductionOnly": true,
+  "review_scope": "metadata_only_no_execution",
+  "overall_decision": "metadata_only_capture",
+  "bundle_count": 4,
+  "bundles": [
+    {
+      "bundle_name": "stress-runner",
+      "domain": "banking-twin",
+      "purpose": "Stage stress-runner bundle metadata for domain and runtime-boundary review.",
+      "source_files": [
+        "bundles/stress-runner/bundle.json",
+        "bundles/stress-runner/smoke.sh",
+        "bundles/stress-runner/vm.nix"
+      ],
+      "classification": "staging_fixture",
+      "target_repo_question": "undecided",
+      "network_posture": {
+        "declared_network_mode": "nat_dns_https",
+        "dns_egress": true,
+        "https_egress": true,
+        "first_capture_allowed": false
+      },
+      "artifact_write_posture": {
+        "writes_artifacts": true,
+        "writable_paths": ["/mnt/artifacts"],
+        "first_capture_allowed": false
+      },
+      "policy_pack_status": {
+        "policy_pack_ref": "UNSET",
+        "hash_status": "unset_placeholder",
+        "first_capture_requires_pin": true
+      },
+      "smoke_script_posture": {
+        "present": true,
+        "executable_in_first_capture": false
+      },
+      "vm_definition_posture": {
+        "present": true,
+        "bootable_in_first_capture": false
+      },
+      "claim_posture": "no_production_claims",
+      "bundle_admission": "metadata_only",
+      "review_findings": [
+        "staging metadata is preserved without activating the bundle",
+        "network and artifact-write posture require later review"
+      ]
+    },
+    {
+      "bundle_name": "capital-rollforward",
+      "domain": "banking-twin",
+      "purpose": "Stage capital-rollforward bundle metadata for domain and runtime-boundary review.",
+      "source_files": [
+        "bundles/capital-rollforward/bundle.json",
+        "bundles/capital-rollforward/smoke.sh",
+        "bundles/capital-rollforward/vm.nix"
+      ],
+      "classification": "staging_fixture",
+      "target_repo_question": "undecided",
+      "network_posture": {
+        "declared_network_mode": "nat_dns_https",
+        "dns_egress": true,
+        "https_egress": true,
+        "first_capture_allowed": false
+      },
+      "artifact_write_posture": {
+        "writes_artifacts": true,
+        "writable_paths": ["/mnt/artifacts"],
+        "first_capture_allowed": false
+      },
+      "policy_pack_status": {
+        "policy_pack_ref": "UNSET",
+        "hash_status": "unset_placeholder",
+        "first_capture_requires_pin": true
+      },
+      "smoke_script_posture": {
+        "present": true,
+        "executable_in_first_capture": false
+      },
+      "vm_definition_posture": {
+        "present": true,
+        "bootable_in_first_capture": false
+      },
+      "claim_posture": "no_production_claims",
+      "bundle_admission": "metadata_only",
+      "review_findings": [
+        "staging metadata is preserved without activating the bundle",
+        "policy-pack placeholder must be pinned before any runnable promotion"
+      ]
+    },
+    {
+      "bundle_name": "filing-assembler",
+      "domain": "banking-twin",
+      "purpose": "Stage filing-assembler bundle metadata for domain and runtime-boundary review.",
+      "source_files": [
+        "bundles/filing-assembler/bundle.json",
+        "bundles/filing-assembler/smoke.sh",
+        "bundles/filing-assembler/vm.nix"
+      ],
+      "classification": "staging_fixture",
+      "target_repo_question": "undecided",
+      "network_posture": {
+        "declared_network_mode": "nat_dns_https",
+        "dns_egress": true,
+        "https_egress": true,
+        "first_capture_allowed": false
+      },
+      "artifact_write_posture": {
+        "writes_artifacts": true,
+        "writable_paths": ["/mnt/artifacts"],
+        "first_capture_allowed": false
+      },
+      "policy_pack_status": {
+        "policy_pack_ref": "UNSET",
+        "hash_status": "unset_placeholder",
+        "first_capture_requires_pin": true
+      },
+      "smoke_script_posture": {
+        "present": true,
+        "executable_in_first_capture": false
+      },
+      "vm_definition_posture": {
+        "present": true,
+        "bootable_in_first_capture": false
+      },
+      "claim_posture": "no_production_claims",
+      "bundle_admission": "metadata_only",
+      "review_findings": [
+        "staging metadata is preserved without activating the bundle",
+        "target repository placement remains undecided"
+      ]
+    },
+    {
+      "bundle_name": "policy-audit",
+      "domain": "banking-twin",
+      "purpose": "Stage policy-audit bundle metadata for domain and runtime-boundary review.",
+      "source_files": [
+        "bundles/policy-audit/bundle.json",
+        "bundles/policy-audit/smoke.sh",
+        "bundles/policy-audit/vm.nix"
+      ],
+      "classification": "staging_fixture",
+      "target_repo_question": "undecided",
+      "network_posture": {
+        "declared_network_mode": "nat_dns_https",
+        "dns_egress": true,
+        "https_egress": true,
+        "first_capture_allowed": false
+      },
+      "artifact_write_posture": {
+        "writes_artifacts": true,
+        "writable_paths": ["/mnt/artifacts"],
+        "first_capture_allowed": false
+      },
+      "policy_pack_status": {
+        "policy_pack_ref": "UNSET",
+        "hash_status": "unset_placeholder",
+        "first_capture_requires_pin": true
+      },
+      "smoke_script_posture": {
+        "present": true,
+        "executable_in_first_capture": false
+      },
+      "vm_definition_posture": {
+        "present": true,
+        "bootable_in_first_capture": false
+      },
+      "claim_posture": "no_production_claims",
+      "bundle_admission": "metadata_only",
+      "review_findings": [
+        "staging metadata is preserved without activating the bundle",
+        "bundle remains non-production only"
+      ]
+    }
+  ],
+  "non_goals": [
+    "bundle_execution",
+    "smoke_script_execution",
+    "vm_boot",
+    "network_access",
+    "provider_integration",
+    "production_banking_claims",
+    "policy_pack_promotion",
+    "runtime_admission",
+    "workspace_mutation"
+  ],
+  "recorded_at": "2026-05-26T19:45:00Z",
+  "receipt_hash": "sha256:3333333333333333333333333333333333333333333333333333333333333333",
+  "labels": {
+    "source": "banking-bundle-staging-review-v0.1",
+    "issue": "SocioProphet/agentplane#239"
+  }
+}
