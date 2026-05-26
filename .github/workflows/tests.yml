@@ -32,5 +32,17 @@ jobs:
       - name: Install pytest
         run: python3 -m pip install pytest
 
-      - name: Run tool tests
-        run: make test
+      - name: Restore admission builder tests
+        run: python3 -m pytest -q tools/tests/test_restore_admission_builder.py
+
+      - name: sp-run core CLI tests
+        run: python3 -m pytest -q tools/tests/test_sp_run_cli.py
+
+      - name: sp-run admission tests
+        run: python3 -m pytest -q tools/tests/test_sp_run_admit_cli.py tools/tests/test_sp_run_preflight_cli.py
+
+      - name: sp-run delegation tests
+        run: python3 -m pytest -q tools/tests/test_sp_run_delegate_surface.py tools/tests/test_sp_run_install_mode.py
+
+      - name: sp-run tool and store tests
+        run: python3 -m pytest -q tools/tests/test_sp_run_tool_adapter.py tools/tests/test_sp_run_run_store_inspection.py

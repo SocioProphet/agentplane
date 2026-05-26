@@ -156,6 +156,26 @@ tests/fixtures/receipts/restore-admission-receipt.possible-side-effect-admitted.
 python3 tools/validate_restore_admission_receipt.py tests/fixtures/receipts/restore-admission-receipt.queued-none-admitted.valid.json
 ```
 
+## Functional path
+
+The functional path is `sp-run restore-admit`. It produces and validates a `RestoreAdmissionReceipt v0.1` before any recovery action can execute.
+
+```bash
+python3 tools/sp_run.py restore-admit tests/fixtures/runs/governed-run-contract.valid.json \
+  --original-attempt-context tests/fixtures/receipts/original-attempt-context.queued-safe.valid.json \
+  --requested-restore-action retry_same_payload \
+  --halt-reason operator_halt \
+  --verifier-state passed \
+  --required-budget-usd 0.1 \
+  --required-iterations 1 \
+  --required-tokens 1000 \
+  --generated-at 2026-05-26T18:40:00Z \
+  --output /tmp/restore-admission-generated.json
+python3 tools/validate_restore_admission_receipt.py /tmp/restore-admission-generated.json
+```
+
+`sp-run restore-admit` is still admission-only. It may admit, require review, deny, or fail closed. It does not perform the admitted recovery action.
+
 ## Non-goals
 
 This receipt does not execute a restore, retry, rollback, or resume action.
