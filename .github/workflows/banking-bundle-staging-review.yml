@@ -1,0 +1,39 @@
+name: banking-bundle-staging-review
+
+on:
+  pull_request:
+    paths:
+      - "schemas/banking-bundle-staging-review.v0.1.schema.json"
+      - "tests/fixtures/reviews/banking-bundle-staging-review.*.json"
+      - "tools/validate_banking_bundle_staging_review.py"
+      - "docs/gitops/banking-bundle-staging-review-v0.1.md"
+      - ".github/workflows/banking-bundle-staging-review.yml"
+  push:
+    branches:
+      - main
+    paths:
+      - "schemas/banking-bundle-staging-review.v0.1.schema.json"
+      - "tests/fixtures/reviews/banking-bundle-staging-review.*.json"
+      - "tools/validate_banking_bundle_staging_review.py"
+      - "docs/gitops/banking-bundle-staging-review-v0.1.md"
+      - ".github/workflows/banking-bundle-staging-review.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-banking-bundle-staging-review:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Validate BankingBundleStagingReview contract
+        run: |
+          python3 -m json.tool schemas/banking-bundle-staging-review.v0.1.schema.json >/dev/null
+          python3 -m json.tool tests/fixtures/reviews/banking-bundle-staging-review.valid.json >/dev/null
+          python3 -m json.tool tests/fixtures/reviews/banking-bundle-staging-review.network-enabled.invalid.json >/dev/null
+          python3 tools/validate_banking_bundle_staging_review.py tests/fixtures/reviews/banking-bundle-staging-review.valid.json
+          ! python3 tools/validate_banking_bundle_staging_review.py tests/fixtures/reviews/banking-bundle-staging-review.network-enabled.invalid.json
