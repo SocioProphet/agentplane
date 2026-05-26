@@ -33,4 +33,20 @@ jobs:
         run: python3 -m pip install pytest
 
       - name: Run tool tests
-        run: make test
+        id: tool-tests
+        run: |
+          set +e
+          make test 2>&1 | tee /tmp/agentplane-pytest.log
+          status=${PIPESTATUS[0]}
+          echo "status=${status}" >> "${GITHUB_OUTPUT}"
+          exit 0
+
+      - name: Upload pytest output
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: agentplane-pytest-output
+          path: /tmp/agentplane-pytest.log
+
+      - name: Fail if tests failed
+        run: test "${{ steps.tool-tests.outputs.status }}" = "0"
