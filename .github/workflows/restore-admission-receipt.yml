@@ -5,7 +5,12 @@ on:
     paths:
       - "schemas/receipts/restore-admission-receipt.v0.1.schema.json"
       - "tests/fixtures/receipts/restore-admission-receipt.*.json"
+      - "tests/fixtures/receipts/original-attempt-context.*.json"
+      - "tests/fixtures/runs/governed-run-contract.valid.json"
+      - "tools/build_restore_admission_receipt.py"
       - "tools/validate_restore_admission_receipt.py"
+      - "tools/sp_run.py"
+      - "tools/tests/test_restore_admission_builder.py"
       - "docs/runtime-governance/restore-admission-receipt-v0.1.md"
       - ".github/workflows/restore-admission-receipt.yml"
   push:
@@ -14,7 +19,12 @@ on:
     paths:
       - "schemas/receipts/restore-admission-receipt.v0.1.schema.json"
       - "tests/fixtures/receipts/restore-admission-receipt.*.json"
+      - "tests/fixtures/receipts/original-attempt-context.*.json"
+      - "tests/fixtures/runs/governed-run-contract.valid.json"
+      - "tools/build_restore_admission_receipt.py"
       - "tools/validate_restore_admission_receipt.py"
+      - "tools/sp_run.py"
+      - "tools/tests/test_restore_admission_builder.py"
       - "docs/runtime-governance/restore-admission-receipt-v0.1.md"
       - ".github/workflows/restore-admission-receipt.yml"
   workflow_dispatch:
@@ -30,6 +40,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
+      - name: Provision test runner
+        run: python3 -m pip install pytest
       - name: Validate RestoreAdmissionReceipt contract
         run: |
           python3 -m json.tool schemas/receipts/restore-admission-receipt.v0.1.schema.json >/dev/null
@@ -49,3 +61,17 @@ jobs:
           ! python3 tools/validate_restore_admission_receipt.py tests/fixtures/receipts/restore-admission-receipt.insufficient-budget-admitted.invalid.json
           ! python3 tools/validate_restore_admission_receipt.py tests/fixtures/receipts/restore-admission-receipt.unknown-halt-no-review.invalid.json
           ! python3 tools/validate_restore_admission_receipt.py tests/fixtures/receipts/restore-admission-receipt.possible-side-effect-admitted.invalid.json
+      - name: Validate restore-admit functional path
+        run: |
+          python3 tools/sp_run.py restore-admit tests/fixtures/runs/governed-run-contract.valid.json \
+            --original-attempt-context tests/fixtures/receipts/original-attempt-context.queued-safe.valid.json \
+            --requested-restore-action retry_same_payload \
+            --halt-reason operator_halt \
+            --verifier-state passed \
+            --required-budget-usd 0.1 \
+            --required-iterations 1 \
+            --required-tokens 1000 \
+            --generated-at 2026-05-26T18:40:00Z \
+            --output /tmp/restore-admission-generated.json
+          python3 tools/validate_restore_admission_receipt.py /tmp/restore-admission-generated.json
+          python3 -m pytest -q tools/tests/test_restore_admission_builder.py
