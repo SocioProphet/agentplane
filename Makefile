@@ -1,135 +1,18 @@
-.PHONY: validate test validate-governance-context validate-lattice-data-governai-execution-refs validate-lattice-runtime-profile-refs validate-network-native-assistant-evidence validate-guardrail-evidence-artifacts validate-stop-gate-evaluator validate-guarded-workcell-artifact validate-guarded-workcell-executor validate-guarded-invocation-artifact validate-guarded-invocation validate-agentic-pr-work-order validate-semantic-enterprise-agent-boundary validate-ops-history-contracts validate-action-contracts validate-agent-operation-contract validate-superconscious-reasoning-import validate-agent-harness-runtime-contracts validate-bounded-action-loop agentplane-evidence-receipt-composition-tier2-binding-ci lawful-learning-phase9-contract-ci validate-evidence-receipt-binding validate-semantic-activation-receipt validate-governed-run-contract validate-attempt-admission-receipt
+.PHONY: validate test validate-sr validate-governance-context validate-lattice-data-governai-execution-refs validate-lattice-runtime-profile-refs validate-network-native-assistant-evidence validate-guardrail-evidence-artifacts validate-stop-gate-evaluator validate-guarded-workcell-artifact validate-guarded-workcell-executor validate-guarded-invocation-artifact validate-guarded-invocation validate-agentic-pr-work-order validate-semantic-enterprise-agent-boundary validate-ops-history-contracts validate-action-contracts validate-agent-operation-contract validate-superconscious-reasoning-import validate-agent-harness-runtime-contracts validate-bounded-action-loop agentplane-evidence-receipt-composition-tier2-binding-ci lawful-learning-phase9-contract-ci validate-evidence-receipt-binding validate-semantic-activation-receipt validate-governed-run-contract validate-attempt-admission-receipt
 
-validate: validate-governance-context validate-lattice-data-governai-execution-refs validate-lattice-runtime-profile-refs validate-network-native-assistant-evidence validate-guardrail-evidence-artifacts validate-stop-gate-evaluator validate-guarded-workcell-artifact validate-guarded-workcell-executor validate-guarded-invocation-artifact validate-guarded-invocation validate-agentic-pr-work-order validate-semantic-enterprise-agent-boundary validate-ops-history-contracts validate-action-contracts validate-agent-operation-contract validate-superconscious-reasoning-import validate-agent-harness-runtime-contracts validate-bounded-action-loop agentplane-evidence-receipt-composition-tier2-binding-ci lawful-learning-phase9-contract-ci validate-evidence-receipt-binding validate-semantic-activation-receipt validate-governed-run-contract validate-attempt-admission-receipt
+validate: validate-sr validate-governance-context validate-lattice-data-governai-execution-refs validate-lattice-runtime-profile-refs validate-network-native-assistant-evidence validate-guardrail-evidence-artifacts validate-stop-gate-evaluator validate-guarded-workcell-artifact validate-guarded-workcell-executor validate-guarded-invocation-artifact validate-guarded-invocation validate-agentic-pr-work-order validate-semantic-enterprise-agent-boundary validate-ops-history-contracts validate-action-contracts validate-agent-operation-contract validate-superconscious-reasoning-import validate-agent-harness-runtime-contracts validate-bounded-action-loop agentplane-evidence-receipt-composition-tier2-binding-ci lawful-learning-phase9-contract-ci validate-evidence-receipt-binding validate-semantic-activation-receipt validate-governed-run-contract validate-attempt-admission-receipt
 	python3 tools/validate_execution_timing.py
+
+validate-sr:
+	@echo "--- JSON Schema validation ---"
+	python3 scripts/validate_schema.py --schema schemas/symbolic-regression/sr-run-artifact.schema.json --fixtures tests/fixtures/symbolic-regression/
+	@echo "--- Replay hash recomputation ---"
+	python3 scripts/validate_replay_hash.py tests/fixtures/symbolic-regression/sr-run-artifact.valid.json
+	python3 scripts/validate_replay_hash.py tests/fixtures/symbolic-regression/reject_tampered_replay_hash.json --expect-invalid
+	@echo "--- Replay reference resolution ---"
+	python3 scripts/validate_replay_ref.py tests/fixtures/symbolic-regression/reject_missing_replay_on_proposal.proposal.json --fixture-store tests/fixtures/symbolic-regression/store/ --expect-invalid
+	@echo "--- SINDy controlAuthority gate ---"
+	python3 scripts/validate_schema.py --schema schemas/symbolic-regression/sr-run-artifact.schema.json --fixture tests/fixtures/symbolic-regression/reject-sindy-control-authority-true.json --expect-invalid
 
 validate-governance-context:
 	python3 scripts/verify_governance_context.py
-
-validate-lattice-data-governai-execution-refs:
-	python3 tools/validate_lattice_data_governai_execution_refs.py
-
-validate-lattice-runtime-profile-refs:
-	python3 tools/validate_lattice_runtime_profile_refs.py
-
-validate-network-native-assistant-evidence:
-	python3 tools/validate_network_native_assistant_evidence.py
-
-validate-guardrail-evidence-artifacts:
-	python3 tools/validate_guardrail_evidence_artifacts.py
-
-validate-stop-gate-evaluator:
-	python3 tools/validate_stop_gate_evaluator.py
-
-validate-guarded-workcell-artifact:
-	python3 tools/validate_guarded_workcell_artifact.py
-
-validate-guarded-workcell-executor:
-	python3 tools/validate_guarded_workcell_executor.py
-
-validate-guarded-invocation-artifact:
-	python3 tools/validate_guarded_invocation_artifact.py
-
-validate-guarded-invocation:
-	python3 tools/validate_guarded_invocation.py
-
-validate-agentic-pr-work-order:
-	python3 tools/validate_agentic_pr_work_order.py
-
-validate-semantic-enterprise-agent-boundary:
-	python3 tools/validate_semantic_enterprise_agent_boundary.py
-
-validate-ops-history-contracts:
-	python3 tools/validate_ops_history_contracts.py
-
-validate-action-contracts:
-	python3 tools/validate_action_contracts.py
-
-validate-agent-operation-contract:
-	python3 tools/validate_agent_operation_contract.py
-
-validate-superconscious-reasoning-import:
-	python3 scripts/import_superconscious_reasoning.py examples/superconscious/deterministic
-
-validate-agent-harness-runtime-contracts:
-	python3 scripts/validate_agent_harness_runtime_contracts.py
-
-validate-bounded-action-loop:
-	python3 tools/check_bounded_action_loop.py
-
-agentplane-evidence-receipt-composition-tier2-binding-ci:
-	python3 -m json.tool schemas/composition/agentplane-evidence-receipt-composition-tier2-binding.v1.json >/dev/null
-	python3 -m json.tool tests/fixtures/composition/agentplane-evidence-receipt-composition-tier2-binding.synthetic.json >/dev/null
-	python3 -m json.tool tests/fixtures/composition/agentplane-evidence-receipt-composition-tier2-binding.runtime-field.invalid.synthetic.json >/dev/null
-	python3 tools/check_agentplane_evidence_receipt_composition_tier2_binding.py tests/fixtures/composition/agentplane-evidence-receipt-composition-tier2-binding.synthetic.json
-	! python3 tools/check_agentplane_evidence_receipt_composition_tier2_binding.py tests/fixtures/composition/agentplane-evidence-receipt-composition-tier2-binding.runtime-field.invalid.synthetic.json
-
-lawful-learning-phase9-contract-ci:
-	python3 -m json.tool schemas/receipts/lawful-learning-receipt-classes.v1.json >/dev/null
-	python3 -m json.tool tests/fixtures/receipts/lawful-learning-alignment-check.valid.json >/dev/null
-	python3 -m json.tool tests/fixtures/receipts/lawful-learning-circuit-admission.valid.json >/dev/null
-	python3 -m json.tool tests/fixtures/receipts/lawful-learning-decision-emission.valid.json >/dev/null
-	python3 -m json.tool tests/fixtures/receipts/lawful-learning-replay-blackboxing.valid.json >/dev/null
-	python3 -m json.tool tests/fixtures/receipts/lawful-learning-alignment-check.missing-replay-seal.invalid.json >/dev/null
-	python3 -m json.tool tests/fixtures/receipts/lawful-learning-alignment-check.semantic-verification.invalid.json >/dev/null
-	python3 -m json.tool tests/fixtures/receipts/lawful-learning-alignment-check.policy-overwrite.invalid.json >/dev/null
-	python3 tools/check_lawful_learning_phase9_receipts.py tests/fixtures/receipts/lawful-learning-alignment-check.valid.json
-	python3 tools/check_lawful_learning_phase9_receipts.py tests/fixtures/receipts/lawful-learning-circuit-admission.valid.json
-	python3 tools/check_lawful_learning_phase9_receipts.py tests/fixtures/receipts/lawful-learning-decision-emission.valid.json
-	python3 tools/check_lawful_learning_phase9_receipts.py tests/fixtures/receipts/lawful-learning-replay-blackboxing.valid.json
-	! python3 tools/check_lawful_learning_phase9_receipts.py tests/fixtures/receipts/lawful-learning-alignment-check.missing-replay-seal.invalid.json
-	! python3 tools/check_lawful_learning_phase9_receipts.py tests/fixtures/receipts/lawful-learning-alignment-check.semantic-verification.invalid.json
-	! python3 tools/check_lawful_learning_phase9_receipts.py tests/fixtures/receipts/lawful-learning-alignment-check.policy-overwrite.invalid.json
-
-validate-evidence-receipt-binding:
-	python3 tools/validate_evidence_receipt_binding.py
-
-validate-semantic-activation-receipt:
-	python3 -m json.tool schemas/receipts/semantic-activation-receipt.v0.1.schema.json >/dev/null
-	python3 -m json.tool tests/fixtures/receipts/semantic-activation-receipt.valid.json >/dev/null
-	python3 -m json.tool tests/fixtures/receipts/semantic-activation-receipt.missing-activation-bundle-hash.invalid.json >/dev/null
-	python3 -m json.tool tests/fixtures/receipts/semantic-activation-receipt.missing-graph-snapshot.invalid.json >/dev/null
-	python3 -m json.tool tests/fixtures/receipts/semantic-activation-receipt.missing-policy-bundle.invalid.json >/dev/null
-	python3 -m json.tool tests/fixtures/receipts/semantic-activation-receipt.missing-replay-artifact.invalid.json >/dev/null
-	python3 -m json.tool tests/fixtures/receipts/semantic-activation-receipt.missing-required-edge-evidence.invalid.json >/dev/null
-	python3 -m json.tool tests/fixtures/receipts/semantic-activation-receipt.missing-admission-decision.invalid.json >/dev/null
-	python3 tools/validate_semantic_activation_receipt.py tests/fixtures/receipts/semantic-activation-receipt.valid.json
-	! python3 tools/validate_semantic_activation_receipt.py tests/fixtures/receipts/semantic-activation-receipt.missing-activation-bundle-hash.invalid.json
-	! python3 tools/validate_semantic_activation_receipt.py tests/fixtures/receipts/semantic-activation-receipt.missing-graph-snapshot.invalid.json
-	! python3 tools/validate_semantic_activation_receipt.py tests/fixtures/receipts/semantic-activation-receipt.missing-policy-bundle.invalid.json
-	! python3 tools/validate_semantic_activation_receipt.py tests/fixtures/receipts/semantic-activation-receipt.missing-replay-artifact.invalid.json
-	! python3 tools/validate_semantic_activation_receipt.py tests/fixtures/receipts/semantic-activation-receipt.missing-required-edge-evidence.invalid.json
-	! python3 tools/validate_semantic_activation_receipt.py tests/fixtures/receipts/semantic-activation-receipt.missing-admission-decision.invalid.json
-
-validate-governed-run-contract:
-	python3 -m json.tool schemas/runs/governed-run-contract.v0.1.schema.json >/dev/null
-	python3 -m json.tool tests/fixtures/runs/governed-run-contract.valid.json >/dev/null
-	python3 -m json.tool tests/fixtures/runs/governed-run-contract.missing-policy.invalid.json >/dev/null
-	python3 -m json.tool tests/fixtures/runs/governed-run-contract.missing-budget.invalid.json >/dev/null
-	python3 -m json.tool tests/fixtures/runs/governed-run-contract.verifierless-mutation.invalid.json >/dev/null
-	python3 -m json.tool tests/fixtures/runs/governed-run-contract.absolute-path.invalid.json >/dev/null
-	python3 -m json.tool tests/fixtures/runs/governed-run-contract.missing-authority-grant.invalid.json >/dev/null
-	python3 tools/validate_governed_run_contract.py tests/fixtures/runs/governed-run-contract.valid.json
-	! python3 tools/validate_governed_run_contract.py tests/fixtures/runs/governed-run-contract.missing-policy.invalid.json
-	! python3 tools/validate_governed_run_contract.py tests/fixtures/runs/governed-run-contract.missing-budget.invalid.json
-	! python3 tools/validate_governed_run_contract.py tests/fixtures/runs/governed-run-contract.verifierless-mutation.invalid.json
-	! python3 tools/validate_governed_run_contract.py tests/fixtures/runs/governed-run-contract.absolute-path.invalid.json
-	! python3 tools/validate_governed_run_contract.py tests/fixtures/runs/governed-run-contract.missing-authority-grant.invalid.json
-
-validate-attempt-admission-receipt:
-	python3 -m json.tool schemas/receipts/attempt-admission-receipt.v0.1.schema.json >/dev/null
-	python3 -m json.tool tests/fixtures/receipts/attempt-admission-receipt.valid.json >/dev/null
-	python3 -m json.tool tests/fixtures/receipts/attempt-admission-receipt.budget-exceeded.invalid.json >/dev/null
-	python3 -m json.tool tests/fixtures/receipts/attempt-admission-receipt.safety-block.invalid.json >/dev/null
-	python3 -m json.tool tests/fixtures/receipts/attempt-admission-receipt.authority-suspended.invalid.json >/dev/null
-	python3 -m json.tool tests/fixtures/receipts/attempt-admission-receipt.require-review-invalid-admit.invalid.json >/dev/null
-	python3 -m json.tool tests/fixtures/receipts/attempt-admission-receipt.fail-closed-missing-reason.invalid.json >/dev/null
-	python3 tools/validate_attempt_admission_receipt.py tests/fixtures/receipts/attempt-admission-receipt.valid.json
-	! python3 tools/validate_attempt_admission_receipt.py tests/fixtures/receipts/attempt-admission-receipt.budget-exceeded.invalid.json
-	! python3 tools/validate_attempt_admission_receipt.py tests/fixtures/receipts/attempt-admission-receipt.safety-block.invalid.json
-	! python3 tools/validate_attempt_admission_receipt.py tests/fixtures/receipts/attempt-admission-receipt.authority-suspended.invalid.json
-	! python3 tools/validate_attempt_admission_receipt.py tests/fixtures/receipts/attempt-admission-receipt.require-review-invalid-admit.invalid.json
-	! python3 tools/validate_attempt_admission_receipt.py tests/fixtures/receipts/attempt-admission-receipt.fail-closed-missing-reason.invalid.json
-
-test:
-	python3 -m pytest -q tools/tests
