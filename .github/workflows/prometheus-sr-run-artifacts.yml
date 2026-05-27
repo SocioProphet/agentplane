@@ -1,0 +1,51 @@
+name: prometheus-sr-run-artifacts
+
+on:
+  pull_request:
+    paths:
+      - "schemas/symbolic-regression/**"
+      - "tests/fixtures/symbolic-regression/**"
+      - "tools/validate_sr_run_artifact.py"
+      - "tools/validate_sr_replay_ref.py"
+      - "docs/symbolic-regression/**"
+      - ".github/workflows/prometheus-sr-run-artifacts.yml"
+  push:
+    branches:
+      - main
+    paths:
+      - "schemas/symbolic-regression/**"
+      - "tests/fixtures/symbolic-regression/**"
+      - "tools/validate_sr_run_artifact.py"
+      - "tools/validate_sr_replay_ref.py"
+      - "docs/symbolic-regression/**"
+      - ".github/workflows/prometheus-sr-run-artifacts.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-prometheus-sr-run-artifacts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Validate JSON syntax
+        run: |
+          python3 -m json.tool schemas/symbolic-regression/sr-run-artifact.schema.json >/dev/null
+          python3 -m json.tool schemas/symbolic-regression/sr-candidate-ref.schema.json >/dev/null
+          for f in tests/fixtures/symbolic-regression/*.json; do python3 -m json.tool "$f" >/dev/null; done
+      - name: Validate SR run artifact fixtures
+        run: |
+          python3 tools/validate_sr_run_artifact.py tests/fixtures/symbolic-regression/sr-run-artifact.valid.json
+          python3 tools/validate_sr_run_artifact.py tests/fixtures/symbolic-regression/reject_missing_dataset_content_hash.json --expect-invalid
+          python3 tools/validate_sr_run_artifact.py tests/fixtures/symbolic-regression/reject_uuid_replay_hash.json --expect-invalid
+          python3 tools/validate_sr_run_artifact.py tests/fixtures/symbolic-regression/reject-sindy-control-authority-true.json --expect-invalid
+          python3 tools/validate_sr_run_artifact.py tests/fixtures/symbolic-regression/reject_absent_random_seed.json --expect-invalid
+          python3 tools/validate_sr_run_artifact.py tests/fixtures/symbolic-regression/reject_promoted_inconsistent_units.json --expect-invalid
+          python3 tools/validate_sr_run_artifact.py tests/fixtures/symbolic-regression/reject_tampered_replay_hash.json --expect-invalid
+      - name: Validate replay reference resolution
+        run: |
+          python3 tools/validate_sr_replay_ref.py tests/fixtures/symbolic-regression/reject_missing_replay_on_proposal.proposal.json --fixture-store tests/fixtures/symbolic-regression/store/ --expect-invalid
