@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://socioprophet.io/schemas/agentplane/automated-shacl-gate-evaluation/v0.1.0",
+  "title": "PrometheusAutomatedShaclGateEvaluation",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "evaluationId",
+    "policyId",
+    "candidateId",
+    "datasetSize",
+    "nmse",
+    "complexity",
+    "unitsStatus",
+    "replayHashVerified",
+    "chronosGovernanceFlags",
+    "requestedReviewSurface",
+    "finalAdmissionRequested",
+    "issuedAt"
+  ],
+  "properties": {
+    "evaluationId": { "type": "string", "format": "uri" },
+    "policyId": { "type": "string", "format": "uri" },
+    "candidateId": { "type": "string", "format": "uri" },
+    "datasetSize": { "type": "integer", "minimum": 0 },
+    "nmse": { "type": "number", "minimum": 0 },
+    "complexity": { "type": "integer", "minimum": 1 },
+    "unitsStatus": {
+      "type": "string",
+      "enum": ["consistent", "inconsistent", "unknown", "unchecked"]
+    },
+    "replayHashVerified": { "type": "boolean" },
+    "chronosGovernanceFlags": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "requestedReviewSurface": {
+      "type": "string",
+      "enum": ["automated_shacl_gate", "git_pr", "prophet_platform_ui", "cli", "sparql_editor", "webprotege"]
+    },
+    "finalAdmissionRequested": { "type": "boolean" },
+    "issuedAt": { "type": "string", "format": "date-time" }
+  }
+}
