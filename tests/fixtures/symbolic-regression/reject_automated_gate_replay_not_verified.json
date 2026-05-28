@@ -1,0 +1,14 @@
+{
+  "evaluationId": "urn:prometheus:automated-gate-evaluation:replay:001",
+  "policyId": "urn:prometheus:automated-shacl-gate-policy:v0.1.0",
+  "candidateId": "urn:sr-candidate:feynman-i-6-2a:001",
+  "datasetSize": 32,
+  "nmse": 0.000001,
+  "complexity": 3,
+  "unitsStatus": "consistent",
+  "replayHashVerified": false,
+  "chronosGovernanceFlags": [],
+  "requestedReviewSurface": "automated_shacl_gate",
+  "finalAdmissionRequested": false,
+  "issuedAt": "2026-05-27T22:06:00Z"
+}

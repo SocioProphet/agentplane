@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://socioprophet.io/schemas/agentplane/automated-shacl-gate-policy/v0.1.0",
+  "title": "PrometheusAutomatedShaclGatePolicy",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "policyId",
+    "policyVersion",
+    "minimumDatasetSize",
+    "nmseCeiling",
+    "complexityCeiling",
+    "requiredUnitsStatus",
+    "replayHashVerificationRequired",
+    "maxChronosGovernanceFlags",
+    "eligibleReviewSurface",
+    "decisionBoundary",
+    "finalAdmissionAllowed",
+    "issuedAt"
+  ],
+  "properties": {
+    "policyId": {
+      "type": "string",
+      "format": "uri"
+    },
+    "policyVersion": {
+      "type": "string"
+    },
+    "minimumDatasetSize": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "nmseCeiling": {
+      "type": "number",
+      "minimum": 0
+    },
+    "complexityCeiling": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "requiredUnitsStatus": {
+      "type": "string",
+      "const": "consistent"
+    },
+    "replayHashVerificationRequired": {
+      "type": "boolean",
+      "const": true
+    },
+    "maxChronosGovernanceFlags": {
+      "type": "integer",
+      "const": 0
+    },
+    "eligibleReviewSurface": {
+      "type": "string",
+      "const": "automated_shacl_gate"
+    },
+    "decisionBoundary": {
+      "type": "string",
+      "const": "eligibility_only"
+    },
+    "finalAdmissionAllowed": {
+      "type": "boolean",
+      "const": false
+    },
+    "issuedAt": {
+      "type": "string",
+      "format": "date-time"
+    }
+  }
+}

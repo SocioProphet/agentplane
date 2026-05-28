@@ -1,0 +1,49 @@
+name: prometheus-automated-gate-policy
+
+on:
+  pull_request:
+    paths:
+      - "schemas/symbolic-regression/automated-shacl-gate-policy.schema.json"
+      - "schemas/symbolic-regression/automated-shacl-gate-evaluation.schema.json"
+      - "tests/fixtures/symbolic-regression/automated-gate-*.json"
+      - "tests/fixtures/symbolic-regression/reject_automated_gate_*.json"
+      - "tools/validate_prometheus_automated_gate_policy.py"
+      - "docs/symbolic-regression/automated-shacl-gate-policy.md"
+      - ".github/workflows/prometheus-automated-gate-policy.yml"
+  push:
+    branches:
+      - main
+    paths:
+      - "schemas/symbolic-regression/automated-shacl-gate-policy.schema.json"
+      - "schemas/symbolic-regression/automated-shacl-gate-evaluation.schema.json"
+      - "tests/fixtures/symbolic-regression/automated-gate-*.json"
+      - "tests/fixtures/symbolic-regression/reject_automated_gate_*.json"
+      - "tools/validate_prometheus_automated_gate_policy.py"
+      - "docs/symbolic-regression/automated-shacl-gate-policy.md"
+      - ".github/workflows/prometheus-automated-gate-policy.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-prometheus-automated-gate-policy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Validate accepted automated gate fixture
+        run: |
+          python3 tools/validate_prometheus_automated_gate_policy.py \
+            --policy tests/fixtures/symbolic-regression/automated-gate-policy.valid.json \
+            --evaluation tests/fixtures/symbolic-regression/automated-gate-evaluation.valid.json
+      - name: Validate rejected automated gate fixtures
+        run: |
+          for fixture in tests/fixtures/symbolic-regression/reject_automated_gate_*.json; do
+            python3 tools/validate_prometheus_automated_gate_policy.py \
+              --policy tests/fixtures/symbolic-regression/automated-gate-policy.valid.json \
+              --evaluation "$fixture" \
+              --expect-invalid
+          done

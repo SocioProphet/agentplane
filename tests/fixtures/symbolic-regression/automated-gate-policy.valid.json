@@ -1,0 +1,14 @@
+{
+  "policyId": "urn:prometheus:automated-shacl-gate-policy:v0.1.0",
+  "policyVersion": "0.1.0",
+  "minimumDatasetSize": 4,
+  "nmseCeiling": 0.001,
+  "complexityCeiling": 10,
+  "requiredUnitsStatus": "consistent",
+  "replayHashVerificationRequired": true,
+  "maxChronosGovernanceFlags": 0,
+  "eligibleReviewSurface": "automated_shacl_gate",
+  "decisionBoundary": "eligibility_only",
+  "finalAdmissionAllowed": false,
+  "issuedAt": "2026-05-27T22:00:00Z"
+}
