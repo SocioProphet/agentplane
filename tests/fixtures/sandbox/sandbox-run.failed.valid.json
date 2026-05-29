@@ -1,0 +1,29 @@
+{
+  "schemaVersion": "0.1.0",
+  "sandboxRunId": "agentplane:sandbox-run:failed:scope-d-example",
+  "requestRef": "environment:validate-change-v2-request:scope-d-example",
+  "executorPlane": "AgentPlane",
+  "executionMode": "synthetic_fixture",
+  "runStatus": "sandbox_failed",
+  "baselineRef": "workspace://scope-d/main",
+  "changedServiceRefs": [],
+  "routingMode": "synthetic_no_network",
+  "asyncIsolationMode": "synthetic_no_network",
+  "statefulResourceMode": "synthetic_no_network",
+  "evidenceRefs": [
+    "evidence://agentplane/sandbox-run/scope-d-example/synthetic-failed"
+  ],
+  "receiptRefs": [
+    "receipt://agentplane/sandbox-run/scope-d-example/synthetic-failed"
+  ],
+  "failureCodes": [
+    "synthetic_validation_failed"
+  ],
+  "teardownState": "not_required_synthetic",
+  "issuedAt": "2026-05-29T18:02:00Z",
+  "nonClaims": [
+    "Failed synthetic sandbox run does not execute live infrastructure.",
+    "Failed synthetic sandbox run blocks validation-success claims.",
+    "Failed synthetic sandbox run does not certify Signadot-style runtime parity."
+  ]
+}

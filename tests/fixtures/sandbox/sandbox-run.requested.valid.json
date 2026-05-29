@@ -1,0 +1,23 @@
+{
+  "schemaVersion": "0.1.0",
+  "sandboxRunId": "agentplane:sandbox-run:requested:scope-d-example",
+  "requestRef": "environment:validate-change-v2-request:scope-d-example",
+  "executorPlane": "AgentPlane",
+  "executionMode": "synthetic_fixture",
+  "runStatus": "sandbox_requested",
+  "baselineRef": "workspace://scope-d/main",
+  "changedServiceRefs": [],
+  "routingMode": "not_configured",
+  "asyncIsolationMode": "not_configured",
+  "statefulResourceMode": "not_configured",
+  "evidenceRefs": [],
+  "receiptRefs": [],
+  "failureCodes": [],
+  "teardownState": "not_required_synthetic",
+  "issuedAt": "2026-05-29T18:00:00Z",
+  "nonClaims": [
+    "Requested sandbox run does not execute live infrastructure.",
+    "Requested sandbox run has no evidence yet.",
+    "Requested sandbox run does not certify Signadot-style runtime parity."
+  ]
+}

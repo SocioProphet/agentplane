@@ -1,0 +1,25 @@
+name: sandbox-run-synthetic-contract
+
+on:
+  pull_request:
+    branches: [ main ]
+    paths:
+      - "schemas/sandbox/sandbox-run.v0.1.schema.json"
+      - "tests/fixtures/sandbox/sandbox-run.*.json"
+      - "tools/validate_sandbox_run.py"
+      - ".github/workflows/sandbox-run-synthetic-contract.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-sandbox-run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Validate synthetic SandboxRun fixtures
+        run: python3 tools/validate_sandbox_run.py

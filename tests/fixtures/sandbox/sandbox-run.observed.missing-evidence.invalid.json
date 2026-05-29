@@ -1,0 +1,23 @@
+{
+  "schemaVersion": "0.1.0",
+  "sandboxRunId": "agentplane:sandbox-run:observed:missing-evidence",
+  "requestRef": "environment:validate-change-v2-request:scope-d-example",
+  "executorPlane": "AgentPlane",
+  "executionMode": "synthetic_fixture",
+  "runStatus": "sandbox_observed",
+  "baselineRef": "workspace://scope-d/main",
+  "changedServiceRefs": [],
+  "routingMode": "synthetic_no_network",
+  "asyncIsolationMode": "synthetic_no_network",
+  "statefulResourceMode": "synthetic_no_network",
+  "evidenceRefs": [],
+  "receiptRefs": [
+    "receipt://agentplane/sandbox-run/scope-d-example/synthetic-observed"
+  ],
+  "failureCodes": [],
+  "teardownState": "not_required_synthetic",
+  "issuedAt": "2026-05-29T18:03:00Z",
+  "nonClaims": [
+    "Invalid fixture: observed status without evidence must be rejected."
+  ]
+}
