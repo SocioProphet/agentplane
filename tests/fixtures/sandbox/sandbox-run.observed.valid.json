@@ -1,0 +1,27 @@
+{
+  "schemaVersion": "0.1.0",
+  "sandboxRunId": "agentplane:sandbox-run:observed:scope-d-example",
+  "requestRef": "environment:validate-change-v2-request:scope-d-example",
+  "executorPlane": "AgentPlane",
+  "executionMode": "synthetic_fixture",
+  "runStatus": "sandbox_observed",
+  "baselineRef": "workspace://scope-d/main",
+  "changedServiceRefs": [],
+  "routingMode": "synthetic_no_network",
+  "asyncIsolationMode": "synthetic_no_network",
+  "statefulResourceMode": "synthetic_no_network",
+  "evidenceRefs": [
+    "evidence://agentplane/sandbox-run/scope-d-example/synthetic-observed"
+  ],
+  "receiptRefs": [
+    "receipt://agentplane/sandbox-run/scope-d-example/synthetic-observed"
+  ],
+  "failureCodes": [],
+  "teardownState": "not_required_synthetic",
+  "issuedAt": "2026-05-29T18:01:00Z",
+  "nonClaims": [
+    "Observed synthetic sandbox run does not execute live infrastructure.",
+    "Observed synthetic sandbox run proves contract shape only.",
+    "Observed synthetic sandbox run does not certify Signadot-style runtime parity."
+  ]
+}
