@@ -1,0 +1,21 @@
+{
+  "schemaVersion": "agentplane.wallguard-collaboration-admission.v0.1",
+  "recordType": "WallGuardCollaborationAdmissionReceipt",
+  "receipt_id": "wallguard-collab-admission:missing-context-invalid-001",
+  "collaboration_request_id": "collab-request:missing-wall-context:001",
+  "source_agent_wall_context_ref": "agent-wall-context://agent-alpha/unknown",
+  "target_agent_wall_context_ref": "agent-wall-context://agent-beta/client-a/matter-x",
+  "source_wall_ref": "unknown",
+  "target_wall_ref": "wall://client-a/matter-x",
+  "collaboration_action": "subagent_delegation",
+  "admitted": true,
+  "admission_decision": "admit",
+  "reason_code": "same_wall_allowed",
+  "wall_decision_ref": "wallguard-decision://missing-context-invalid-001",
+  "wall_decision_outcome": "allow",
+  "evidence_refs": [
+    "SocioProphet/ProCybernetica#103"
+  ],
+  "receipt_hash": "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+  "issued_at": "2026-05-29T00:00:00Z"
+}
