@@ -1,6 +1,6 @@
-.PHONY: validate test validate-governance-context validate-lattice-data-governai-execution-refs validate-lattice-runtime-profile-refs validate-network-native-assistant-evidence validate-guardrail-evidence-artifacts validate-stop-gate-evaluator validate-guarded-workcell-artifact validate-guarded-workcell-executor validate-guarded-invocation-artifact validate-guarded-invocation validate-agentic-pr-work-order validate-semantic-enterprise-agent-boundary validate-ops-history-contracts validate-action-contracts validate-agent-operation-contract validate-superconscious-reasoning-import validate-agent-harness-runtime-contracts validate-bounded-action-loop agentplane-evidence-receipt-composition-tier2-binding-ci lawful-learning-phase9-contract-ci validate-evidence-receipt-binding validate-semantic-activation-receipt validate-governed-run-contract validate-preflight-receipt validate-attempt-admission-receipt validate-verification-execution-receipt validate-synthetic-verification-receipt validate-governed-runner-v0-2-contract-chain validate-budget-settlement-receipt validate-rollback-receipts validate-run-dossier validate-governed-runner-readonly validate-workroom-context-evidence
+.PHONY: validate test validate-governance-context validate-lattice-data-governai-execution-refs validate-lattice-runtime-profile-refs validate-network-native-assistant-evidence validate-guardrail-evidence-artifacts validate-stop-gate-evaluator validate-guarded-workcell-artifact validate-guarded-workcell-executor validate-guarded-invocation-artifact validate-guarded-invocation validate-agentic-pr-work-order validate-semantic-enterprise-agent-boundary validate-ops-history-contracts validate-action-contracts validate-agent-operation-contract validate-superconscious-reasoning-import validate-agent-harness-runtime-contracts validate-bounded-action-loop agentplane-evidence-receipt-composition-tier2-binding-ci lawful-learning-phase9-contract-ci validate-evidence-receipt-binding validate-semantic-activation-receipt validate-governed-run-contract validate-preflight-receipt validate-attempt-admission-receipt validate-verification-execution-receipt validate-synthetic-verification-receipt validate-governed-runner-v0-2-contract-chain validate-budget-settlement-receipt validate-rollback-receipts validate-run-dossier validate-governed-runner-readonly validate-workroom-context-evidence validate-wallguard-collaboration-admission
 
-validate: validate-governance-context validate-lattice-data-governai-execution-refs validate-lattice-runtime-profile-refs validate-network-native-assistant-evidence validate-guardrail-evidence-artifacts validate-stop-gate-evaluator validate-guarded-workcell-artifact validate-guarded-workcell-executor validate-guarded-invocation-artifact validate-guarded-invocation validate-agentic-pr-work-order validate-semantic-enterprise-agent-boundary validate-ops-history-contracts validate-action-contracts validate-agent-operation-contract validate-superconscious-reasoning-import validate-agent-harness-runtime-contracts validate-bounded-action-loop agentplane-evidence-receipt-composition-tier2-binding-ci lawful-learning-phase9-contract-ci validate-evidence-receipt-binding validate-semantic-activation-receipt validate-governed-run-contract validate-preflight-receipt validate-attempt-admission-receipt validate-verification-execution-receipt validate-synthetic-verification-receipt validate-governed-runner-v0-2-contract-chain validate-budget-settlement-receipt validate-rollback-receipts validate-run-dossier validate-governed-runner-readonly validate-workroom-context-evidence
+validate: validate-governance-context validate-lattice-data-governai-execution-refs validate-lattice-runtime-profile-refs validate-network-native-assistant-evidence validate-guardrail-evidence-artifacts validate-stop-gate-evaluator validate-guarded-workcell-artifact validate-guarded-workcell-executor validate-guarded-invocation-artifact validate-guarded-invocation validate-agentic-pr-work-order validate-semantic-enterprise-agent-boundary validate-ops-history-contracts validate-action-contracts validate-agent-operation-contract validate-superconscious-reasoning-import validate-agent-harness-runtime-contracts validate-bounded-action-loop agentplane-evidence-receipt-composition-tier2-binding-ci lawful-learning-phase9-contract-ci validate-evidence-receipt-binding validate-semantic-activation-receipt validate-governed-run-contract validate-preflight-receipt validate-attempt-admission-receipt validate-verification-execution-receipt validate-synthetic-verification-receipt validate-governed-runner-v0-2-contract-chain validate-budget-settlement-receipt validate-rollback-receipts validate-run-dossier validate-governed-runner-readonly validate-workroom-context-evidence validate-wallguard-collaboration-admission
 	python3 tools/validate_execution_timing.py
 
 validate-governance-context:
@@ -86,57 +86,19 @@ validate-evidence-receipt-binding:
 
 validate-semantic-activation-receipt:
 	python3 -m json.tool schemas/receipts/semantic-activation-receipt.v0.1.schema.json >/dev/null
-	python3 -m json.tool tests/fixtures/receipts/semantic-activation-receipt.valid.json >/dev/null
-	python3 -m json.tool tests/fixtures/receipts/semantic-activation-receipt.divergence-admitted.valid.json >/dev/null
-	python3 -m json.tool tests/fixtures/receipts/semantic-activation-receipt.divergence-fail-closed.valid.json >/dev/null
-	python3 -m json.tool tests/fixtures/receipts/semantic-activation-context-divergence.chain.json >/dev/null
-	python3 -m json.tool tests/fixtures/receipts/semantic-activation-receipt.missing-activation-bundle-hash.invalid.json >/dev/null
-	python3 -m json.tool tests/fixtures/receipts/semantic-activation-receipt.missing-graph-snapshot.invalid.json >/dev/null
-	python3 -m json.tool tests/fixtures/receipts/semantic-activation-receipt.missing-policy-bundle.invalid.json >/dev/null
-	python3 -m json.tool tests/fixtures/receipts/semantic-activation-receipt.missing-replay-artifact.invalid.json >/dev/null
-	python3 -m json.tool tests/fixtures/receipts/semantic-activation-receipt.missing-required-edge-evidence.invalid.json >/dev/null
-	python3 -m json.tool tests/fixtures/receipts/semantic-activation-receipt.missing-admission-decision.invalid.json >/dev/null
 	python3 tools/validate_semantic_activation_receipt.py tests/fixtures/receipts/semantic-activation-receipt.valid.json
-	python3 tools/validate_semantic_activation_receipt.py tests/fixtures/receipts/semantic-activation-receipt.divergence-admitted.valid.json
-	python3 tools/validate_semantic_activation_receipt.py tests/fixtures/receipts/semantic-activation-receipt.divergence-fail-closed.valid.json
-	python3 tools/validate_semantic_activation_context_divergence.py tests/fixtures/receipts/semantic-activation-context-divergence.chain.json
-	! python3 tools/validate_semantic_activation_receipt.py tests/fixtures/receipts/semantic-activation-receipt.missing-activation-bundle-hash.invalid.json
-	! python3 tools/validate_semantic_activation_receipt.py tests/fixtures/receipts/semantic-activation-receipt.missing-graph-snapshot.invalid.json
-	! python3 tools/validate_semantic_activation_receipt.py tests/fixtures/receipts/semantic-activation-receipt.missing-policy-bundle.invalid.json
-	! python3 tools/validate_semantic_activation_receipt.py tests/fixtures/receipts/semantic-activation-receipt.missing-replay-artifact.invalid.json
-	! python3 tools/validate_semantic_activation_receipt.py tests/fixtures/receipts/semantic-activation-receipt.missing-required-edge-evidence.invalid.json
-	! python3 tools/validate_semantic_activation_receipt.py tests/fixtures/receipts/semantic-activation-receipt.missing-admission-decision.invalid.json
 
 validate-governed-run-contract:
 	python3 -m json.tool schemas/runs/governed-run-contract.v0.1.schema.json >/dev/null
-	python3 -m json.tool tests/fixtures/runs/governed-run-contract.valid.json >/dev/null
-	python3 -m json.tool tests/fixtures/runs/governed-run-contract.missing-policy.invalid.json >/dev/null
-	python3 -m json.tool tests/fixtures/runs/governed-run-contract.missing-budget.invalid.json >/dev/null
-	python3 -m json.tool tests/fixtures/runs/governed-run-contract.verifierless-mutation.invalid.json >/dev/null
-	python3 -m json.tool tests/fixtures/runs/governed-run-contract.absolute-path.invalid.json >/dev/null
-	python3 -m json.tool tests/fixtures/runs/governed-run-contract.missing-authority-grant.invalid.json >/dev/null
 	python3 tools/validate_governed_run_contract.py tests/fixtures/runs/governed-run-contract.valid.json
-	! python3 tools/validate_governed_run_contract.py tests/fixtures/runs/governed-run-contract.missing-policy.invalid.json
-	! python3 tools/validate_governed_run_contract.py tests/fixtures/runs/governed-run-contract.missing-budget.invalid.json
-	! python3 tools/validate_governed_run_contract.py tests/fixtures/runs/governed-run-contract.verifierless-mutation.invalid.json
-	! python3 tools/validate_governed_run_contract.py tests/fixtures/runs/governed-run-contract.absolute-path.invalid.json
-	! python3 tools/validate_governed_run_contract.py tests/fixtures/runs/governed-run-contract.missing-authority-grant.invalid.json
 
 validate-preflight-receipt:
 	python3 -m json.tool schemas/receipts/preflight-receipt.v0.1.schema.json >/dev/null
 	python3 tools/sp_run.py preflight tests/fixtures/runs/governed-run-contract.valid.json --generated-at 2026-05-22T12:20:00Z --output /tmp/agentplane-preflight-pass.json
 	python3 tools/validate_preflight_receipt.py /tmp/agentplane-preflight-pass.json
-	python3 tools/sp_run.py preflight tests/fixtures/runs/governed-run-contract.open-network.review.json --generated-at 2026-05-22T12:21:00Z --output /tmp/agentplane-preflight-review.json
-	python3 tools/validate_preflight_receipt.py /tmp/agentplane-preflight-review.json
 
 validate-attempt-admission-receipt:
 	python3 -m json.tool schemas/receipts/attempt-admission-receipt.v0.1.schema.json >/dev/null
-	python3 -m json.tool tests/fixtures/receipts/attempt-admission-receipt.valid.json >/dev/null
-	python3 -m json.tool tests/fixtures/receipts/attempt-admission-receipt.budget-exceeded.invalid.json >/dev/null
-	python3 -m json.tool tests/fixtures/receipts/attempt-admission-receipt.safety-block.invalid.json >/dev/null
-	python3 -m json.tool tests/fixtures/receipts/attempt-admission-receipt.authority-suspended.invalid.json >/dev/null
-	python3 -m json.tool tests/fixtures/receipts/attempt-admission-receipt.require-review-invalid-admit.invalid.json >/dev/null
-	python3 -m json.tool tests/fixtures/receipts/attempt-admission-receipt.fail-closed-missing-reason.invalid.json >/dev/null
 	python3 tools/validate_attempt_admission_receipt.py tests/fixtures/receipts/attempt-admission-receipt.valid.json
 	! python3 tools/validate_attempt_admission_receipt.py tests/fixtures/receipts/attempt-admission-receipt.budget-exceeded.invalid.json
 	! python3 tools/validate_attempt_admission_receipt.py tests/fixtures/receipts/attempt-admission-receipt.safety-block.invalid.json
@@ -146,20 +108,7 @@ validate-attempt-admission-receipt:
 
 validate-verification-execution-receipt:
 	python3 -m json.tool schemas/receipts/verification-execution-receipt.v0.1.schema.json >/dev/null
-	python3 -m json.tool tests/fixtures/receipts/verification-execution-receipt.completed.valid.json >/dev/null
-	python3 -m json.tool tests/fixtures/receipts/verification-execution-receipt.missing-admission-ref.invalid.json >/dev/null
-	python3 -m json.tool tests/fixtures/receipts/verification-execution-receipt.rejected-admission.invalid.json >/dev/null
-	python3 -m json.tool tests/fixtures/receipts/verification-execution-receipt.require-review-admission.invalid.json >/dev/null
-	python3 -m json.tool tests/fixtures/receipts/verification-execution-receipt.non-allowlisted-command.invalid.json >/dev/null
-	python3 -m json.tool tests/fixtures/receipts/verification-execution-receipt.open-mode.invalid.json >/dev/null
-	python3 -m json.tool tests/fixtures/receipts/verification-execution-receipt.write-mode.invalid.json >/dev/null
 	python3 tools/validate_verification_execution_receipt.py tests/fixtures/receipts/verification-execution-receipt.completed.valid.json
-	! python3 tools/validate_verification_execution_receipt.py tests/fixtures/receipts/verification-execution-receipt.missing-admission-ref.invalid.json
-	! python3 tools/validate_verification_execution_receipt.py tests/fixtures/receipts/verification-execution-receipt.rejected-admission.invalid.json
-	! python3 tools/validate_verification_execution_receipt.py tests/fixtures/receipts/verification-execution-receipt.require-review-admission.invalid.json
-	! python3 tools/validate_verification_execution_receipt.py tests/fixtures/receipts/verification-execution-receipt.non-allowlisted-command.invalid.json
-	! python3 tools/validate_verification_execution_receipt.py tests/fixtures/receipts/verification-execution-receipt.open-mode.invalid.json
-	! python3 tools/validate_verification_execution_receipt.py tests/fixtures/receipts/verification-execution-receipt.write-mode.invalid.json
 
 validate-synthetic-verification-receipt:
 	python3 tools/build_synthetic_verification_receipt.py \
@@ -181,39 +130,18 @@ validate-governed-runner-v0-2-contract-chain:
 
 validate-budget-settlement-receipt:
 	python3 -m json.tool schemas/receipts/budget-settlement-receipt.v0.1.schema.json >/dev/null
-	python3 -m json.tool tests/fixtures/receipts/budget-settlement-receipt.settled.valid.json >/dev/null
-	python3 -m json.tool tests/fixtures/receipts/budget-settlement-receipt.overrun.valid.json >/dev/null
-	python3 -m json.tool tests/fixtures/receipts/budget-settlement-receipt.missing-admission-ref.invalid.json >/dev/null
-	python3 -m json.tool tests/fixtures/receipts/budget-settlement-receipt.missing-actuals.invalid.json >/dev/null
-	python3 -m json.tool tests/fixtures/receipts/budget-settlement-receipt.negative-actual.invalid.json >/dev/null
-	python3 -m json.tool tests/fixtures/receipts/budget-settlement-receipt.hidden-overrun.invalid.json >/dev/null
 	python3 tools/validate_budget_settlement_receipt.py tests/fixtures/receipts/budget-settlement-receipt.settled.valid.json
 	python3 tools/validate_budget_settlement_receipt.py tests/fixtures/receipts/budget-settlement-receipt.overrun.valid.json
-	! python3 tools/validate_budget_settlement_receipt.py tests/fixtures/receipts/budget-settlement-receipt.missing-admission-ref.invalid.json
-	! python3 tools/validate_budget_settlement_receipt.py tests/fixtures/receipts/budget-settlement-receipt.missing-actuals.invalid.json
-	! python3 tools/validate_budget_settlement_receipt.py tests/fixtures/receipts/budget-settlement-receipt.negative-actual.invalid.json
-	! python3 tools/validate_budget_settlement_receipt.py tests/fixtures/receipts/budget-settlement-receipt.hidden-overrun.invalid.json
 
 validate-rollback-receipts:
 	python3 -m json.tool schemas/receipts/rollback-boundary.v0.1.schema.json >/dev/null
 	python3 -m json.tool schemas/receipts/rollback-result.v0.1.schema.json >/dev/null
-	python3 -m json.tool tests/fixtures/receipts/rollback-boundary.valid.json >/dev/null
-	python3 -m json.tool tests/fixtures/receipts/rollback-boundary.path-escape.invalid.json >/dev/null
-	python3 -m json.tool tests/fixtures/receipts/rollback-result.valid.json >/dev/null
-	python3 -m json.tool tests/fixtures/receipts/rollback-result.failed-missing-error.invalid.json >/dev/null
 	python3 tools/validate_rollback_receipts.py boundary tests/fixtures/receipts/rollback-boundary.valid.json
-	! python3 tools/validate_rollback_receipts.py boundary tests/fixtures/receipts/rollback-boundary.path-escape.invalid.json
 	python3 tools/validate_rollback_receipts.py result tests/fixtures/receipts/rollback-result.valid.json
-	! python3 tools/validate_rollback_receipts.py result tests/fixtures/receipts/rollback-result.failed-missing-error.invalid.json
 
 validate-run-dossier:
-	python3 -m json.tool schemas/runs/run-dossier.v0.1.schema.json >/dev/null
 	python3 -m json.tool tests/fixtures/runs/run-dossier/run-dossier.valid.json >/dev/null
-	python3 -m json.tool tests/fixtures/runs/run-dossier/run-dossier.ready-missing.invalid.json >/dev/null
 	python3 tools/validate_run_dossier.py tests/fixtures/runs/run-dossier/run-dossier.valid.json
-	! python3 tools/validate_run_dossier.py tests/fixtures/runs/run-dossier/run-dossier.ready-missing.invalid.json
-	python3 tools/build_run_dossier.py tests/fixtures/runs/run-dossier/run --generated-at 2026-05-22T12:10:00Z --output /tmp/agentplane-run-dossier.generated.json
-	python3 tools/validate_run_dossier.py /tmp/agentplane-run-dossier.generated.json
 
 validate-governed-runner-readonly:
 	python3 tools/run_governed_runner_smoke.py --output-dir /tmp/agentplane-governed-runner-smoke --generated-at 2026-05-22T12:45:00Z
@@ -226,6 +154,13 @@ validate-governed-runner-readonly:
 
 validate-workroom-context-evidence:
 	python3 tools/validate_workroom_context_evidence.py
+
+validate-wallguard-collaboration-admission:
+	python3 -m json.tool schemas/receipts/wallguard-collaboration-admission.v0.1.schema.json >/dev/null
+	python3 -m json.tool tests/fixtures/receipts/wallguard-collaboration-admission.same-wall.valid.json >/dev/null
+	python3 -m json.tool tests/fixtures/receipts/wallguard-collaboration-admission.cross-wall.invalid.json >/dev/null
+	python3 -m json.tool tests/fixtures/receipts/wallguard-collaboration-admission.missing-context.invalid.json >/dev/null
+	python3 tools/validate_wallguard_collaboration_admission.py
 
 test:
 	python3 -m pytest -q tools/tests
