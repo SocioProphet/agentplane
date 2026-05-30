@@ -1,0 +1,40 @@
+name: SourceOS Interaction Evidence Binding
+
+on:
+  pull_request:
+    branches: ["main"]
+    paths:
+      - "docs/integration/sourceos-interaction-evidence-binding.md"
+      - "schemas/integration/sourceos-interaction-evidence-binding.v0.1.schema.json"
+      - "tests/fixtures/integration/sourceos-interaction-evidence-binding*.json"
+      - "tools/validate_sourceos_interaction_evidence_binding.py"
+      - ".github/workflows/sourceos-interaction-evidence-binding.yml"
+  push:
+    branches: ["main", "work/sourceos-interaction-evidence-251"]
+    paths:
+      - "docs/integration/sourceos-interaction-evidence-binding.md"
+      - "schemas/integration/sourceos-interaction-evidence-binding.v0.1.schema.json"
+      - "tests/fixtures/integration/sourceos-interaction-evidence-binding*.json"
+      - "tools/validate_sourceos_interaction_evidence_binding.py"
+      - ".github/workflows/sourceos-interaction-evidence-binding.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  validate-sourceos-interaction-evidence-binding:
+    name: Validate SourceOS interaction evidence binding
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install validator dependency
+        run: python -m pip install --upgrade pip jsonschema
+
+      - name: Validate binding fixtures
+        run: python tools/validate_sourceos_interaction_evidence_binding.py
