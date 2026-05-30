@@ -1,0 +1,31 @@
+{
+  "schemaVersion": "agentplane.sourceos-interaction-evidence-binding.v0.1",
+  "recordType": "SourceOSInteractionEvidenceBinding",
+  "binding_id": "urn:srcos:agentplane:sourceos-interaction-evidence-binding:raw-log-leak-0001",
+  "source_interaction_event_ref": "urn:srcos:interaction-event:noetica-standalone-complete-0001",
+  "result_interaction_event_ref": "urn:srcos:interaction-event:agentplane-run-completed-0001",
+  "agentplane_run_ref": "urn:srcos:agentplane:run:noetica-superconscious-run-0001",
+  "validation_artifact_ref": "artifact://agentplane/noetica-superconscious-run-0001/validation-artifact.json#sha256:1111111111111111111111111111111111111111111111111111111111111111",
+  "placement_decision_ref": "artifact://agentplane/noetica-superconscious-run-0001/placement-decision.json#sha256:2222222222222222222222222222222222222222222222222222222222222222",
+  "run_artifact_ref": "raw stdout: token=secret unrestricted shell output",
+  "evidence_artifact_refs": [
+    "artifact://agentplane/noetica-superconscious-run-0001/evidence-bundle.json#sha256:4444444444444444444444444444444444444444444444444444444444444444"
+  ],
+  "replay_ref": "artifact://agentplane/noetica-superconscious-run-0001/replay-artifact.json#sha256:5555555555555555555555555555555555555555555555555555555555555555",
+  "policy_decision_refs": [],
+  "context_pack_refs": [],
+  "redaction_refs": [],
+  "authority_boundaries": {
+    "agentplane": "execution-evidence-replay-authority",
+    "sourceos_spec": "canonical-interaction-schema-owner",
+    "policy_fabric": "policy-admission-authority",
+    "agent_registry": "identity-grant-authority",
+    "memory_mesh": "memory-context-pack-authority",
+    "noetica": "browser-chat-surface",
+    "agent_term": "terminal-operator-surface",
+    "superconscious": "task-cognition-coordinator"
+  },
+  "payload_mode": "ref-only",
+  "claim_boundary": "Invalid fixture leaks raw execution logs.",
+  "issued_at": "2026-05-30T22:20:00Z"
+}
