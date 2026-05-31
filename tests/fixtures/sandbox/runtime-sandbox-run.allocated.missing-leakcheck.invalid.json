@@ -1,0 +1,34 @@
+{
+  "schemaVersion": "0.1.0",
+  "runtimeRunId": "agentplane:runtime-sandbox-run:allocated:missing-leakcheck",
+  "requestRef": "environment:validate-change-v2-request:scope-d-example",
+  "executorPlane": "AgentPlane",
+  "executionMode": "runtime_contract",
+  "runtimeParityLevel": "runtime_observed",
+  "runStatus": "runtime_allocated",
+  "environmentRef": "environment://runtime/scope-d-example/allocated",
+  "baselineRef": "workspace://scope-d/main",
+  "changedServiceRefs": [
+    "service://scope-d/api"
+  ],
+  "dependencyGraphRef": "dependency-graph://runtime/scope-d-example/allocated",
+  "routingRef": "routing://runtime/scope-d-example/allocated",
+  "isolationRefs": {
+    "network": "isolation://runtime/scope-d-example/network/allocated",
+    "async": "isolation://runtime/scope-d-example/async/allocated",
+    "stateful": "isolation://runtime/scope-d-example/stateful/allocated"
+  },
+  "evidenceRefs": [
+    "evidence://agentplane/runtime-sandbox-run/scope-d-example/allocated"
+  ],
+  "receiptRefs": [
+    "receipt://agentplane/runtime-sandbox-run/scope-d-example/allocated"
+  ],
+  "failureCodes": [],
+  "teardownState": "not_started",
+  "leakCheckRef": "",
+  "issuedAt": "2026-05-31T00:23:00Z",
+  "nonClaims": [
+    "Invalid fixture: runtime allocation without leak-check ref must be rejected."
+  ]
+}
