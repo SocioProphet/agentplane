@@ -1,0 +1,25 @@
+name: runtime-sandbox-run-contract
+
+on:
+  pull_request:
+    branches: [ main ]
+    paths:
+      - "schemas/sandbox/runtime-sandbox-run.v0.1.schema.json"
+      - "tests/fixtures/sandbox/runtime-sandbox-run.*.json"
+      - "tools/validate_runtime_sandbox_run.py"
+      - ".github/workflows/runtime-sandbox-run-contract.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-runtime-sandbox-run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Validate runtime sandbox run fixtures
+        run: python3 tools/validate_runtime_sandbox_run.py
