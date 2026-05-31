@@ -1,0 +1,14 @@
+{
+  "policyId": "urn:agentplane:sr-gate-policy:platform-dynamics-direct-eligible",
+  "schemaVersion": "0.1.0",
+  "applicationMode": "platform_dynamics",
+  "methodFamilies": ["sindy"],
+  "minimumDatasetRows": 24,
+  "maximumCandidateComplexity": 32,
+  "maximumNmse": 0.01,
+  "requiredUnitsStatus": "consistent",
+  "requireReplayVerified": true,
+  "allowControlAuthority": false,
+  "forbiddenGovernanceFlags": [],
+  "promotionEligibility": "eligible"
+}
