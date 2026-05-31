@@ -1,0 +1,14 @@
+{
+  "policyId": "urn:agentplane:sr-gate-policy:bad-metric-shape",
+  "schemaVersion": "0.1.0",
+  "applicationMode": "equation_discovery",
+  "methodFamilies": ["pysr"],
+  "minimumDatasetRows": 0,
+  "maximumCandidateComplexity": 0,
+  "maximumNmse": -1,
+  "requiredUnitsStatus": "consistent",
+  "requireReplayVerified": true,
+  "allowControlAuthority": false,
+  "forbiddenGovernanceFlags": [],
+  "promotionEligibility": "review_required"
+}
