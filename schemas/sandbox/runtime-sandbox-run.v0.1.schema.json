@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://socioprophet.io/schemas/agentplane/runtime-sandbox-run/v0.1.0",
+  "title": "RuntimeSandboxRun",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "runtimeRunId",
+    "requestRef",
+    "executorPlane",
+    "executionMode",
+    "runtimeParityLevel",
+    "runStatus",
+    "environmentRef",
+    "baselineRef",
+    "changedServiceRefs",
+    "dependencyGraphRef",
+    "routingRef",
+    "isolationRefs",
+    "evidenceRefs",
+    "receiptRefs",
+    "teardownState",
+    "leakCheckRef",
+    "issuedAt",
+    "nonClaims"
+  ],
+  "properties": {
+    "schemaVersion": { "type": "string", "const": "0.1.0" },
+    "runtimeRunId": { "type": "string", "pattern": "^agentplane:runtime-sandbox-run:" },
+    "requestRef": { "type": "string", "pattern": "^environment:validate-change-v2-request:" },
+    "executorPlane": { "type": "string", "const": "AgentPlane" },
+    "executionMode": { "type": "string", "const": "runtime_contract" },
+    "runtimeParityLevel": { "type": "string", "enum": ["contract_only", "runtime_observed"] },
+    "runStatus": { "type": "string", "enum": ["runtime_requested", "runtime_allocated", "runtime_failed", "runtime_teardown_complete"] },
+    "environmentRef": { "type": "string", "pattern": "^environment://" },
+    "baselineRef": { "type": "string", "pattern": "^workspace://" },
+    "changedServiceRefs": { "type": "array", "items": { "type": "string" } },
+    "dependencyGraphRef": { "type": "string", "pattern": "^dependency-graph://" },
+    "routingRef": { "type": "string", "pattern": "^routing://" },
+    "isolationRefs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["network", "async", "stateful"],
+      "properties": {
+        "network": { "type": "string", "pattern": "^isolation://" },
+        "async": { "type": "string", "pattern": "^isolation://" },
+        "stateful": { "type": "string", "pattern": "^isolation://" }
+      }
+    },
+    "evidenceRefs": { "type": "array", "items": { "type": "string", "pattern": "^evidence://" } },
+    "receiptRefs": { "type": "array", "items": { "type": "string", "pattern": "^receipt://" } },
+    "failureCodes": { "type": "array", "items": { "type": "string" }, "default": [] },
+    "teardownState": { "type": "string", "enum": ["not_started", "teardown_complete", "teardown_failed"] },
+    "leakCheckRef": { "type": "string", "pattern": "^leak-check://" },
+    "issuedAt": { "type": "string", "format": "date-time" },
+    "nonClaims": { "type": "array", "minItems": 1, "items": { "type": "string" } }
+  }
+}
