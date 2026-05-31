@@ -1,0 +1,14 @@
+{
+  "policyId": "urn:agentplane:sr-gate-policy:bad-control-authority",
+  "schemaVersion": "0.1.0",
+  "applicationMode": "equation_discovery",
+  "methodFamilies": ["pysr"],
+  "minimumDatasetRows": 24,
+  "maximumCandidateComplexity": 32,
+  "maximumNmse": 0.01,
+  "requiredUnitsStatus": "consistent",
+  "requireReplayVerified": true,
+  "allowControlAuthority": true,
+  "forbiddenGovernanceFlags": [],
+  "promotionEligibility": "review_required"
+}
