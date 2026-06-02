@@ -1,0 +1,49 @@
+{
+  "schema_version": "0.1",
+  "artifact_id": "agentplane:supply-chain-validation-artifact:runtime-asset-demo-002",
+  "artifact_type": "SupplyChainValidationArtifact",
+  "runtime_asset_ref": "runtime-asset://lattice-forge/legacy-python-ml@0.0.3",
+  "scope": {
+    "environment": "production",
+    "risk_tier": "regulated_enterprise"
+  },
+  "evidence_refs": {
+    "sbom_ref": "sbom://lattice-forge/legacy-python-ml/0.0.3/spdx.json",
+    "vex_ref": null,
+    "lockfile_ref": "lockfile://lattice-forge/legacy-python-ml/0.0.3/flake.lock",
+    "signature_ref": "sigstore://lattice-forge/legacy-python-ml/0.0.3/bundle.sigstore",
+    "scan_record_ref": "scan://lattice-forge/legacy-python-ml/0.0.3/osv-scan.json",
+    "promotion_evidence_ref": null,
+    "rollback_evidence_ref": null
+  },
+  "policy_decision_ref": "policy://trust-chain/dependency-admission/regulated-enterprise-production",
+  "guardrail_decision_ref": "guardrail:decision:trust-chain-runtime-deny-001",
+  "validation_artifact_ref": null,
+  "replay_artifact_ref": null,
+  "runtime_receipt_ref": null,
+  "decision": "blocked",
+  "effects": {
+    "execution_allowed": false,
+    "promotion_allowed": false,
+    "repair_required": true,
+    "human_review_required": true
+  },
+  "remediation": [
+    {
+      "step_id": "patch-runtime-asset",
+      "authority": "SocioProphet/lattice-forge",
+      "required_before_execution": true,
+      "instruction": "Replace or patch the vulnerable RuntimeAsset and emit fresh SBOM, VEX, scan, signature, promotion, and rollback evidence."
+    },
+    {
+      "step_id": "rerun-agentplane-validation",
+      "authority": "SocioProphet/agentplane",
+      "required_before_execution": true,
+      "instruction": "Run validation and replay after the patched RuntimeAsset is available."
+    }
+  ],
+  "non_claims": [
+    "This fixture is expected to remain blocked until required evidence exists.",
+    "This fixture does not perform live package scanning."
+  ]
+}
