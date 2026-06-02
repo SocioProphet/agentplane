@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.socioprophet.dev/agentplane/trust-chain/supply-chain-validation-artifact.v0.1.schema.json",
+  "title": "SupplyChainValidationArtifact v0.1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "artifact_id", "artifact_type", "runtime_asset_ref", "scope", "evidence_refs", "policy_decision_ref", "guardrail_decision_ref", "validation_artifact_ref", "replay_artifact_ref", "runtime_receipt_ref", "decision", "effects", "non_claims"],
+  "properties": {
+    "schema_version": {"const": "0.1"},
+    "artifact_id": {"type": "string", "pattern": "^agentplane:supply-chain-validation-artifact:"},
+    "artifact_type": {"const": "SupplyChainValidationArtifact"},
+    "runtime_asset_ref": {"type": "string", "pattern": "^runtime-asset://"},
+    "scope": {"type": "object", "additionalProperties": false, "required": ["environment", "risk_tier"], "properties": {"environment": {"enum": ["preview", "staging", "production"]}, "risk_tier": {"enum": ["internal", "enterprise", "regulated_enterprise"]}}},
+    "evidence_refs": {"type": "object", "additionalProperties": false, "required": ["sbom_ref", "vex_ref", "lockfile_ref", "signature_ref", "scan_record_ref"], "properties": {"sbom_ref": {"type": ["string", "null"]}, "vex_ref": {"type": ["string", "null"]}, "lockfile_ref": {"type": ["string", "null"]}, "signature_ref": {"type": ["string", "null"]}, "scan_record_ref": {"type": ["string", "null"]}, "promotion_evidence_ref": {"type": ["string", "null"]}, "rollback_evidence_ref": {"type": ["string", "null"]}}},
+    "policy_decision_ref": {"type": ["string", "null"]},
+    "guardrail_decision_ref": {"type": ["string", "null"]},
+    "validation_artifact_ref": {"type": ["string", "null"]},
+    "replay_artifact_ref": {"type": ["string", "null"]},
+    "runtime_receipt_ref": {"type": ["string", "null"]},
+    "decision": {"enum": ["validated", "blocked", "review_required"]},
+    "effects": {"type": "object", "additionalProperties": false, "required": ["execution_allowed", "promotion_allowed", "repair_required", "human_review_required"], "properties": {"execution_allowed": {"type": "boolean"}, "promotion_allowed": {"type": "boolean"}, "repair_required": {"type": "boolean"}, "human_review_required": {"type": "boolean"}}},
+    "remediation": {"type": "array", "items": {"type": "object", "additionalProperties": false, "required": ["step_id", "authority", "required_before_execution", "instruction"], "properties": {"step_id": {"type": "string"}, "authority": {"type": "string"}, "required_before_execution": {"type": "boolean"}, "instruction": {"type": "string"}}}},
+    "non_claims": {"type": "array", "items": {"type": "string"}, "minItems": 1}
+  }
+}

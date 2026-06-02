@@ -1,0 +1,37 @@
+{
+  "schema_version": "0.1",
+  "artifact_id": "agentplane:supply-chain-validation-artifact:runtime-asset-demo-001",
+  "artifact_type": "SupplyChainValidationArtifact",
+  "runtime_asset_ref": "runtime-asset://lattice-forge/prophet-python-ml@0.1.0",
+  "scope": {
+    "environment": "production",
+    "risk_tier": "regulated_enterprise"
+  },
+  "evidence_refs": {
+    "sbom_ref": "sbom://lattice-forge/prophet-python-ml/0.1.0/spdx.json",
+    "vex_ref": "vex://lattice-forge/prophet-python-ml/0.1.0/vex.json",
+    "lockfile_ref": "lockfile://lattice-forge/prophet-python-ml/0.1.0/flake.lock",
+    "signature_ref": "sigstore://lattice-forge/prophet-python-ml/0.1.0/bundle.sigstore",
+    "scan_record_ref": "scan://lattice-forge/prophet-python-ml/0.1.0/osv-scan.json",
+    "promotion_evidence_ref": "promotion://lattice-forge/prophet-python-ml/0.1.0/stable",
+    "rollback_evidence_ref": "rollback://lattice-forge/prophet-python-ml/0.0.1"
+  },
+  "policy_decision_ref": "policy://trust-chain/dependency-admission/regulated-enterprise-production",
+  "guardrail_decision_ref": "guardrail:decision:trust-chain-runtime-allow-001",
+  "validation_artifact_ref": "agentplane:validation:runtime-asset-demo-001",
+  "replay_artifact_ref": "agentplane:replay:runtime-asset-demo-001",
+  "runtime_receipt_ref": "runtime-receipt://trust-chain/demo-runtime-asset-001",
+  "decision": "validated",
+  "effects": {
+    "execution_allowed": true,
+    "promotion_allowed": true,
+    "repair_required": false,
+    "human_review_required": false
+  },
+  "remediation": [],
+  "non_claims": [
+    "This fixture does not perform live package scanning.",
+    "This fixture does not claim IBM/Red Hat Lightwell integration.",
+    "This fixture is a contract example and not a production certification by itself."
+  ]
+}
