@@ -1,0 +1,52 @@
+{
+  "schema_version": "0.1",
+  "state_ref": "agentplane:runtime-certification-state:scope-d-example:runtime-observed",
+  "runtime_run_ref": "agentplane:runtime-sandbox-run:allocated:scope-d-example",
+  "current_state": "runtime_observed",
+  "promotion_chain": [
+    {
+      "state": "contract_only",
+      "entered_at": "2026-06-02T01:20:00Z",
+      "evidence_ref": "contract://agentplane/runtime-sandbox-run/v0.1",
+      "promotion_allowed": true,
+      "blocked_by": []
+    },
+    {
+      "state": "runtime_observed",
+      "entered_at": "2026-06-02T01:21:00Z",
+      "evidence_ref": "evidence://agentplane/runtime-sandbox-run/scope-d-example/allocated",
+      "promotion_allowed": false,
+      "blocked_by": [
+        "teardown_not_verified",
+        "leak_check_not_verified"
+      ]
+    }
+  ],
+  "evidence_refs": {
+    "contract_ref": "contract://agentplane/runtime-sandbox-run/v0.1",
+    "runtime_observation_ref": "evidence://agentplane/runtime-sandbox-run/scope-d-example/allocated",
+    "teardown_ref": null,
+    "leak_check_ref": null,
+    "certification_receipt_ref": null
+  },
+  "blocking_gaps": [
+    "teardown_not_verified",
+    "leak_check_not_verified"
+  ],
+  "authority": {
+    "state_authority": "AgentPlane",
+    "execution_authority": "AgentPlane",
+    "certification_authority": "AgentPlane"
+  },
+  "effects": {
+    "runtime_parity_certified": false,
+    "autonomy_allowed": false,
+    "promotion_allowed": false,
+    "human_review_required": true
+  },
+  "non_claims": [
+    "Runtime observation is not runtime parity certification.",
+    "This fixture does not execute teardown.",
+    "This fixture does not execute leak checks."
+  ]
+}
