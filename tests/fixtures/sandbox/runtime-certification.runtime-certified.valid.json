@@ -1,0 +1,67 @@
+{
+  "schema_version": "0.1",
+  "state_ref": "agentplane:runtime-certification-state:scope-d-example:runtime-certified",
+  "runtime_run_ref": "agentplane:runtime-sandbox-run:certified:scope-d-example",
+  "current_state": "runtime_certified",
+  "promotion_chain": [
+    {
+      "state": "contract_only",
+      "entered_at": "2026-06-02T01:20:00Z",
+      "evidence_ref": "contract://agentplane/runtime-sandbox-run/v0.1",
+      "promotion_allowed": true,
+      "blocked_by": []
+    },
+    {
+      "state": "runtime_observed",
+      "entered_at": "2026-06-02T01:21:00Z",
+      "evidence_ref": "evidence://agentplane/runtime-sandbox-run/scope-d-example/allocated",
+      "promotion_allowed": true,
+      "blocked_by": []
+    },
+    {
+      "state": "teardown_verified",
+      "entered_at": "2026-06-02T01:22:00Z",
+      "evidence_ref": "teardown://agentplane/runtime-sandbox-run/scope-d-example/verified",
+      "promotion_allowed": true,
+      "blocked_by": []
+    },
+    {
+      "state": "leak_check_verified",
+      "entered_at": "2026-06-02T01:23:00Z",
+      "evidence_ref": "leak-check://agentplane/runtime-sandbox-run/scope-d-example/verified",
+      "promotion_allowed": true,
+      "blocked_by": []
+    },
+    {
+      "state": "runtime_certified",
+      "entered_at": "2026-06-02T01:24:00Z",
+      "evidence_ref": "receipt://agentplane/runtime-certification/scope-d-example/certified",
+      "promotion_allowed": true,
+      "blocked_by": []
+    }
+  ],
+  "evidence_refs": {
+    "contract_ref": "contract://agentplane/runtime-sandbox-run/v0.1",
+    "runtime_observation_ref": "evidence://agentplane/runtime-sandbox-run/scope-d-example/allocated",
+    "teardown_ref": "teardown://agentplane/runtime-sandbox-run/scope-d-example/verified",
+    "leak_check_ref": "leak-check://agentplane/runtime-sandbox-run/scope-d-example/verified",
+    "certification_receipt_ref": "receipt://agentplane/runtime-certification/scope-d-example/certified"
+  },
+  "blocking_gaps": [],
+  "authority": {
+    "state_authority": "AgentPlane",
+    "execution_authority": "AgentPlane",
+    "certification_authority": "AgentPlane"
+  },
+  "effects": {
+    "runtime_parity_certified": true,
+    "autonomy_allowed": true,
+    "promotion_allowed": true,
+    "human_review_required": false
+  },
+  "non_claims": [
+    "Runtime certification requires teardown and leak-check evidence.",
+    "This fixture models certification state and does not execute infrastructure by itself.",
+    "This fixture does not replace downstream policy admission."
+  ]
+}
