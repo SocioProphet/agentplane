@@ -1,0 +1,87 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.socioprophet.dev/agentplane/legal-core/runtime-action-admission-legal-gate.v0.1.schema.json",
+  "title": "RuntimeActionAdmissionLegalGate v0.1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "gate_id",
+    "artifact_type",
+    "action_ref",
+    "legal_core_decision_ref",
+    "authority_basis",
+    "purpose",
+    "safe_processing",
+    "sandbox_allocation",
+    "evidence_promotion",
+    "decision",
+    "effects",
+    "runtime_receipt_ref",
+    "non_claims"
+  ],
+  "properties": {
+    "schema_version": { "const": "0.1" },
+    "gate_id": { "type": "string", "pattern": "^agentplane:legal-core-runtime-gate:" },
+    "artifact_type": { "const": "RuntimeActionAdmissionLegalGate" },
+    "action_ref": { "type": "string", "pattern": "^agentplane:action-proposal:" },
+    "legal_core_decision_ref": { "type": "string", "pattern": "^legal-core-decision:" },
+    "authority_basis": {
+      "type": "string",
+      "enum": ["first_party_defensive", "customer_authorized", "public_source", "licensed_source", "contractual_right", "statutory_public_record", "unknown", "prohibited"]
+    },
+    "purpose": {
+      "type": "string",
+      "enum": ["defensive_endpoint_triage", "static_document_triage", "source_curation", "world_evidence_ingestion", "supply_chain_enrichment", "economic_signal_analysis", "claim_bounded_reporting"]
+    },
+    "safe_processing": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["unsafe_rendering_allowed", "external_lookup_allowed", "mutation_allowed", "network_access_allowed", "credential_access_allowed"],
+      "properties": {
+        "unsafe_rendering_allowed": { "type": "boolean", "const": false },
+        "external_lookup_allowed": { "type": "boolean" },
+        "mutation_allowed": { "type": "boolean" },
+        "network_access_allowed": { "type": "boolean" },
+        "credential_access_allowed": { "type": "boolean", "const": false }
+      }
+    },
+    "sandbox_allocation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["allocation_allowed", "execution_claimed", "production_parity_claimed", "teardown_required", "leak_check_required"],
+      "properties": {
+        "allocation_allowed": { "type": "boolean" },
+        "execution_claimed": { "type": "boolean" },
+        "production_parity_claimed": { "type": "boolean", "const": false },
+        "teardown_required": { "type": "boolean" },
+        "leak_check_required": { "type": "boolean" }
+      }
+    },
+    "evidence_promotion": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["promotion_allowed", "requires_legal_receipt", "requires_claim_boundary_receipt"],
+      "properties": {
+        "promotion_allowed": { "type": "boolean" },
+        "requires_legal_receipt": { "type": "boolean", "const": true },
+        "requires_claim_boundary_receipt": { "type": "boolean", "const": true }
+      }
+    },
+    "decision": { "enum": ["admitted", "denied", "review_required"] },
+    "effects": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["runtime_action_allowed", "sandbox_allocation_allowed", "evidence_promotion_allowed", "human_review_required"],
+      "properties": {
+        "runtime_action_allowed": { "type": "boolean" },
+        "sandbox_allocation_allowed": { "type": "boolean" },
+        "evidence_promotion_allowed": { "type": "boolean" },
+        "human_review_required": { "type": "boolean" }
+      }
+    },
+    "runtime_receipt_ref": { "type": ["string", "null"] },
+    "denial_receipt_ref": { "type": ["string", "null"] },
+    "non_claims": { "type": "array", "items": { "type": "string" }, "minItems": 1 }
+  }
+}
