@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.socioprophet.org/agentplane/receipts/workspace-prophet-control-receipt.v0.1.json",
+  "title": "WorkspaceProphetControlReceipt v0.1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "recordType",
+    "receipt_id",
+    "capability_id",
+    "operation_id",
+    "claim_id",
+    "evidence_thread_id",
+    "readiness_record_ref",
+    "control_decision",
+    "placement_decision",
+    "run_binding",
+    "source_repos",
+    "validation_refs",
+    "receipt_hash"
+  ],
+  "properties": {
+    "schemaVersion": { "const": "agentplane.workspace-prophet-control-receipt.v0.1" },
+    "recordType": { "const": "WorkspaceProphetControlReceipt" },
+    "receipt_id": { "type": "string" },
+    "capability_id": { "type": "string" },
+    "operation_id": { "type": "string" },
+    "claim_id": { "type": "string" },
+    "evidence_thread_id": { "type": "string" },
+    "readiness_record_ref": { "type": "string" },
+    "control_decision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["state", "production_ready", "allowed_actions", "blocked_actions", "reason_codes"],
+      "properties": {
+        "state": { "type": "string", "enum": ["fixture_validated", "ready_for_demo", "blocked", "production_ready"] },
+        "production_ready": { "type": "boolean", "const": false },
+        "allowed_actions": { "type": "array", "items": { "type": "string" } },
+        "blocked_actions": { "type": "array", "items": { "type": "string" } },
+        "reason_codes": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "placement_decision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["execution_location", "worker_class", "cloud_burst_enabled", "authority_band"],
+      "properties": {
+        "execution_location": { "type": "string", "enum": ["local", "private_cluster", "attested_fog", "cloud"] },
+        "worker_class": { "type": "string" },
+        "cloud_burst_enabled": { "type": "boolean", "const": false },
+        "authority_band": { "type": "string" }
+      }
+    },
+    "run_binding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mode", "runtime_execution", "fixture_refs"],
+      "properties": {
+        "mode": { "type": "string", "enum": ["fixture_only", "runtime_observed"] },
+        "runtime_execution": { "type": "boolean" },
+        "fixture_refs": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "source_repos": { "type": "array", "items": { "type": "string" } },
+    "validation_refs": { "type": "array", "items": { "type": "string" } },
+    "generated_at": { "type": "string" },
+    "receipt_hash": { "type": "string", "pattern": "^sha256:" }
+  }
+}
