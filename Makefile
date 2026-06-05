@@ -236,3 +236,7 @@ validate-wallguard-collaboration-admission:
 
 test:
 	python3 -m pytest -q tools/tests
+.PHONY: validate-workspace-prophet-control-receipt
+validate-workspace-prophet-control-receipt:
+	python3 tools/validate_workspace_prophet_control_receipt.py
+

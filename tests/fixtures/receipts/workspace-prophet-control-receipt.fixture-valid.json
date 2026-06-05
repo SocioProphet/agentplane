@@ -1,0 +1,64 @@
+{
+  "schemaVersion": "agentplane.workspace-prophet-control-receipt.v0.1",
+  "recordType": "WorkspaceProphetControlReceipt",
+  "receipt_id": "receipt_workspace_prophet_control_fixture_validated_demo",
+  "capability_id": "workspace_operation_prophet_membrane_v0",
+  "operation_id": "op_readonly_diagnostics_demo",
+  "claim_id": "claim_workspace_readonly_diagnostics_completed_demo",
+  "evidence_thread_id": "thread_workspace_readonly_diagnostics_completed_demo",
+  "readiness_record_ref": "sociosphere:workspace_operation_prophet_membrane_v0",
+  "control_decision": {
+    "state": "fixture_validated",
+    "production_ready": false,
+    "allowed_actions": [
+      "observe",
+      "recommend",
+      "queue_for_review"
+    ],
+    "blocked_actions": [
+      "production_ready",
+      "remote_execution",
+      "autonomous_remediation",
+      "customer_facing_claim"
+    ],
+    "reason_codes": [
+      "contracts_validated",
+      "runtime_fixture_validated",
+      "sherlock_evidence_indexed",
+      "sociosphere_readiness_fixture_validated",
+      "production_readiness_blocked_by_design"
+    ]
+  },
+  "placement_decision": {
+    "execution_location": "local",
+    "worker_class": "smallest_eligible_fixture_worker",
+    "cloud_burst_enabled": false,
+    "authority_band": "recommend"
+  },
+  "run_binding": {
+    "mode": "fixture_only",
+    "runtime_execution": false,
+    "fixture_refs": [
+      "prophet-platform:contracts/workspace-prophet/e2e/workspace-operation-prophet-membrane-v0.json",
+      "prophet-platform:contracts/workspace-prophet/e2e/claim-projection-workspace-operation-prophet-v0.json",
+      "sherlock-search:examples/workspace-prophet/evidence-index.example.json",
+      "sociosphere:tests/fixtures/workspace-prophet/readiness.fixture_validated.json"
+    ]
+  },
+  "source_repos": [
+    "SocioProphet/prophet-core-contracts",
+    "SocioProphet/prophet-platform",
+    "SocioProphet/sherlock-search",
+    "SocioProphet/sociosphere",
+    "SocioProphet/agentplane"
+  ],
+  "validation_refs": [
+    "prophet-core-contracts:make validate",
+    "prophet-platform:make validate-workspace-prophet-membrane-e2e",
+    "prophet-platform:python3 tools/validate_workspace_prophet_claim_projection.py",
+    "sherlock-search:make validate-workspace-prophet-evidence-index",
+    "sociosphere:python3 tools/validate_workspace_prophet_readiness.py"
+  ],
+  "generated_at": "2026-06-05T17:50:00Z",
+  "receipt_hash": "sha256:workspace-prophet-control-fixture-validated-demo"
+}
