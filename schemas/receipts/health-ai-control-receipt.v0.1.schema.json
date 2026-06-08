@@ -1,0 +1,156 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.socioprophet.org/agentplane/receipts/health-ai-control-receipt.v0.1.json",
+  "title": "HealthAIControlReceipt v0.1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "recordType",
+    "receipt_id",
+    "capability_id",
+    "readiness_record_ref",
+    "control_decision",
+    "benchmark_boundary",
+    "clinical_boundary",
+    "source_repos",
+    "validation_refs",
+    "receipt_hash"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "agentplane.health-ai-control-receipt.v0.1"
+    },
+    "recordType": {
+      "const": "HealthAIControlReceipt"
+    },
+    "receipt_id": {
+      "type": "string"
+    },
+    "capability_id": {
+      "type": "string"
+    },
+    "readiness_record_ref": {
+      "type": "string"
+    },
+    "control_decision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "state",
+        "production_ready",
+        "allowed_actions",
+        "blocked_actions",
+        "reason_codes"
+      ],
+      "properties": {
+        "state": {
+          "type": "string",
+          "enum": [
+            "planning_only",
+            "fixture_validated",
+            "runtime_observed",
+            "production_ready",
+            "blocked"
+          ]
+        },
+        "production_ready": {
+          "type": "boolean",
+          "const": false
+        },
+        "allowed_actions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "blocked_actions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        },
+        "reason_codes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        }
+      }
+    },
+    "benchmark_boundary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "protected_examples_reproduced",
+        "answer_keys_reproduced",
+        "canary_reproduced"
+      ],
+      "properties": {
+        "protected_examples_reproduced": {
+          "type": "boolean",
+          "const": false
+        },
+        "answer_keys_reproduced": {
+          "type": "boolean",
+          "const": false
+        },
+        "canary_reproduced": {
+          "type": "boolean",
+          "const": false
+        }
+      }
+    },
+    "clinical_boundary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "patient_care_action",
+        "autonomous_clinical_action",
+        "real_clinical_data_processing",
+        "customer_facing_healthcare_claim"
+      ],
+      "properties": {
+        "patient_care_action": {
+          "type": "boolean",
+          "const": false
+        },
+        "autonomous_clinical_action": {
+          "type": "boolean",
+          "const": false
+        },
+        "real_clinical_data_processing": {
+          "type": "boolean",
+          "const": false
+        },
+        "customer_facing_healthcare_claim": {
+          "type": "boolean",
+          "const": false
+        }
+      }
+    },
+    "source_repos": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1
+    },
+    "validation_refs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1
+    },
+    "generated_at": {
+      "type": "string"
+    },
+    "receipt_hash": {
+      "type": "string",
+      "pattern": "^sha256:"
+    }
+  }
+}
