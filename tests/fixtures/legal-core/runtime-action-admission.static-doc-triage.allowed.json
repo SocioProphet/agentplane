@@ -1,0 +1,43 @@
+{
+  "schema_version": "0.1",
+  "gate_id": "agentplane:legal-core-runtime-gate:static-doc-triage-allowed",
+  "artifact_type": "RuntimeActionAdmissionLegalGate",
+  "action_ref": "agentplane:action-proposal:static-document-triage-001",
+  "legal_core_decision_ref": "legal-core-decision:preview-surface-endpoint-triage-allowed",
+  "authority_basis": "first_party_defensive",
+  "purpose": "static_document_triage",
+  "safe_processing": {
+    "unsafe_rendering_allowed": false,
+    "external_lookup_allowed": false,
+    "mutation_allowed": false,
+    "network_access_allowed": false,
+    "credential_access_allowed": false
+  },
+  "sandbox_allocation": {
+    "allocation_allowed": true,
+    "execution_claimed": false,
+    "production_parity_claimed": false,
+    "teardown_required": true,
+    "leak_check_required": true
+  },
+  "evidence_promotion": {
+    "promotion_allowed": false,
+    "requires_legal_receipt": true,
+    "requires_claim_boundary_receipt": true
+  },
+  "decision": "admitted",
+  "effects": {
+    "runtime_action_allowed": true,
+    "sandbox_allocation_allowed": true,
+    "evidence_promotion_allowed": false,
+    "human_review_required": false
+  },
+  "runtime_receipt_ref": "runtime-receipt://agentplane/legal-core/static-document-triage-001",
+  "denial_receipt_ref": null,
+  "non_claims": [
+    "This fixture admits read-only static document triage only.",
+    "This fixture does not allow unsafe rendering or external lookup from suspect provenance metadata.",
+    "Sandbox allocation does not claim infrastructure execution or production parity.",
+    "Evidence promotion remains blocked until Legal Core and claim-boundary receipts exist."
+  ]
+}
