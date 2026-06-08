@@ -1,0 +1,39 @@
+schema_version: effective-authority/v0.1
+repo: SocioProphet/agentplane
+zone: C
+owner: AgentPlane runtime lane
+maturity: draft
+
+authority_classes:
+  - agent_runtime
+  - tool_invocation
+  - session_execution
+  - runtime_evidence_production
+observation_channels:
+  - filesystem
+  - terminal_pty
+  - memory_store
+control_channels:
+  - mcp
+  - agent_to_agent
+  - scheduler
+egress_classes:
+  - model_request
+  - tool_input
+  - tool_output
+  - metadata
+background_workers:
+  - scheduled_agent_task
+runtime_subjects:
+  - native_process
+  - agent_worker
+connector_surfaces: []
+policy_sources:
+  - user_grant
+  - signed_config
+  - runtime_contract
+ledger_sinks:
+  - model-governance-ledger
+  - policy-fabric
+ci_validators:
+  - effective-authority-ci
