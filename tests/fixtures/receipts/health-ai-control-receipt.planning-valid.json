@@ -1,0 +1,55 @@
+{
+  "schemaVersion": "agentplane.health-ai-control-receipt.v0.1",
+  "recordType": "HealthAIControlReceipt",
+  "receipt_id": "receipt_health_ai_control_planning_v0",
+  "capability_id": "health_ai_eval_and_clinical_value_v0",
+  "readiness_record_ref": "sociosphere:registry/health-ai/health-ai-eval-readiness.v0.json",
+  "control_decision": {
+    "state": "planning_only",
+    "production_ready": false,
+    "allowed_actions": [
+      "capture_source_claims",
+      "draft_eval_contracts",
+      "index_planning_evidence",
+      "register_planning_readiness"
+    ],
+    "blocked_actions": [
+      "production_ready",
+      "patient_care_action",
+      "autonomous_clinical_action",
+      "real_clinical_data_processing",
+      "customer_facing_healthcare_claim",
+      "protected_benchmark_reproduction"
+    ],
+    "reason_codes": [
+      "health_ai_readiness_planning_only",
+      "clinical_contracts_fixture_only",
+      "search_packets_planning_only",
+      "production_and_patient_care_blocked"
+    ]
+  },
+  "benchmark_boundary": {
+    "protected_examples_reproduced": false,
+    "answer_keys_reproduced": false,
+    "canary_reproduced": false
+  },
+  "clinical_boundary": {
+    "patient_care_action": false,
+    "autonomous_clinical_action": false,
+    "real_clinical_data_processing": false,
+    "customer_facing_healthcare_claim": false
+  },
+  "source_repos": [
+    "SocioProphet/prophet-core-contracts",
+    "SocioProphet/sherlock-search",
+    "SocioProphet/sociosphere",
+    "SocioProphet/agentplane"
+  ],
+  "validation_refs": [
+    "prophet-core-contracts:make validate-health-ai-contracts",
+    "sherlock-search:make validate-health-ai-search-packets",
+    "sociosphere:python3 tools/validate_health_ai_readiness.py"
+  ],
+  "generated_at": "2026-06-08T00:00:00Z",
+  "receipt_hash": "sha256:health-ai-control-planning-v0"
+}

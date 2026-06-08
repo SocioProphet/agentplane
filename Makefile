@@ -240,3 +240,7 @@ test:
 validate-workspace-prophet-control-receipt:
 	python3 tools/validate_workspace_prophet_control_receipt.py
 
+.PHONY: validate-health-ai-control-receipt
+validate-health-ai-control-receipt:
+	python3 tools/validate_health_ai_control_receipt.py
+
