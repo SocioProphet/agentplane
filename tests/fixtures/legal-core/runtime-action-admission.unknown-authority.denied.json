@@ -1,0 +1,43 @@
+{
+  "schema_version": "0.1",
+  "gate_id": "agentplane:legal-core-runtime-gate:unknown-authority-denied",
+  "artifact_type": "RuntimeActionAdmissionLegalGate",
+  "action_ref": "agentplane:action-proposal:unknown-authority-001",
+  "legal_core_decision_ref": "legal-core-decision:unknown-authority-blocked",
+  "authority_basis": "unknown",
+  "purpose": "static_document_triage",
+  "safe_processing": {
+    "unsafe_rendering_allowed": false,
+    "external_lookup_allowed": false,
+    "mutation_allowed": false,
+    "network_access_allowed": false,
+    "credential_access_allowed": false
+  },
+  "sandbox_allocation": {
+    "allocation_allowed": false,
+    "execution_claimed": false,
+    "production_parity_claimed": false,
+    "teardown_required": false,
+    "leak_check_required": false
+  },
+  "evidence_promotion": {
+    "promotion_allowed": false,
+    "requires_legal_receipt": true,
+    "requires_claim_boundary_receipt": true
+  },
+  "decision": "denied",
+  "effects": {
+    "runtime_action_allowed": false,
+    "sandbox_allocation_allowed": false,
+    "evidence_promotion_allowed": false,
+    "human_review_required": true
+  },
+  "runtime_receipt_ref": null,
+  "denial_receipt_ref": "denial-receipt://agentplane/legal-core/unknown-authority-001",
+  "non_claims": [
+    "This fixture denies runtime action admission because authority is unknown.",
+    "This fixture does not classify the source as malicious.",
+    "This fixture does not provide jurisdiction-specific legal advice.",
+    "No sandbox allocation, runtime execution, production parity, or evidence promotion is claimed."
+  ]
+}
