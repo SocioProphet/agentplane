@@ -1,0 +1,82 @@
+{
+  "schema_version": "0.1.0",
+  "kind": "prophet_mesh_agentplane_adapter_contract",
+  "source_repo": "SocioProphet/prophet-mesh",
+  "target_repo": "SocioProphet/agentplane",
+  "release_channel": "private_preview",
+  "adapter_mode": "dry_run_receipt_preview",
+  "source_artifacts": [
+    "examples/runtime-release-bundle.accepted.json",
+    "artifacts/runtime/router-request.email.runtime.json"
+  ],
+  "required_runtime_sections": [
+    "router_decision",
+    "choir_plan",
+    "conductor_response",
+    "execution_trace",
+    "validation"
+  ],
+  "required_agentplane_artifacts": [
+    "validation_artifact",
+    "placement_decision",
+    "run_artifact",
+    "replay_artifact"
+  ],
+  "request_projection": {
+    "request_id": "agentplane-request:req-router-dry-run-001",
+    "source_trace_id": "execution-trace:req-router-dry-run-001",
+    "source_runtime_bundle_id": "runtime-release-bundle:req-router-dry-run-001",
+    "conductor_id": "michael-agent",
+    "principal": "principal:socioprophet",
+    "task": "email_reply",
+    "memory_scope": "relationship_context:approved",
+    "projection_mode": "receipt_only",
+    "effect_enabled": false,
+    "workspace_write_enabled": false,
+    "operator_review_required": true,
+    "approval_refs": ["approve_external_action"],
+    "evidence_refs": ["evidence:event:req-router-dry-run-001"],
+    "audit_refs": ["audit:req-router-dry-run-001"],
+    "adapter_inputs": {
+      "router_decision_ref": "router-decision:req-router-dry-run-001",
+      "choir_plan_ref": "choir-plan:req-router-dry-run-001",
+      "conductor_response_ref": "conductor-response:req-router-dry-run-001",
+      "execution_trace_ref": "execution-trace:req-router-dry-run-001"
+    },
+    "controls": {
+      "identity": true,
+      "policy": true,
+      "evidence": true,
+      "attestation": true,
+      "revocation": true,
+      "audit": true,
+      "tenant_isolation": true
+    }
+  },
+  "artifact_expectation": {
+    "validation_artifact_required": true,
+    "placement_decision_required": true,
+    "run_artifact_required": true,
+    "replay_artifact_required": true,
+    "run_artifact_status": "not_run_receipt_only",
+    "replay_artifact_mode": "metadata_only",
+    "effect_receipts_required": false,
+    "executor_required": false
+  },
+  "private_preview_invariants": [
+    "validated_runtime_chain_required",
+    "execution_trace_required",
+    "memory_scope_required",
+    "operator_review_required_for_email_reply",
+    "receipt_only_by_default",
+    "workspace_write_disabled_by_default",
+    "agentplane_emits_metadata_without_effects"
+  ],
+  "non_claims": [
+    "This adapter contract records a private-preview receipt-only bridge from Prophet Mesh to AgentPlane.",
+    "This adapter contract does not run production work.",
+    "This adapter contract does not authorize side effects.",
+    "This adapter contract does not change workspace assets.",
+    "This adapter contract does not certify production readiness or autonomous operation."
+  ]
+}
