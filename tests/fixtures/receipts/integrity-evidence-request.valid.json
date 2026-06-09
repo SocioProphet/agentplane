@@ -11,7 +11,7 @@
   "safe_root": "repo",
   "path_set": [
     {
-      "path": "docs/example.md",
+      "path": "repo/docs/example.md",
       "before_digest": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
       "expected_digest": "sha256:2222222222222222222222222222222222222222222222222222222222222222"
     }
