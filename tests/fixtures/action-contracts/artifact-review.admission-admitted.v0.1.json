@@ -1,0 +1,20 @@
+{
+  "apiVersion": "agentplane.socioprophet.org/v0.1",
+  "kind": "ActionAdmission",
+  "admissionId": "adm_artifact_review_001",
+  "proposalRef": "ap_artifact_review_001",
+  "policyDecision": {
+    "policyDecisionRef": "pd_artifact_review_001",
+    "decision": "allow",
+    "policyFabricEnvelopeRef": "pfe_artifact_review_001",
+    "policyDecisionArtifactRef": "pda_artifact_review_001"
+  },
+  "runtimeBoundary": {
+    "nodeRef": "node_review_worker_01",
+    "runtimeRef": "runtime_python_3_12_sandboxed",
+    "runtimeProfileRef": "profile_artifact_review_readonly_v1",
+    "sandboxProfileRef": "sandbox_artifact_review_v1"
+  },
+  "status": "admitted",
+  "recordedAt": "2026-06-11T11:00:05Z"
+}

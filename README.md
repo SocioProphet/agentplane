@@ -40,6 +40,9 @@ Agentplane treats execution as evidence-producing work. The current public evide
 - `ExternalModelProviderRouteEvidence`
 - `NativeAssistantBridgeEvidence`
 - `SupplyChainValidationArtifact`
+- `ActionProposal`
+- `ActionAdmission`
+- `RuntimeReceipt`
 
 The Network Door / BYOM / Native Assistant evidence types are non-mutating by default. They record policy posture, references, route decisions, hash-only prompt/destination evidence, and side-effect flags without directly mutating firewall state, installing mesh components, contacting model providers, invoking native assistant APIs, or storing credentials.
 
@@ -166,6 +169,7 @@ agentplane/
 | State pointer model | [docs/state-pointers.md](docs/state-pointers.md) |
 | Control matrix import | [policy/imports/control-matrix/README.md](policy/imports/control-matrix/README.md) |
 | Architecture Decision Records | [docs/adr/README.md](docs/adr/README.md) |
+| Action proposal / admission / runtime receipt contracts | [docs/integration/action-contracts.md](docs/integration/action-contracts.md) |
 | Contributing | [CONTRIBUTING.md](CONTRIBUTING.md) |
 
 ---

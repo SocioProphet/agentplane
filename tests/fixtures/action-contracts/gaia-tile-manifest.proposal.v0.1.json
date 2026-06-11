@@ -1,0 +1,41 @@
+{
+  "apiVersion": "agentplane.socioprophet.org/v0.1",
+  "kind": "ActionProposal",
+  "proposalId": "ap_gaia_tile_001",
+  "agentIntentRef": "intent_gaia_ingest_tile_001",
+  "actionType": "gaia.tile_manifest.publish",
+  "targetRef": "gaia:world-model:tile-manifest:semantic-feature-plane-q1",
+  "parametersHash": "sha256:a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2",
+  "claims": [
+    {
+      "claimRef": "claim_gaia_intent_001",
+      "role": "intent"
+    },
+    {
+      "claimRef": "claim_gaia_effect_tile_written_001",
+      "role": "expected_effect"
+    }
+  ],
+  "evidence": [
+    {
+      "evidenceRef": "ev_gaia_tile_source_001",
+      "digest": "sha256:b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3"
+    }
+  ],
+  "expectedEffects": [
+    "gaia:world-model:tile-manifest:semantic-feature-plane-q1 written",
+    "regis:graph:semantic-feature-plane updated with new tile boundary refs"
+  ],
+  "priorActionSimilarity": {
+    "reEvaluationRequired": true,
+    "vectorCandidates": [
+      {
+        "candidateRef": "ap_gaia_tile_000",
+        "score": 0.91,
+        "candidateOnly": true,
+        "admissionAuthority": false
+      }
+    ]
+  },
+  "createdAt": "2026-06-11T10:00:00Z"
+}

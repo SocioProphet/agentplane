@@ -1,0 +1,29 @@
+{
+  "apiVersion": "agentplane.socioprophet.org/v0.1",
+  "kind": "ActionProposal",
+  "proposalId": "ap_artifact_review_001",
+  "agentIntentRef": "intent_artifact_review_001",
+  "actionType": "artifact.review.classify",
+  "targetRef": "artifact:ev_source_doc_review_001",
+  "parametersHash": "sha256:c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4",
+  "claims": [
+    {
+      "claimRef": "claim_artifact_review_intent_001",
+      "role": "intent"
+    },
+    {
+      "claimRef": "claim_artifact_review_classification_effect_001",
+      "role": "expected_effect"
+    }
+  ],
+  "evidence": [
+    {
+      "evidenceRef": "ev_source_doc_review_001",
+      "digest": "sha256:d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5"
+    }
+  ],
+  "expectedEffects": [
+    "artifact:ev_source_doc_review_001 classified and promotion decision emitted"
+  ],
+  "createdAt": "2026-06-11T11:00:00Z"
+}

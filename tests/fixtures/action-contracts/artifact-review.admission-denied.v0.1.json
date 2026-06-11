@@ -1,0 +1,15 @@
+{
+  "apiVersion": "agentplane.socioprophet.org/v0.1",
+  "kind": "ActionAdmission",
+  "admissionId": "adm_artifact_review_denied_001",
+  "proposalRef": "ap_artifact_review_001",
+  "policyDecision": {
+    "policyDecisionRef": "pd_artifact_review_denied_001",
+    "decision": "deny",
+    "policyFabricEnvelopeRef": "pfe_artifact_review_denied_001",
+    "policyDecisionArtifactRef": null
+  },
+  "status": "denied",
+  "reason": "artifact review action denied: artifact lacks required provenance claim; policy rule artifact_review.provenance_required",
+  "recordedAt": "2026-06-11T11:00:10Z"
+}
