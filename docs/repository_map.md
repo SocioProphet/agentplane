@@ -64,3 +64,16 @@ Tenant worker execution wrappers and contract adapters.
 - `worker.v1.Capability/Execute` — tenant
 - `evidence.v1.Event/Append` — shared with local precedence
 - `replay.v1.Cairn/Materialize` — local first
+
+## Enrichment Twin (forward pointer)
+
+The Enrichment Twin archetype (photo, media, document, per-asset analysis as a governed mission) is specified in `SocioProphet/ProCybernetica`:
+
+- **Mission spec:** `ProCybernetica/docs/architecture/enrichment-twin-mission-spec.md`
+- **GenesisSeed schema:** `ProCybernetica/schemas/genesis_seed.schema.json`
+- **Enrichment claim hologram schema:** `ProCybernetica/schemas/enrichment_claim_hologram.schema.json`
+- **Open decisions (owner call required before build):** `ProCybernetica/docs/adr/0002-enrichment-twin-open-decisions.md`
+
+Agentplane is the target runtime for the Enrichment Twin. The integration surface is: receive a validated `seed:enrichment/photo-v1` bundle → bind organs → execute per-asset analysis → write claim holograms to memory-mesh → gate `GATED_HOST_UPDATE` with approval. The K3 twin bridge lifecycle (`INIT_SESSION → ... → TWIN_READY → GATED_HOST_UPDATE`) maps onto the existing agentplane bundle + executor + evidence chain.
+
+Agent-buildable once: (1) the three open decisions in ADR-0002 have owner calls, (2) the placement scheduler locus-eligibility table is wired, and (3) `make validate` is green across prophet-platform, agentplane, memory-mesh, and model-router.
