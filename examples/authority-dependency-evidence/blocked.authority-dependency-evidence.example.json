@@ -1,0 +1,17 @@
+{
+  "apiVersion": "agentplane.socioprophet.org/v0.1",
+  "kind": "AuthorityDependencyEvidence",
+  "evidence_id": "ade_blocked_001",
+  "run_id": "run_untrusted_001",
+  "actor_ref": "agent:untrusted-worker:v0.1",
+  "authority_dependency_id": "authdep_network_egress_001",
+  "trust_surface_ref": "trust-surface:network-egress-lane",
+  "policy_decision_ref": "pd_denied_egress_001",
+  "control_effect": "network_egress_blocked",
+  "target_ref": "network:external-endpoint:api.example.com",
+  "evidence_outcome": "blocked",
+  "recorded_at": "2026-06-11T11:30:00Z",
+  "executor_ref": "executor:node_restricted_01",
+  "side_effect_flags": ["no_mutation", "no_network"],
+  "replay_classification": "blocked_no_side_effects"
+}

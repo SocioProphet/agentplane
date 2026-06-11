@@ -1,0 +1,22 @@
+{
+  "apiVersion": "agentplane.socioprophet.org/v0.1",
+  "kind": "AgentCycleHealth",
+  "cycle_id": "cycle_denied_001",
+  "session_id": "session_003",
+  "actor_id": "agent_external_001",
+  "model_id": "claude-sonnet-4-6",
+  "runtime_lane": "restricted",
+  "host_loop_mode": "governed_runner_v0.1",
+  "executor_id": "executor_node_restricted_01",
+  "outcome": "failed_policy_denied",
+  "failure_class": "policy_admission_denied",
+  "error_message_redacted": "[redacted: policy rule artifact_export.provenance_required]",
+  "seconds_to_outcome": 0.2,
+  "tool_calls": 0,
+  "state_preserved": false,
+  "evidence_refs": [
+    "admission:adm_denied_001"
+  ],
+  "privacy_class": "restricted",
+  "receipt_hash": "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+}

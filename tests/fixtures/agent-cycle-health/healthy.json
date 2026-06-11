@@ -1,0 +1,26 @@
+{
+  "apiVersion": "agentplane.socioprophet.org/v0.1",
+  "kind": "AgentCycleHealth",
+  "cycle_id": "cycle_healthy_001",
+  "session_id": "session_001",
+  "actor_id": "agent_gaia_ingest_001",
+  "model_id": "claude-sonnet-4-6",
+  "runtime_lane": "bounded_ingest",
+  "host_loop_mode": "governed_runner_v0.1",
+  "executor_id": "executor_node_gaia_01",
+  "bundle_id": "bundle_gaia_ingest_v0.1",
+  "is_resume": false,
+  "outcome": "completed",
+  "first_response_latency_ms": 412,
+  "seconds_to_outcome": 3.8,
+  "transcript_size_bytes": 4096,
+  "tool_calls": 2,
+  "files_changed": 1,
+  "state_preserved": true,
+  "evidence_refs": [
+    "run:run_healthy_001",
+    "replay:replay_healthy_001"
+  ],
+  "privacy_class": "internal",
+  "receipt_hash": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+}

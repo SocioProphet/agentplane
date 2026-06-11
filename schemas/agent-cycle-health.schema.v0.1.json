@@ -1,0 +1,73 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "AgentCycleHealth",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "apiVersion",
+    "kind",
+    "cycle_id",
+    "session_id",
+    "actor_id",
+    "model_id",
+    "runtime_lane",
+    "host_loop_mode",
+    "executor_id",
+    "outcome",
+    "seconds_to_outcome",
+    "privacy_class",
+    "receipt_hash"
+  ],
+  "properties": {
+    "apiVersion": { "const": "agentplane.socioprophet.org/v0.1" },
+    "kind": { "const": "AgentCycleHealth" },
+    "cycle_id": { "type": "string", "minLength": 1 },
+    "session_id": { "type": "string", "minLength": 1 },
+    "parent_session_id": { "type": "string", "minLength": 1 },
+    "actor_id": { "type": "string", "minLength": 1 },
+    "model_id": { "type": "string", "minLength": 1 },
+    "runtime_lane": { "type": "string", "minLength": 1 },
+    "host_loop_mode": { "type": "string", "minLength": 1 },
+    "executor_id": { "type": "string", "minLength": 1 },
+    "bundle_id": { "type": "string", "minLength": 1 },
+    "is_resume": { "type": "boolean" },
+    "outcome": {
+      "type": "string",
+      "enum": [
+        "completed",
+        "completed_with_warnings",
+        "failed_retriable",
+        "failed_rate_limited",
+        "failed_policy_denied",
+        "failed_user_action_required",
+        "failed_internal_error"
+      ]
+    },
+    "failure_class": { "type": "string", "minLength": 1 },
+    "error_message_redacted": { "type": "string", "minLength": 1 },
+    "first_response_latency_ms": { "type": "number", "minimum": 0 },
+    "seconds_to_outcome": { "type": "number", "minimum": 0 },
+    "transcript_size_bytes": { "type": "integer", "minimum": 0 },
+    "tool_calls": { "type": "integer", "minimum": 0 },
+    "files_changed": { "type": "integer", "minimum": 0 },
+    "state_preserved": { "type": "boolean" },
+    "retry_policy": {
+      "type": "object",
+      "properties": {
+        "max_attempts": { "type": "integer", "minimum": 1 },
+        "backoff_seconds": { "type": "number", "minimum": 0 },
+        "retry_on": { "type": "array", "items": { "type": "string" } }
+      },
+      "additionalProperties": false
+    },
+    "evidence_refs": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "privacy_class": { "type": "string", "minLength": 1 },
+    "receipt_hash": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$"
+    }
+  }
+}
