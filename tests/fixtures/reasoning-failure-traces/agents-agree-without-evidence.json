@@ -1,0 +1,26 @@
+{
+  "apiVersion": "agentplane.socioprophet.org/v0.1",
+  "kind": "ReasoningFailureTrace",
+  "trace_id": "rft_no_evidence_001",
+  "task_id": "task_multi_agent_review_001",
+  "actor_id": "agent_reviewer_a_001",
+  "typed_intent": "confirm artifact review result via multi-agent consensus",
+  "failure_cluster": "inter_agent_misalignment",
+  "failure_annotation": "agents_agree_without_independent_evidence: both agents reached the same conclusion but no independent evidence refs were provided",
+  "claim_refs": ["claim_artifact_clean_001"],
+  "invariant_refs": ["inv_independent_evidence_per_agent"],
+  "evidence_refs": [],
+  "assumptions": ["other agent already verified independently"],
+  "verifier_required": true,
+  "verifier_decision": "failed",
+  "termination_authority": "policy_fabric_multi_agent",
+  "escalation_rule": "block_until_independent_evidence_provided",
+  "residual_risk": "high",
+  "llm_rationale_unsupported": true,
+  "inter_agent_alignment": {
+    "agents": ["agent_reviewer_a_001", "agent_reviewer_b_001"],
+    "independent_evidence_required": true,
+    "agreement_without_evidence": true
+  },
+  "recorded_at": "2026-06-11T13:00:00Z"
+}
