@@ -6,12 +6,14 @@ on:
       - '**/*.py'
       - '**/*.json'
       - '**/*.md'
+      - '.prophet/**/*.yaml'
       - '.github/workflows/lint.yml'
   pull_request:
     paths:
       - '**/*.py'
       - '**/*.json'
       - '**/*.md'
+      - '.prophet/**/*.yaml'
       - '.github/workflows/lint.yml'
 
 jobs:
