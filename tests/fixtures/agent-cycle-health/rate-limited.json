@@ -1,0 +1,23 @@
+{
+  "apiVersion": "agentplane.socioprophet.org/v0.1",
+  "kind": "AgentCycleHealth",
+  "cycle_id": "cycle_ratelimit_001",
+  "session_id": "session_002",
+  "actor_id": "agent_gaia_ingest_001",
+  "model_id": "claude-sonnet-4-6",
+  "runtime_lane": "bounded_ingest",
+  "host_loop_mode": "governed_runner_v0.1",
+  "executor_id": "executor_node_gaia_01",
+  "outcome": "failed_rate_limited",
+  "failure_class": "provider_rate_limit",
+  "error_message_redacted": "[redacted: provider rate limit exceeded]",
+  "seconds_to_outcome": 0.9,
+  "tool_calls": 0,
+  "retry_policy": {
+    "max_attempts": 3,
+    "backoff_seconds": 30,
+    "retry_on": ["failed_rate_limited"]
+  },
+  "privacy_class": "internal",
+  "receipt_hash": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+}

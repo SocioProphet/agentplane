@@ -1,0 +1,19 @@
+{
+  "apiVersion": "agentplane.socioprophet.org/v0.1",
+  "kind": "AuthorityDependencyEvidence",
+  "evidence_id": "ade_used_001",
+  "run_id": "run_gaia_ingest_001",
+  "actor_ref": "agent:gaia-ingest-worker:v0.1",
+  "authority_dependency_id": "authdep_graph_write_001",
+  "trust_surface_ref": "trust-surface:regis-graph-write-lane",
+  "policy_decision_ref": "pd_gaia_tile_001",
+  "control_effect": "graph_write_permitted",
+  "target_ref": "regis:graph:semantic-feature-plane",
+  "evidence_outcome": "used",
+  "recorded_at": "2026-06-11T10:00:09Z",
+  "executor_ref": "executor:node_gaia_ingest_worker_01",
+  "session_ref": "session_gaia_001",
+  "bundle_id": "bundle_gaia_ingest_v0.1",
+  "side_effect_flags": ["graph_mutation"],
+  "replay_classification": "deterministic"
+}

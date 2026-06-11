@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "AuthorityDependencyEvidence",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "apiVersion",
+    "kind",
+    "evidence_id",
+    "run_id",
+    "actor_ref",
+    "authority_dependency_id",
+    "trust_surface_ref",
+    "policy_decision_ref",
+    "control_effect",
+    "target_ref",
+    "evidence_outcome",
+    "recorded_at"
+  ],
+  "properties": {
+    "apiVersion": { "const": "agentplane.socioprophet.org/v0.1" },
+    "kind": { "const": "AuthorityDependencyEvidence" },
+    "evidence_id": { "type": "string", "minLength": 1 },
+    "run_id": { "type": "string", "minLength": 1 },
+    "actor_ref": { "type": "string", "minLength": 1 },
+    "authority_dependency_id": { "type": "string", "minLength": 1 },
+    "trust_surface_ref": { "type": "string", "minLength": 1 },
+    "policy_decision_ref": { "type": "string", "minLength": 1 },
+    "control_effect": { "type": "string", "minLength": 1 },
+    "target_ref": { "type": "string", "minLength": 1 },
+    "evidence_outcome": {
+      "type": "string",
+      "enum": ["used", "denied", "blocked", "cancelled", "quarantined", "degraded", "simulated", "not_used"]
+    },
+    "recorded_at": { "type": "string", "format": "date-time" },
+    "executor_ref": { "type": "string", "minLength": 1 },
+    "session_ref": { "type": "string", "minLength": 1 },
+    "bundle_id": { "type": "string", "minLength": 1 },
+    "side_effect_flags": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "replay_classification": { "type": "string", "minLength": 1 },
+    "cancellation_binding_ref": { "type": "string", "minLength": 1 }
+  }
+}
