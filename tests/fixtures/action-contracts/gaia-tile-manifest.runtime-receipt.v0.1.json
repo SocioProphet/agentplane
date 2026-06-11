@@ -1,0 +1,26 @@
+{
+  "apiVersion": "agentplane.socioprophet.org/v0.1",
+  "kind": "RuntimeReceipt",
+  "receiptId": "rr_gaia_tile_001",
+  "proposalRef": "ap_gaia_tile_001",
+  "admissionRef": "adm_gaia_tile_001",
+  "policyDecisionRef": "pd_gaia_tile_001",
+  "agentIdentity": {
+    "agentId": "agent_gaia_ingest_001",
+    "agentRef": "agent:gaia-ingest-worker:v0.1"
+  },
+  "runtimeIdentity": {
+    "nodeRef": "node_gaia_ingest_worker_01",
+    "runtimeRef": "runtime_python_3_12_sandboxed"
+  },
+  "runtimeProfile": {
+    "runtimeProfileRef": "profile_gaia_bounded_ingest_v1",
+    "sandboxProfileRef": "sandbox_gaia_write_restricted_v1"
+  },
+  "inputHash": "sha256:a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2",
+  "outputHash": "sha256:e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6",
+  "logsRef": "logs:gaia-ingest:node_gaia_ingest_worker_01:rr_gaia_tile_001",
+  "startTime": "2026-06-11T10:00:06Z",
+  "endTime": "2026-06-11T10:00:09Z",
+  "status": "succeeded"
+}

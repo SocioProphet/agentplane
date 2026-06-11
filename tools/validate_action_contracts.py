@@ -9,7 +9,7 @@ from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
 SCHEMAS = ROOT / "schemas"
-FIXTURES = ROOT / "fixtures" / "action-contracts"
+FIXTURES = ROOT / "tests" / "fixtures" / "action-contracts"
 
 ACTION_PROPOSAL_SCHEMA = SCHEMAS / "action-proposal.schema.v0.1.json"
 ACTION_ADMISSION_SCHEMA = SCHEMAS / "action-admission.schema.v0.1.json"
