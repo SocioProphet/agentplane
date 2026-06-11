@@ -1,0 +1,21 @@
+{
+  "apiVersion": "agentplane.socioprophet.org/v0.1",
+  "kind": "ReasoningFailureTrace",
+  "trace_id": "rft_stale_memory_001",
+  "task_id": "task_route_decision_001",
+  "actor_id": "agent_router_001",
+  "typed_intent": "select model route based on runtime context",
+  "failure_cluster": "specification_system_design",
+  "failure_annotation": "stale_memory_contaminated_run: retrieved memory snapshot predates current policy bundle; route decision may reflect revoked policy",
+  "claim_refs": ["claim_route_decision_001"],
+  "invariant_refs": ["inv_memory_freshness_gate"],
+  "evidence_refs": ["ev_memory_snapshot_stale_001"],
+  "assumptions": ["memory lane is always fresh"],
+  "verifier_required": true,
+  "verifier_decision": "inconclusive",
+  "termination_authority": "policy_fabric_route_gate",
+  "escalation_rule": "refresh_memory_and_retry_or_block",
+  "residual_risk": "medium",
+  "llm_rationale_unsupported": false,
+  "recorded_at": "2026-06-11T14:00:00Z"
+}

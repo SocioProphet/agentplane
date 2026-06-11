@@ -1,0 +1,21 @@
+{
+  "apiVersion": "agentplane.socioprophet.org/v0.1",
+  "kind": "ReasoningFailureTrace",
+  "trace_id": "rft_no_authority_001",
+  "task_id": "task_ingest_delta_001",
+  "actor_id": "agent_gaia_001",
+  "typed_intent": "mark task complete after graph delta ingestion",
+  "failure_cluster": "task_verification_termination",
+  "failure_annotation": "agent_marks_complete_without_termination_authority: agent declared task complete but no termination_authority granted by policy",
+  "claim_refs": ["claim_delta_ingested_001"],
+  "invariant_refs": ["inv_termination_authority_required"],
+  "evidence_refs": [],
+  "assumptions": ["policy would auto-grant on completion"],
+  "verifier_required": true,
+  "verifier_decision": "failed",
+  "termination_authority": "none",
+  "escalation_rule": "require_human_review_on_termination_failure",
+  "residual_risk": "medium",
+  "llm_rationale_unsupported": true,
+  "recorded_at": "2026-06-11T12:00:00Z"
+}
