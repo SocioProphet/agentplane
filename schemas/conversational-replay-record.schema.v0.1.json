@@ -1,0 +1,79 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://socioprophet.io/schemas/agentplane/conversational-replay-record/v0.1",
+  "title": "ConversationalReplayRecord",
+  "description": "Replay record linking a conversational session or turn to an AgentPlane governed replay execution. Provides the replay artifact for ConversationalActionEvidence.replay_linkage. AgentPlane emits this on replay completion; the conversational service is the upstream consumer.",
+  "type": "object",
+  "required": [
+    "kind",
+    "replay_record_id",
+    "conversation_session_id",
+    "replay_trigger_ref",
+    "replay_execution_ref",
+    "replay_status",
+    "replay_scope",
+    "policy_decision_ref",
+    "non_claims",
+    "issued_at"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "kind": { "type": "string", "const": "ConversationalReplayRecord" },
+    "replay_record_id": { "type": "string", "minLength": 1 },
+    "conversation_session_id": { "type": "string", "minLength": 1 },
+    "turn_id": { "type": "string" },
+    "replay_trigger_ref": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Ref to the ConversationalActionEvidence that triggered this replay"
+    },
+    "replay_execution_ref": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Ref to the AgentPlane governed execution artifact for this replay"
+    },
+    "replay_status": {
+      "type": "string",
+      "enum": ["completed", "failed", "diverged", "pending"]
+    },
+    "replay_scope": {
+      "type": "string",
+      "enum": ["turn", "session", "execution_artifact"]
+    },
+    "policy_decision_ref": { "type": "string", "minLength": 1 },
+    "divergence_record": {
+      "type": "object",
+      "required": ["detected_at", "divergence_type", "original_ref", "replay_ref"],
+      "additionalProperties": false,
+      "properties": {
+        "detected_at": { "type": "string", "format": "date-time" },
+        "divergence_type": {
+          "type": "string",
+          "enum": ["output_mismatch", "policy_change", "data_drift", "actor_change", "tool_unavailable"]
+        },
+        "original_ref": { "type": "string", "minLength": 1 },
+        "replay_ref": { "type": "string", "minLength": 1 },
+        "resolution_status": {
+          "type": "string",
+          "enum": ["unresolved", "accepted", "escalated", "invalidated"]
+        }
+      }
+    },
+    "non_claims": {
+      "type": "array",
+      "items": { "type": "string" },
+      "minItems": 1
+    },
+    "upstream_anchors": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "issued_at": { "type": "string", "format": "date-time" }
+  },
+  "if": {
+    "properties": { "replay_status": { "const": "diverged" } }
+  },
+  "then": {
+    "required": ["divergence_record"]
+  }
+}

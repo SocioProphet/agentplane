@@ -1,0 +1,23 @@
+{
+  "kind": "ConversationalReplayRecord",
+  "replay_record_id": "conv-replay:c3d4e5-diverged",
+  "conversation_session_id": "conv-session:policy-migration-sess-003",
+  "turn_id": "conv-turn:sess-003-turn-02",
+  "replay_trigger_ref": "conv-evidence:c3d4e5-replay-request",
+  "replay_execution_ref": "governed-run://agentplane/runs/replay-run-c3d4e5",
+  "replay_status": "diverged",
+  "replay_scope": "execution_artifact",
+  "policy_decision_ref": "policy-fabric://decision/pd-conv-replay-c3d4e5",
+  "divergence_record": {
+    "detected_at": "2024-01-15T16:05:22Z",
+    "divergence_type": "policy_change",
+    "original_ref": "governed-run://agentplane/runs/run-c3d4e5-original",
+    "replay_ref": "governed-run://agentplane/runs/replay-run-c3d4e5",
+    "resolution_status": "escalated"
+  },
+  "non_claims": [
+    "This record does not prescribe a resolution path for the detected divergence.",
+    "Divergence escalation outcome is tracked separately by the policy fabric."
+  ],
+  "issued_at": "2024-01-15T16:05:25Z"
+}

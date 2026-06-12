@@ -1,0 +1,27 @@
+{
+  "kind": "ConversationalActionEvidence",
+  "evidence_id": "conv-evidence:b2c3d4-approval-denial",
+  "conversation_session_id": "conv-session:escalation-review-2024-01-15-sess-002",
+  "turn_id": "conv-turn:sess-002-turn-03",
+  "action_type": "approval_denial",
+  "actor_ref": "user://operator/senior-analyst/badge-7841",
+  "service_ref": "service://conversational-mesh/escalation-review/v1",
+  "policy_decision_ref": "policy-fabric://decision/pd-conv-approval-denial-b2c3",
+  "policy_outcome": "deny",
+  "execution_artifact_ref": "governed-run://agentplane/runs/run-b2c3d4e5-denied",
+  "execution_artifact_kind": "GovernedRunContract",
+  "replay_linkage": {
+    "replay_eligible": true,
+    "replay_artifact_ref": "replay://agentplane/conversational/replay-b2c3d4",
+    "replay_verified": false,
+    "replay_scope": "turn"
+  },
+  "non_claims": [
+    "This artifact does not record the reason for denial beyond the policy decision ref.",
+    "This artifact does not represent the outcome of any subsequent appeal."
+  ],
+  "hellgraph_evidence_refs": [
+    "evidence://hellgraph/conversational/conv-evidence-b2c3d4"
+  ],
+  "issued_at": "2024-01-15T14:12:10Z"
+}
