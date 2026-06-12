@@ -1,0 +1,161 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://socioprophet.io/schemas/agentplane/shir-governed-chain-job/v0.1",
+  "title": "SHIRGovernedChainJob",
+  "description": "AgentPlane job contract for the governed SHIR chain (rdf-to-shir → shir-to-pyg → semantic-leakage → chain receipt). job_type: shir.governed_chain.v0.1. No PyTorch/PyG/DGL runtime required in v0.1. AgentPlane orchestrates stages, retains artifacts, and emits the chain run receipt.",
+  "type": "object",
+  "required": [
+    "kind",
+    "job_id",
+    "job_type",
+    "input_ref",
+    "schema_ref",
+    "ontology_profile_ref",
+    "out_ref",
+    "policy_mode",
+    "relation_strategy",
+    "stages",
+    "artifacts",
+    "job_status",
+    "policy_decision_ref",
+    "non_claims",
+    "issued_at"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "kind": { "type": "string", "const": "SHIRGovernedChainJob" },
+    "job_id": { "type": "string", "minLength": 1 },
+    "job_type": { "type": "string", "const": "shir.governed_chain.v0.1" },
+    "input_ref": {
+      "type": "string",
+      "minLength": 1,
+      "description": "RDF/Turtle/JSON-LD/TriG artifact reference; v0.1 defaults to Turtle"
+    },
+    "input_format": {
+      "type": "string",
+      "enum": ["turtle", "json-ld", "trig", "n-quads"],
+      "default": "turtle"
+    },
+    "schema_ref": { "type": "string", "minLength": 1 },
+    "ontology_profile_ref": { "type": "string", "minLength": 1 },
+    "out_ref": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Artifact-retention location (stable run directory or object prefix)"
+    },
+    "prediction_cutoff": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Optional timestamp for semantic leakage checks"
+    },
+    "policy_mode": {
+      "type": "string",
+      "enum": ["advisory", "fail_closed", "review_required"]
+    },
+    "relation_strategy": {
+      "type": "string",
+      "enum": ["relation_node", "edge_only", "hybrid"],
+      "description": "v0.1 default: relation_node"
+    },
+    "stages": { "$ref": "#/$defs/SHIRChainStages" },
+    "artifacts": { "$ref": "#/$defs/SHIRArtifacts" },
+    "failure_mode": {
+      "type": "string",
+      "enum": [
+        "none",
+        "syntax_parse_failure",
+        "schema_validation_failure",
+        "projection_loss_blocking",
+        "semantic_leakage_blocking",
+        "policy_denied",
+        "artifact_retention_failure",
+        "downstream_publication_failure",
+        "replay_mismatch"
+      ]
+    },
+    "failure_artifact_ref": {
+      "type": "string",
+      "description": "Structured error artifact ref when failure_mode is set"
+    },
+    "job_status": {
+      "type": "string",
+      "enum": ["running", "completed", "requires_review", "failed_closed", "failed", "denied"]
+    },
+    "policy_outcome": {
+      "type": "string",
+      "enum": ["allowed", "requires_review", "denied", "failed_closed"]
+    },
+    "policy_decision_ref": { "type": "string", "minLength": 1 },
+    "replay_artifact_ref": { "type": "string" },
+    "hellgraph_evidence_refs": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "upstream_anchors": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "non_claims": {
+      "type": "array",
+      "items": { "type": "string" },
+      "minItems": 1
+    },
+    "issued_at": { "type": "string", "format": "date-time" }
+  },
+  "$defs": {
+    "SHIRChainStages": {
+      "type": "object",
+      "required": ["rdf_to_shir", "shir_to_pyg", "semantic_leakage", "chain_receipt"],
+      "additionalProperties": false,
+      "properties": {
+        "rdf_to_shir": { "$ref": "#/$defs/StageRecord" },
+        "shir_to_pyg": { "$ref": "#/$defs/StageRecord" },
+        "semantic_leakage": { "$ref": "#/$defs/StageRecord" },
+        "chain_receipt": { "$ref": "#/$defs/StageRecord" }
+      }
+    },
+    "StageRecord": {
+      "type": "object",
+      "required": ["stage_id", "stage_status"],
+      "additionalProperties": false,
+      "properties": {
+        "stage_id": { "type": "string", "minLength": 1 },
+        "stage_status": {
+          "type": "string",
+          "enum": ["pending", "running", "completed", "failed", "skipped", "blocked"]
+        },
+        "stage_receipt_ref": { "type": "string" },
+        "failure_reason": { "type": "string" },
+        "artifact_refs": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "SHIRArtifacts": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "shir_candidate_assertion_ref": { "type": "string" },
+        "shir_assertion_ref": { "type": "string" },
+        "rdf_to_shir_receipt_ref": { "type": "string" },
+        "pyg_manifest_ref": { "type": "string" },
+        "projection_manifest_ref": { "type": "string" },
+        "projection_loss_report_ref": { "type": "string" },
+        "shir_to_pyg_receipt_ref": { "type": "string" },
+        "semantic_leakage_report_ref": { "type": "string" },
+        "semantic_leakage_projection_loss_report_ref": { "type": "string" },
+        "semantic_leakage_receipt_ref": { "type": "string" },
+        "chain_run_receipt_ref": { "type": "string" }
+      }
+    }
+  },
+  "if": {
+    "properties": {
+      "job_status": { "enum": ["requires_review", "failed_closed"] }
+    }
+  },
+  "then": {
+    "required": ["failure_mode", "policy_outcome"]
+  }
+}

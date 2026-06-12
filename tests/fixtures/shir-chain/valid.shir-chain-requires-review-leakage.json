@@ -1,0 +1,64 @@
+{
+  "kind": "SHIRGovernedChainJob",
+  "job_id": "shir-job:leakage-review-002",
+  "job_type": "shir.governed_chain.v0.1",
+  "input_ref": "artifact://fabric-mlops-ts-suite/rdf/leaky-ontology.v1.ttl",
+  "input_format": "turtle",
+  "schema_ref": "semantic-serdes://schema/shir-v1/checkout-2024-01-15",
+  "ontology_profile_ref": "ontogenesis://profile/shir/leaky-v1",
+  "out_ref": "artifact://agentplane/shir-jobs/leakage-review-002/output",
+  "policy_mode": "review_required",
+  "relation_strategy": "relation_node",
+  "stages": {
+    "rdf_to_shir": {
+      "stage_id": "shir-job:leakage-review-002:rdf-to-shir",
+      "stage_status": "completed",
+      "stage_receipt_ref": "receipt://shir/leakage-review-002/rdf-to-shir"
+    },
+    "shir_to_pyg": {
+      "stage_id": "shir-job:leakage-review-002:shir-to-pyg",
+      "stage_status": "completed",
+      "stage_receipt_ref": "receipt://shir/leakage-review-002/shir-to-pyg",
+      "artifact_refs": [
+        "artifact://agentplane/shir-jobs/leakage-review-002/output/projection-loss-report.json"
+      ]
+    },
+    "semantic_leakage": {
+      "stage_id": "shir-job:leakage-review-002:semantic-leakage",
+      "stage_status": "blocked",
+      "stage_receipt_ref": "receipt://shir/leakage-review-002/semantic-leakage",
+      "failure_reason": "Semantic leakage exceeds advisory threshold; review_required policy mode triggered.",
+      "artifact_refs": [
+        "artifact://agentplane/shir-jobs/leakage-review-002/output/semantic-leakage-report.json"
+      ]
+    },
+    "chain_receipt": {
+      "stage_id": "shir-job:leakage-review-002:chain-receipt",
+      "stage_status": "completed",
+      "stage_receipt_ref": "receipt://shir/leakage-review-002/chain"
+    }
+  },
+  "artifacts": {
+    "rdf_to_shir_receipt_ref": "receipt://shir/leakage-review-002/rdf-to-shir",
+    "projection_loss_report_ref": "artifact://agentplane/shir-jobs/leakage-review-002/output/projection-loss-report.json",
+    "shir_to_pyg_receipt_ref": "receipt://shir/leakage-review-002/shir-to-pyg",
+    "semantic_leakage_report_ref": "artifact://agentplane/shir-jobs/leakage-review-002/output/semantic-leakage-report.json",
+    "semantic_leakage_receipt_ref": "receipt://shir/leakage-review-002/semantic-leakage",
+    "chain_run_receipt_ref": "receipt://shir/leakage-review-002/chain"
+  },
+  "failure_mode": "semantic_leakage_blocking",
+  "failure_artifact_ref": "artifact://agentplane/shir-jobs/leakage-review-002/output/semantic-leakage-report.json",
+  "job_status": "requires_review",
+  "policy_outcome": "requires_review",
+  "policy_decision_ref": "policy-fabric://decision/pd-shir-leakage-review-002",
+  "upstream_anchors": [
+    "prophet-platform-fabric-mlops-ts-suite#38",
+    "prophet-platform-fabric-mlops-ts-suite#45",
+    "agentplane#112"
+  ],
+  "non_claims": [
+    "requires_review does not halt artifact retention; partial artifacts are preserved.",
+    "This job does not prescribe the review outcome."
+  ],
+  "issued_at": "2024-01-15T16:30:00Z"
+}
