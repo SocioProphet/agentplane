@@ -1,0 +1,12 @@
+{
+  "_reject_reason": "replay_status=diverged requires divergence_record (conditional)",
+  "kind": "GuardrailReplayArtifact",
+  "replay_id": "guardrail-replay:reject-diverged-no-record",
+  "policy_decision_artifact_ref": "guardrail-fabric://policy-decision/reject",
+  "workcell_ref": "workcell://reject",
+  "replay_class": "best-effort",
+  "replay_status": "diverged",
+  "policy_decision_ref": "policy-fabric://decision/pd-reject",
+  "non_claims": ["placeholder"],
+  "issued_at": "2024-01-15T10:00:00Z"
+}

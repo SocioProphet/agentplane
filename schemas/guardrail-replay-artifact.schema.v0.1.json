@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://socioprophet.io/schemas/agentplane/guardrail-replay-artifact/v0.1",
+  "title": "GuardrailReplayArtifact",
+  "description": "AgentPlane replay artifact for a guardrail-fabric PolicyDecisionArtifact. Enables auditing and replaying the governed execution context that produced a guardrail decision. AgentPlane owns replay execution; guardrail-fabric evaluates policy.",
+  "type": "object",
+  "required": [
+    "kind",
+    "replay_id",
+    "policy_decision_artifact_ref",
+    "workcell_ref",
+    "replay_class",
+    "replay_status",
+    "policy_decision_ref",
+    "non_claims",
+    "issued_at"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "kind": { "type": "string", "const": "GuardrailReplayArtifact" },
+    "replay_id": { "type": "string", "minLength": 1 },
+    "policy_decision_artifact_ref": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Ref to the guardrail-fabric PolicyDecisionArtifact being replayed"
+    },
+    "workcell_ref": { "type": "string", "minLength": 1 },
+    "replay_class": {
+      "type": "string",
+      "enum": ["exact", "best-effort", "evidence-only", "non-replayable-side-effect"]
+    },
+    "replay_status": {
+      "type": "string",
+      "enum": ["completed", "failed", "diverged", "pending"]
+    },
+    "divergence_record": {
+      "type": "object",
+      "required": ["detected_at", "divergence_type"],
+      "additionalProperties": false,
+      "properties": {
+        "detected_at": { "type": "string", "format": "date-time" },
+        "divergence_type": {
+          "type": "string",
+          "enum": ["policy_change", "data_drift", "guardrail_version_change", "output_mismatch"]
+        },
+        "resolution_status": {
+          "type": "string",
+          "enum": ["unresolved", "accepted", "escalated"]
+        }
+      }
+    },
+    "evidence_refs": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "policy_decision_ref": { "type": "string", "minLength": 1 },
+    "non_claims": {
+      "type": "array",
+      "items": { "type": "string" },
+      "minItems": 1
+    },
+    "issued_at": { "type": "string", "format": "date-time" }
+  },
+  "if": {
+    "properties": { "replay_status": { "const": "diverged" } }
+  },
+  "then": {
+    "required": ["divergence_record"]
+  }
+}

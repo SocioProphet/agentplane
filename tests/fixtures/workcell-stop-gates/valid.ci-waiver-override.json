@@ -1,0 +1,19 @@
+{
+  "kind": "HumanOverrideArtifact",
+  "override_id": "override:ci-waiver-issue-106-001",
+  "override_type": "ci_waiver",
+  "overridden_artifact_ref": "stop-gate://agentplane/workcell-issue-106-001/ci-check",
+  "authority_ref": "user://operator/senior-engineer/badge-4291",
+  "override_reason": "CI failure is a pre-existing flaky test in test_analytics_batch; not related to this change. Senior engineer confirms scope is isolated.",
+  "scope_constraints": [
+    "Limited to branch feat/graph-aware-dispatch only",
+    "Expires after PR merge or 24 hours"
+  ],
+  "policy_decision_ref": "policy-fabric://decision/pd-human-override-ci-waiver-001",
+  "audit_ref": "audit://agentplane/human-overrides/ci-waiver-issue-106-001",
+  "non_claims": [
+    "This override does not certify the CI failure is unrelated; it records the human authority judgment.",
+    "Scope is limited; this override does not apply to other branches or tasks."
+  ],
+  "issued_at": "2024-01-15T11:00:00Z"
+}
