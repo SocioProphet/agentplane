@@ -1,0 +1,13 @@
+{
+  "_reject_reason": "kind must be SubstrateTrustGate (const violation)",
+  "kind": "SubstrateTrustGateV2",
+  "gate_id": "trust-gate:reject-wrong-kind",
+  "substrate_ref": "memory://reject",
+  "substrate_type": "memory_lane",
+  "report_ref": "sourceos-syncd://report/reject",
+  "diagnosis_status": "healthy",
+  "gate_decision": "allow",
+  "policy_decision_ref": "policy-fabric://decision/pd-reject",
+  "non_claims": ["placeholder"],
+  "evaluated_at": "2024-01-15T10:00:00Z"
+}

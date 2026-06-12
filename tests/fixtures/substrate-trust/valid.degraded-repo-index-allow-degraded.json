@@ -1,0 +1,22 @@
+{
+  "kind": "SubstrateTrustGate",
+  "gate_id": "trust-gate:repo-index-degraded-002",
+  "substrate_ref": "repo-index://agentplane/main/semantic-index",
+  "substrate_type": "repo_index",
+  "report_ref": "sourceos-syncd://report/repo-index/integrity-2024-01-15-degraded",
+  "report_schema_valid": true,
+  "report_freshness": "stale",
+  "diagnosis_status": "degraded",
+  "lane_status": "degraded",
+  "replay_lag_acceptable": false,
+  "heartbeat_fresh": true,
+  "gate_decision": "allow_degraded",
+  "degraded_mode_authorization_ref": "policy-fabric://authorization/degraded-repo-index-access/2024-01-15",
+  "trusted_report_ref": "sourceos-syncd://report/repo-index/integrity-2024-01-15-degraded",
+  "policy_decision_ref": "policy-fabric://decision/pd-substrate-repo-degraded-002",
+  "non_claims": [
+    "allow_degraded requires explicit policy authorization; this gate carries the authorization ref.",
+    "Degraded repo index means affected node/edge coverage may be incomplete; agent output must reflect this."
+  ],
+  "evaluated_at": "2024-01-15T10:05:00Z"
+}

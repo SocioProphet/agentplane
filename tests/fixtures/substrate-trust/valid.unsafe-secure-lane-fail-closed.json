@@ -1,0 +1,21 @@
+{
+  "kind": "SubstrateTrustGate",
+  "gate_id": "trust-gate:secure-lane-unsafe-003",
+  "substrate_ref": "secure-lane://agentplane/policy-state/live",
+  "substrate_type": "secure_lane",
+  "report_ref": "sourceos-syncd://report/secure-lane/integrity-2024-01-15-unsafe",
+  "report_schema_valid": true,
+  "report_freshness": "current",
+  "diagnosis_status": "unsafe",
+  "lane_status": "blocked",
+  "replay_lag_acceptable": false,
+  "heartbeat_fresh": false,
+  "secure_lane_redaction_required": true,
+  "gate_decision": "fail_closed",
+  "policy_decision_ref": "policy-fabric://decision/pd-substrate-secure-unsafe-003",
+  "non_claims": [
+    "fail_closed: unsafe secure lane access is blocked. No agent action is permitted against this substrate.",
+    "This gate does not prescribe remediation; repair must be tracked separately."
+  ],
+  "evaluated_at": "2024-01-15T10:10:00Z"
+}

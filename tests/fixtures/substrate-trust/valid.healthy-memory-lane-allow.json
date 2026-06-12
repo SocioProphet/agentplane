@@ -1,0 +1,25 @@
+{
+  "kind": "SubstrateTrustGate",
+  "gate_id": "trust-gate:memory-lane-healthy-001",
+  "substrate_ref": "memory://agentplane/local/case-analysis-context",
+  "substrate_type": "memory_lane",
+  "report_ref": "sourceos-syncd://report/memory-lane/integrity-2024-01-15",
+  "report_schema_valid": true,
+  "report_freshness": "current",
+  "diagnosis_status": "healthy",
+  "lane_status": "compliant",
+  "replay_lag_acceptable": true,
+  "heartbeat_fresh": true,
+  "migration_complete": true,
+  "repair_complete": true,
+  "attestation_required": false,
+  "secure_lane_redaction_required": false,
+  "gate_decision": "allow",
+  "trusted_report_ref": "sourceos-syncd://report/memory-lane/integrity-2024-01-15",
+  "policy_decision_ref": "policy-fabric://decision/pd-substrate-memory-healthy-001",
+  "non_claims": [
+    "This gate does not certify the content of memory lane artifacts; it certifies the substrate integrity report.",
+    "Gate decision allow does not grant write authority; write requires a separate policy gate."
+  ],
+  "evaluated_at": "2024-01-15T10:00:00Z"
+}
