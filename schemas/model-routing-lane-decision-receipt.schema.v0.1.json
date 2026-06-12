@@ -1,0 +1,124 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://socioprophet.io/schemas/agentplane/model-routing-lane-decision-receipt/v0.1",
+  "title": "ModelRoutingLaneDecisionReceipt",
+  "description": "AgentPlane evidence receipt for a model-routing lane decision. Consumed from model-router AgentExecutionModelRoutingPolicy and recorded as first-class execution evidence. Required before any model-backed execution stage. AgentPlane enforces the contract; model-router owns policy semantics.",
+  "type": "object",
+  "required": [
+    "kind",
+    "receipt_id",
+    "run_ref",
+    "chain_stage",
+    "task_class",
+    "requested_lane",
+    "selected_lane",
+    "lane_decision_outcome",
+    "cost_class",
+    "prompt_evidence_policy",
+    "context_tool_posture",
+    "policy_decision_ref",
+    "model_router_policy_ref",
+    "non_claims",
+    "issued_at"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "kind": { "type": "string", "const": "ModelRoutingLaneDecisionReceipt" },
+    "receipt_id": { "type": "string", "minLength": 1 },
+    "run_ref": { "type": "string", "minLength": 1 },
+    "chain_stage": {
+      "type": "string",
+      "enum": ["planning", "execution", "verification", "reflection", "synthesis"],
+      "description": "Stage in the agent execution chain. verification defaults to no-model (mechanical tools)."
+    },
+    "task_class": {
+      "type": "string",
+      "enum": [
+        "reasoning",
+        "code_generation",
+        "code_review",
+        "data_extraction",
+        "summarization",
+        "verification",
+        "classification",
+        "retrieval_augmented"
+      ]
+    },
+    "requested_lane": { "$ref": "#/$defs/RoutingLane" },
+    "selected_lane": { "$ref": "#/$defs/RoutingLane" },
+    "lane_decision_outcome": {
+      "type": "string",
+      "enum": ["lane_selected", "downgraded", "escalated", "denied", "deferred"],
+      "description": "denied: high-end/pro requested without escalation receipt; deferred: pending approval"
+    },
+    "downgrade_reason": { "type": "string" },
+    "escalation_reason": { "type": "string" },
+    "escalation_receipt_ref": {
+      "type": "string",
+      "description": "Required when selected_lane=high_end or pro and lane_decision_outcome=escalated"
+    },
+    "de_escalation_required_after_stage": {
+      "type": "boolean",
+      "description": "True when the current high-end/pro selection must de-escalate in subsequent stages unless independently re-qualified"
+    },
+    "cost_class": {
+      "type": "string",
+      "enum": ["minimal", "standard", "elevated", "high", "pro"]
+    },
+    "prompt_evidence_policy": {
+      "type": "string",
+      "enum": ["hash_only", "hash_and_schema", "redacted_summary"],
+      "description": "hash_only is the default. Raw prompts are never stored."
+    },
+    "prompt_hash_ref": {
+      "type": "string",
+      "description": "Hash ref to prompt, per prompt_evidence_policy. Never raw text."
+    },
+    "context_tool_posture": {
+      "type": "string",
+      "enum": ["tools_disabled", "tools_read_only", "tools_governed", "tools_full"],
+      "description": "Governs tool access during this model-backed stage"
+    },
+    "verification_mode": {
+      "type": "string",
+      "enum": ["mechanical_tools_only", "model_assisted", "model_primary"],
+      "description": "Verification stage should be mechanical_tools_only by default"
+    },
+    "policy_decision_ref": { "type": "string", "minLength": 1 },
+    "model_router_policy_ref": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Ref to the AgentExecutionModelRoutingPolicy in model-router"
+    },
+    "guardrail_fabric_ref": { "type": "string" },
+    "hellgraph_evidence_refs": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "upstream_anchors": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "non_claims": {
+      "type": "array",
+      "items": { "type": "string" },
+      "minItems": 1
+    },
+    "issued_at": { "type": "string", "format": "date-time" }
+  },
+  "$defs": {
+    "RoutingLane": {
+      "type": "string",
+      "enum": ["no_model", "lightweight", "standard", "high_end", "pro"],
+      "description": "no_model: mechanical tools only; lightweight: fast/cheap; standard: balanced; high_end: frontier reasoning; pro: maximum capability"
+    }
+  },
+  "if": {
+    "properties": {
+      "selected_lane": { "enum": ["high_end", "pro"] }
+    }
+  },
+  "then": {
+    "required": ["escalation_receipt_ref", "de_escalation_required_after_stage"]
+  }
+}

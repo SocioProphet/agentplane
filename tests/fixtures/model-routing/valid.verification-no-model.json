@@ -1,0 +1,21 @@
+{
+  "kind": "ModelRoutingLaneDecisionReceipt",
+  "receipt_id": "route-receipt:verification-no-model-run-a1b2",
+  "run_ref": "governed-run://agentplane/runs/run-a1b2c3-code-review",
+  "chain_stage": "verification",
+  "task_class": "verification",
+  "requested_lane": "no_model",
+  "selected_lane": "no_model",
+  "lane_decision_outcome": "lane_selected",
+  "cost_class": "minimal",
+  "prompt_evidence_policy": "hash_only",
+  "context_tool_posture": "tools_read_only",
+  "verification_mode": "mechanical_tools_only",
+  "policy_decision_ref": "policy-fabric://decision/pd-model-routing-verification-a1b2",
+  "model_router_policy_ref": "model-router://policy/agent-execution-model-routing/default.v1",
+  "non_claims": [
+    "Verification stage uses mechanical tools only (tests, linters, schema validation, diffs, build output).",
+    "This receipt does not claim the verification output is model-interpreted."
+  ],
+  "issued_at": "2024-01-15T10:00:03Z"
+}

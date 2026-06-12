@@ -1,0 +1,21 @@
+{
+  "kind": "ModelRoutingLaneDecisionReceipt",
+  "receipt_id": "route-receipt:denied-high-end-no-escalation-run-c3d4",
+  "run_ref": "governed-run://agentplane/runs/run-c3d4e5-denied",
+  "chain_stage": "execution",
+  "task_class": "code_generation",
+  "requested_lane": "high_end",
+  "selected_lane": "no_model",
+  "lane_decision_outcome": "denied",
+  "downgrade_reason": "high_end lane requested without a valid escalation receipt; execution stage denied, de-escalated to no_model pending escalation approval.",
+  "cost_class": "minimal",
+  "prompt_evidence_policy": "hash_only",
+  "context_tool_posture": "tools_disabled",
+  "policy_decision_ref": "policy-fabric://decision/pd-model-routing-denied-c3d4",
+  "model_router_policy_ref": "model-router://policy/agent-execution-model-routing/default.v1",
+  "non_claims": [
+    "Denial does not imply the task class is invalid, only that escalation authorization was not present.",
+    "This receipt does not store the contents of the denied request."
+  ],
+  "issued_at": "2024-01-15T10:00:04Z"
+}

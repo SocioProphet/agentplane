@@ -1,0 +1,32 @@
+{
+  "kind": "ModelRoutingLaneDecisionReceipt",
+  "receipt_id": "route-receipt:high-end-planning-run-b2c3",
+  "run_ref": "governed-run://agentplane/runs/run-b2c3d4-complex-reasoning",
+  "chain_stage": "planning",
+  "task_class": "reasoning",
+  "requested_lane": "high_end",
+  "selected_lane": "high_end",
+  "lane_decision_outcome": "escalated",
+  "escalation_reason": "Task requires multi-step causal reasoning across 6+ dependent services; standard lane scored insufficient confidence on prior similar tasks.",
+  "escalation_receipt_ref": "escalation://model-router/receipts/escalation-b2c3d4-planning",
+  "de_escalation_required_after_stage": true,
+  "cost_class": "high",
+  "prompt_evidence_policy": "hash_only",
+  "prompt_hash_ref": "sha256:b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5",
+  "context_tool_posture": "tools_governed",
+  "policy_decision_ref": "policy-fabric://decision/pd-model-routing-highend-b2c3",
+  "model_router_policy_ref": "model-router://policy/agent-execution-model-routing/default.v1",
+  "hellgraph_evidence_refs": [
+    "evidence://hellgraph/model-routing/route-receipt-highend-b2c3"
+  ],
+  "upstream_anchors": [
+    "model-router://schemas/agent-execution-model-routing-policy",
+    "agentplane#119"
+  ],
+  "non_claims": [
+    "This receipt does not store raw prompts.",
+    "high_end lane selection must de-escalate in subsequent chain stages unless independently re-qualified.",
+    "This receipt does not claim the escalation reason is the only valid justification for high_end selection."
+  ],
+  "issued_at": "2024-01-15T10:00:02Z"
+}

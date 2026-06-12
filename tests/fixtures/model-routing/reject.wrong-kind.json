@@ -1,0 +1,18 @@
+{
+  "_reject_reason": "kind must be ModelRoutingLaneDecisionReceipt (const violation)",
+  "kind": "ModelRoutingReceipt",
+  "receipt_id": "route-receipt:reject-wrong-kind",
+  "run_ref": "governed-run://agentplane/runs/reject-wrong-kind",
+  "chain_stage": "planning",
+  "task_class": "reasoning",
+  "requested_lane": "standard",
+  "selected_lane": "standard",
+  "lane_decision_outcome": "lane_selected",
+  "cost_class": "standard",
+  "prompt_evidence_policy": "hash_only",
+  "context_tool_posture": "tools_governed",
+  "policy_decision_ref": "policy-fabric://decision/pd-reject-wrong-kind",
+  "model_router_policy_ref": "model-router://policy/default",
+  "non_claims": ["placeholder"],
+  "issued_at": "2024-01-15T10:00:00Z"
+}
