@@ -1,0 +1,45 @@
+{
+  "kind": "AgentCapabilityRadiusExample",
+  "description": "Capability radius profile for a governed evidence-writing agent in AgentPlane. Current level R3 with conditional R4 gate.",
+  "actor_ref": "agent://agentplane/evidence-writer/v2",
+  "capability_radius": {
+    "current_level": "R3",
+    "allowed_levels": ["R0", "R1", "R2", "R3"],
+    "conditional_levels": [
+      {
+        "level": "R4",
+        "condition": "Explicit post_authority_ref from senior analyst and signed PolicyFabric R4 grant",
+        "gate": "policy-fabric://gate/R4-deploy-staged"
+      }
+    ],
+    "denied_levels": ["R5"]
+  },
+  "tool_grants_in_scope": [
+    {
+      "tool_id": "tool://evidence-store/write/v2",
+      "radius_required": "R3",
+      "policy_decision_ref": "policy-fabric://decision/pd-tool-grant-evidence-write-v2",
+      "cgrm_decision_ref": "cgrm://decision/cgrm-evidence-write-v2"
+    },
+    {
+      "tool_id": "tool://hellgraph/emit/v1",
+      "radius_required": "R3",
+      "policy_decision_ref": "policy-fabric://decision/pd-tool-grant-hellgraph-emit-v1",
+      "cgrm_decision_ref": "cgrm://decision/cgrm-hellgraph-emit-v1"
+    }
+  ],
+  "tension_members_at_current_radius": {
+    "policy": "required",
+    "identity": "required",
+    "provenance": "required",
+    "evidence": "required",
+    "replay": "required",
+    "revocation": "required",
+    "audit": "required_on_intervention"
+  },
+  "oversteer_guards": {
+    "max_radius_jump_per_session": 1,
+    "require_intermediate_evidence_between_jumps": true,
+    "rapid_radius_escalation_indicator": "rapid_radius_escalation"
+  }
+}
