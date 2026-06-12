@@ -6,13 +6,17 @@ from pathlib import Path
 from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
+SANDBOX = ROOT / "tests" / "fixtures" / "sandbox"
 VALID_FIXTURES = [
-    ROOT / "tests" / "fixtures" / "sandbox" / "runtime-sandbox-run.requested.valid.json",
-    ROOT / "tests" / "fixtures" / "sandbox" / "runtime-sandbox-run.allocated.valid.json",
-    ROOT / "tests" / "fixtures" / "sandbox" / "runtime-sandbox-run.failed.valid.json",
+    SANDBOX / "runtime-sandbox-run.requested.valid.json",
+    SANDBOX / "runtime-sandbox-run.allocated.valid.json",
+    SANDBOX / "runtime-sandbox-run.failed.valid.json",
+    SANDBOX / "runtime-sandbox-run.shared-receipt.valid.json",
+    SANDBOX / "runtime-sandbox-run.teardown.valid.json",
 ]
 INVALID_FIXTURES = [
-    ROOT / "tests" / "fixtures" / "sandbox" / "runtime-sandbox-run.allocated.missing-leakcheck.invalid.json",
+    SANDBOX / "runtime-sandbox-run.allocated.missing-leakcheck.invalid.json",
+    SANDBOX / "runtime-sandbox-run.teardown.missing-evidence.invalid.json",
 ]
 STATUSES = {"runtime_requested", "runtime_allocated", "runtime_failed", "runtime_teardown_complete"}
 PARITY_LEVELS = {"contract_only", "runtime_observed"}
@@ -112,6 +116,17 @@ def validate(data: dict[str, Any]) -> list[str]:
             problems.append("runtime_failed requires runtime_allocation_failed")
         if data.get("teardownState") != "teardown_failed":
             problems.append("runtime_failed teardownState must be teardown_failed")
+    if status == "runtime_teardown_complete":
+        if parity != "runtime_observed":
+            problems.append("runtime_teardown_complete must be runtime_observed")
+        if not evidence_refs:
+            problems.append("runtime_teardown_complete requires evidence refs")
+        if not receipt_refs:
+            problems.append("runtime_teardown_complete requires receipt refs")
+        if failure_codes:
+            problems.append("runtime_teardown_complete must not have failure codes")
+        if data.get("teardownState") != "teardown_complete":
+            problems.append("runtime_teardown_complete teardownState must be teardown_complete")
 
     return problems
 
