@@ -1,0 +1,21 @@
+{
+  "_reject_reason": "kind must be CivicStackRunCapsule (const violation)",
+  "kind": "CivicStackRunCapsuleV2",
+  "run_id": "civic-stack-run:reject-wrong-kind",
+  "actor_ref": "agent://agentplane/civic-stack-agent/v1",
+  "oql_plan_id": "oql://plan/service-delivery-v1/step-1",
+  "artifact_manifest_id": "manifest://civic-stack/artifacts/reject-wrong-kind",
+  "policy_decision_id": "policy-fabric://decision/pd-reject-wrong-kind",
+  "timestamps": {
+    "started_at": "2024-01-15T10:00:00Z",
+    "completed_at": "2024-01-15T10:01:00Z"
+  },
+  "provenance_refs": ["provenance://sociosphere/civic-stack-run/reject-wrong-kind"],
+  "rationalgrl_trace": {
+    "trace_id": "rationalgrl-trace:reject-wrong-kind",
+    "goals_addressed": [],
+    "tasks_executed": []
+  },
+  "hellgraph_evidence_refs": ["evidence://hellgraph/reject-wrong-kind/run-capsule"],
+  "issued_at": "2024-01-15T10:01:01Z"
+}

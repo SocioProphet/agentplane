@@ -1,0 +1,69 @@
+{
+  "kind": "CivicStackRunCapsule",
+  "run_id": "civic-stack-run:blocked-b2c3d4e5-f6a7-8901-bcde-f12345678901",
+  "actor_ref": "agent://agentplane/civic-stack-agent/v1",
+  "oql_plan_id": "oql://plan/restricted-data-access-v1/step-1",
+  "artifact_manifest_id": "manifest://civic-stack/artifacts/2024-01-15-run-b2c3-blocked",
+  "policy_decision_id": "policy-fabric://decision/pd-civic-run-b2c3-deny",
+  "policy_decision_outcome": "deny",
+  "dataset_ids": ["dataset://restricted/pii-records/batch-009"],
+  "resource_ids": [],
+  "tool_grants": [],
+  "action_dispatch_records": [
+    {
+      "dispatch_id": "dispatch:civic-run-b2c3-blocked-action-1",
+      "action_type": "pii.access",
+      "policy_decision_ref": "policy-fabric://decision/pd-civic-run-b2c3-deny",
+      "dispatch_status": "blocked",
+      "rationalgrl_task_ref": "task://rationalgrl/pii-access-task/v1",
+      "defeater_reason": "PolicyFabric denied PII access: insufficient authorization scope for beneficiary PII"
+    }
+  ],
+  "oql_plan_acceptance": {
+    "acceptance_id": "oql-acceptance:civic-run-b2c3-blocked",
+    "oql_plan_id": "oql://plan/restricted-data-access-v1/step-1",
+    "acceptance_status": "rejected",
+    "interpretation_ref": "oql://interpretation/restricted-data-access-v1/step-1-interp"
+  },
+  "timestamps": {
+    "started_at": "2024-01-15T11:00:00Z",
+    "completed_at": "2024-01-15T11:00:04Z"
+  },
+  "provenance_refs": [
+    "provenance://sociosphere/civic-stack-run/b2c3-blocked"
+  ],
+  "rationalgrl_trace": {
+    "trace_id": "rationalgrl-trace:civic-run-b2c3-blocked",
+    "goals_addressed": [
+      {
+        "goal_ref": "goal://rationalgrl/restricted-data-access/primary",
+        "goal_type": "goal",
+        "satisfaction_status": "denied",
+        "contribution_refs": []
+      }
+    ],
+    "tasks_executed": [
+      {
+        "task_ref": "task://rationalgrl/pii-access-task/v1",
+        "execution_status": "blocked",
+        "defeater_reason": "RationalGRL defeater: PolicyFabric deny decision prevents task execution"
+      }
+    ],
+    "dependencies_blocked": [
+      {
+        "dependency_ref": "task://rationalgrl/pii-access-task/v1",
+        "blocking_policy_ref": "policy-fabric://decision/pd-civic-run-b2c3-deny",
+        "defeater_reason": "PII access blocked: authorization scope insufficient"
+      }
+    ]
+  },
+  "hellgraph_evidence_refs": [
+    "evidence://hellgraph/civic-stack-run-b2c3/run-capsule-blocked",
+    "evidence://prophet-core/civic-stack-run-b2c3/policy-deny-evidence"
+  ],
+  "upstream_anchors": [
+    "ontogenesis#80",
+    "policy-fabric#72"
+  ],
+  "issued_at": "2024-01-15T11:00:05Z"
+}

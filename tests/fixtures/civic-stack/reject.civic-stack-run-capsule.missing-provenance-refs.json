@@ -1,0 +1,21 @@
+{
+  "_reject_reason": "provenance_refs is required (minItems: 1) but empty",
+  "kind": "CivicStackRunCapsule",
+  "run_id": "civic-stack-run:reject-empty-provenance",
+  "actor_ref": "agent://agentplane/civic-stack-agent/v1",
+  "oql_plan_id": "oql://plan/service-delivery-v1/step-1",
+  "artifact_manifest_id": "manifest://civic-stack/artifacts/reject-empty-provenance",
+  "policy_decision_id": "policy-fabric://decision/pd-reject-empty-provenance",
+  "timestamps": {
+    "started_at": "2024-01-15T10:00:00Z",
+    "completed_at": "2024-01-15T10:01:00Z"
+  },
+  "provenance_refs": [],
+  "rationalgrl_trace": {
+    "trace_id": "rationalgrl-trace:reject-empty-provenance",
+    "goals_addressed": [],
+    "tasks_executed": []
+  },
+  "hellgraph_evidence_refs": ["evidence://hellgraph/reject-empty-provenance/run-capsule"],
+  "issued_at": "2024-01-15T10:01:01Z"
+}

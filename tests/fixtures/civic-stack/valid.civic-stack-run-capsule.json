@@ -1,0 +1,160 @@
+{
+  "kind": "CivicStackRunCapsule",
+  "run_id": "civic-stack-run:a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+  "actor_ref": "agent://agentplane/civic-stack-agent/v1",
+  "post_authority_ref": "post://authority/civic-oversight-post/v1",
+  "oql_plan_id": "oql://plan/service-delivery-v1/step-3",
+  "artifact_manifest_id": "manifest://civic-stack/artifacts/2024-01-15-run-a1b2",
+  "service_id": "civic-service:social-case-management",
+  "policy_decision_id": "policy-fabric://decision/pd-civic-run-a1b2",
+  "policy_decision_outcome": "allow",
+  "dataset_ids": [
+    "dataset://case-management/beneficiary-records/batch-001",
+    "dataset://case-management/service-catalog/v4"
+  ],
+  "resource_ids": [
+    "resource://compute/civic-agent-executor/slot-7",
+    "resource://storage/case-output/run-a1b2"
+  ],
+  "tool_grants": [
+    {
+      "grant_id": "grant:civic-run-a1b2-tool-1",
+      "tool_id": "tool://case-lookup/v2",
+      "granted_to": "agent://agentplane/civic-stack-agent/v1",
+      "policy_decision_ref": "policy-fabric://decision/pd-civic-run-a1b2",
+      "cgrm_decision_ref": "cgrm://decision/cgrm-civic-run-a1b2-read",
+      "scope_constraints": ["read_only", "beneficiary_scope_limited"]
+    },
+    {
+      "grant_id": "grant:civic-run-a1b2-tool-2",
+      "tool_id": "tool://service-eligibility-check/v3",
+      "granted_to": "agent://agentplane/civic-stack-agent/v1",
+      "policy_decision_ref": "policy-fabric://decision/pd-civic-run-a1b2",
+      "cgrm_decision_ref": "cgrm://decision/cgrm-civic-run-a1b2-eligibility"
+    }
+  ],
+  "action_dispatch_records": [
+    {
+      "dispatch_id": "dispatch:civic-run-a1b2-action-1",
+      "action_type": "case.lookup",
+      "policy_decision_ref": "policy-fabric://decision/pd-civic-run-a1b2",
+      "dispatch_status": "completed",
+      "rationalgrl_task_ref": "task://rationalgrl/case-lookup-task/v1"
+    },
+    {
+      "dispatch_id": "dispatch:civic-run-a1b2-action-2",
+      "action_type": "eligibility.check",
+      "policy_decision_ref": "policy-fabric://decision/pd-civic-run-a1b2",
+      "dispatch_status": "completed",
+      "rationalgrl_task_ref": "task://rationalgrl/eligibility-check-task/v1"
+    }
+  ],
+  "oql_plan_acceptance": {
+    "acceptance_id": "oql-acceptance:civic-run-a1b2",
+    "oql_plan_id": "oql://plan/service-delivery-v1/step-3",
+    "acceptance_status": "accepted",
+    "interpretation_ref": "oql://interpretation/service-delivery-v1/step-3-interp",
+    "oql_task_mappings": [
+      {
+        "task_id": "oql-task-map:1",
+        "oql_task_ref": "oql://task/case-lookup",
+        "agent_action_ref": "dispatch:civic-run-a1b2-action-1"
+      },
+      {
+        "task_id": "oql-task-map:2",
+        "oql_task_ref": "oql://task/eligibility-check",
+        "agent_action_ref": "dispatch:civic-run-a1b2-action-2"
+      }
+    ]
+  },
+  "oac_compiler_invocation": {
+    "invocation_id": "oac-invocation:civic-run-a1b2",
+    "compiler_id": "oac://compiler/civic-stack/v1",
+    "artifact_manifest_id": "manifest://civic-stack/artifacts/2024-01-15-run-a1b2",
+    "invocation_status": "success",
+    "artifact_emission_refs": [
+      "artifact://case-eligibility-result/run-a1b2/output-001",
+      "artifact://service-delivery-report/run-a1b2/output-002"
+    ]
+  },
+  "subagent_delegations": [
+    {
+      "delegation_id": "delegation:civic-run-a1b2-sub-1",
+      "delegated_to": "agent://agentplane/case-lookup-subagent/v1",
+      "task_ref": "task://rationalgrl/case-lookup-task/v1",
+      "policy_decision_ref": "policy-fabric://decision/pd-civic-run-a1b2-sub"
+    }
+  ],
+  "attestation_events": [
+    {
+      "attestation_id": "attestation:civic-run-a1b2-policy",
+      "attestation_type": "policy_compliance",
+      "attested_by": "agent://agentplane/civic-stack-agent/v1",
+      "ref": "policy-fabric://decision/pd-civic-run-a1b2"
+    },
+    {
+      "attestation_id": "attestation:civic-run-a1b2-oql",
+      "attestation_type": "oql_plan_acceptance",
+      "attested_by": "agent://agentplane/civic-stack-agent/v1",
+      "ref": "oql-acceptance:civic-run-a1b2"
+    }
+  ],
+  "timestamps": {
+    "started_at": "2024-01-15T10:00:00Z",
+    "completed_at": "2024-01-15T10:04:33Z"
+  },
+  "provenance_refs": [
+    "provenance://sociosphere/civic-stack-run/a1b2c3d4",
+    "provenance://ontogenesis/civic-run-lineage/a1b2"
+  ],
+  "rationalgrl_trace": {
+    "trace_id": "rationalgrl-trace:civic-run-a1b2",
+    "goals_addressed": [
+      {
+        "goal_ref": "goal://rationalgrl/civic-service-delivery/primary",
+        "goal_type": "goal",
+        "satisfaction_status": "satisfied",
+        "contribution_refs": [
+          "dispatch:civic-run-a1b2-action-1",
+          "dispatch:civic-run-a1b2-action-2"
+        ]
+      },
+      {
+        "goal_ref": "goal://rationalgrl/civic-service-delivery/quality",
+        "goal_type": "softgoal",
+        "satisfaction_status": "partially_satisfied",
+        "contribution_refs": [
+          "dispatch:civic-run-a1b2-action-1"
+        ]
+      }
+    ],
+    "tasks_executed": [
+      {
+        "task_ref": "task://rationalgrl/case-lookup-task/v1",
+        "execution_status": "completed",
+        "resource_used_refs": ["resource://compute/civic-agent-executor/slot-7"],
+        "dependency_satisfied_refs": []
+      },
+      {
+        "task_ref": "task://rationalgrl/eligibility-check-task/v1",
+        "execution_status": "completed",
+        "resource_used_refs": ["resource://compute/civic-agent-executor/slot-7"],
+        "dependency_satisfied_refs": ["task://rationalgrl/case-lookup-task/v1"]
+      }
+    ],
+    "dependencies_blocked": []
+  },
+  "hellgraph_evidence_refs": [
+    "evidence://hellgraph/civic-stack-run-a1b2/run-capsule",
+    "evidence://prophet-core/civic-stack-run-a1b2/emission"
+  ],
+  "delivery_excellence_signal_ref": "de://signal/civic-stack-run-a1b2/score",
+  "upstream_anchors": [
+    "ontogenesis#80",
+    "ontogenesis#81",
+    "policy-fabric#72",
+    "sociosphere#323",
+    "delivery-excellence#28"
+  ],
+  "issued_at": "2024-01-15T10:04:35Z"
+}
