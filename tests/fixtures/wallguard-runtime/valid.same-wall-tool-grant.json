@@ -1,0 +1,21 @@
+{
+  "schemaVersion": "agentplane.wallguard-collaboration-admission.v0.1",
+  "recordType": "WallGuardCollaborationAdmissionReceipt",
+  "receipt_id": "wallguard-collab-admission:same-wall-tool-grant-001",
+  "collaboration_request_id": "collab-request:client-a-matter-x:tool-grant-001",
+  "source_agent_wall_context_ref": "agent-wall-context://agent-alpha/client-a/matter-x",
+  "target_agent_wall_context_ref": "agent-wall-context://tool-provider-a/client-a/matter-x",
+  "source_wall_ref": "wall://client-a/matter-x",
+  "target_wall_ref": "wall://client-a/matter-x",
+  "collaboration_action": "tool_grant",
+  "admitted": true,
+  "admission_decision": "admit",
+  "reason_code": "same_wall_allowed",
+  "wall_decision_ref": "wallguard-decision://same-wall-tool-grant-allow-001",
+  "wall_decision_outcome": "allow",
+  "evidence_refs": [
+    "evidence://agentplane/wallguard/same-wall-tool-grant-001"
+  ],
+  "receipt_hash": "sha256:aaaa1111aaaa1111aaaa1111aaaa1111aaaa1111aaaa1111aaaa1111aaaa1111",
+  "issued_at": "2024-01-15T10:00:00Z"
+}
