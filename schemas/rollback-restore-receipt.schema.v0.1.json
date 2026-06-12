@@ -1,0 +1,83 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12",
+  "$id": "https://schemas.socioprophet.io/agentplane/rollback-restore-receipt.v0.1.json",
+  "title": "RollbackRestoreReceipt",
+  "description": "Evidence receipt for a completed or attempted rollback restore action. Records before/after digests, verified paths, and restore status. Completed restores must carry verified digests.",
+  "type": "object",
+  "required": [
+    "kind",
+    "receipt_id",
+    "request_ref",
+    "restore_status",
+    "before_digest",
+    "before_digest_verified",
+    "policy_decision_ref",
+    "non_claims",
+    "issued_at"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "kind": { "type": "string", "const": "RollbackRestoreReceipt" },
+    "receipt_id": { "type": "string", "minLength": 1 },
+    "request_ref": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Ref to the RollbackRestoreRequest this receipt closes."
+    },
+    "restore_status": {
+      "type": "string",
+      "enum": ["completed", "failed", "denied", "rolled_back"]
+    },
+    "restored_paths": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "description": "Paths actually restored."
+    },
+    "before_digest": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$",
+      "description": "SHA-256 digest of state before restore; must match the request before_digest."
+    },
+    "before_digest_verified": {
+      "type": "boolean",
+      "description": "Whether before_digest was verified against the actual pre-restore state."
+    },
+    "after_digest": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$",
+      "description": "SHA-256 digest of state after restore."
+    },
+    "after_digest_verified": {
+      "type": "boolean",
+      "description": "Whether after_digest matches the expected digest from the request."
+    },
+    "denial_reason": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Required when restore_status=denied."
+    },
+    "failure_reason": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Required when restore_status=failed."
+    },
+    "policy_decision_ref": { "type": "string", "minLength": 1 },
+    "non_claims": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "minItems": 1
+    },
+    "issued_at": { "type": "string", "format": "date-time" }
+  },
+  "if": {
+    "properties": { "restore_status": { "const": "completed" } },
+    "required": ["restore_status"]
+  },
+  "then": {
+    "required": ["after_digest", "after_digest_verified"],
+    "properties": {
+      "before_digest_verified": { "const": true },
+      "after_digest_verified": { "const": true }
+    }
+  }
+}
