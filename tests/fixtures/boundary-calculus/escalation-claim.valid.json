@@ -1,0 +1,23 @@
+{
+  "kind": "BoundaryCalculusEvidenceEnvelope",
+  "envelope_id": "bcee_security_escalation_001",
+  "run_ref": "agentplane://run/boundary-calculus/run_20260611_002",
+  "claim_id": "claim://boundary-calculus/security-boundary-breach-001",
+  "claim_status": "hypothesis",
+  "local_model": "claude-sonnet-4-6",
+  "boundary_or_interface": "Security.CapabilityBoundary.DataAccess",
+  "load_bearing": true,
+  "non_claims": [
+    "This envelope does not confirm a breach has occurred.",
+    "This envelope does not authorize incident response actions.",
+    "This envelope does not replace a formal security review."
+  ],
+  "evidence_refs": [
+    "evidence://agentplane/run/boundary-calculus/run_20260611_002/anomaly-signal",
+    "evidence://agentplane/run/boundary-calculus/run_20260611_002/capability-trace"
+  ],
+  "promotion_gate": "policy_fabric_evaluation",
+  "policy_result": "escalate",
+  "security_escalation_ref": "escalation://security/agentplane/boundary-calculus/esc_20260611_001",
+  "captured_at": "2026-06-11T11:00:00Z"
+}
