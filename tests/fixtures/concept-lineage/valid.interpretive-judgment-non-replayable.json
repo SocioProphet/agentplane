@@ -1,0 +1,45 @@
+{
+  "kind": "ConceptToArtifactLineageReceipt",
+  "receipt_id": "c2a-receipt:interpretive-commons-claim-001",
+  "concept_id": "ontogenesis://concept/world-game-commons-impact/entry-003",
+  "concept_kind": "commons_impact_claim",
+  "source_anchor": {
+    "source_ref": "ontogenesis://source/fuller-operating-manual-1969/chapter-4",
+    "anchor_type": "oral_record",
+    "page_or_section": "World Game Workshop transcript, 1969",
+    "extraction_confidence": "low",
+    "assumptions": [
+      "Transcript accuracy depends on the fidelity of the 1969 recording and transcription.",
+      "Speaker intent is interpreted, not recoverable from transcript alone."
+    ]
+  },
+  "commons_impact": {
+    "impact_claim": "World Game resource distribution model could reduce global resource scarcity if deployed at planetary scale.",
+    "evidence_basis": "theoretical",
+    "validation_state": "disputed",
+    "evidence_refs": [
+      "ontogenesis://source/world-game-institute/archive-001"
+    ]
+  },
+  "extraction_mode": "non_replayable_interpretive_judgment",
+  "validation_state": "proposed",
+  "replay_semantics": {
+    "is_replayable": false,
+    "replay_fidelity": "not_replayable",
+    "non_replayable_reason": "This claim is an interpretive judgment about historical intent from an oral record. Re-extraction by any agent would produce a different interpretation; no deterministic or model-consistent replay is possible."
+  },
+  "policy_decision_ref": "policy-fabric://decision/pd-concept-lineage-interpretive-001",
+  "hellgraph_evidence_refs": [
+    "evidence://hellgraph/concept-lineage/interpretive-commons-claim-001"
+  ],
+  "upstream_anchors": [
+    "ontogenesis#61",
+    "agentplane#134"
+  ],
+  "non_claims": [
+    "This receipt does not assert the commons impact claim is correct or validated.",
+    "Non-replayable interpretive judgment is explicitly marked; it must not be used as proof.",
+    "This receipt does not store the model rationale chain that produced the interpretation."
+  ],
+  "issued_at": "2024-01-15T13:00:00Z"
+}
