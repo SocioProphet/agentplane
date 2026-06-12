@@ -1,0 +1,122 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://socioprophet.io/schemas/agentplane/device-actuation-boundary-receipt/v0.1",
+  "title": "DeviceActuationBoundaryReceipt",
+  "description": "AgentPlane evidence receipt enforcing the hard boundary between agent proposal and physical/digital device actuation. Agents propose; actuation requires capability class, policy decision, and explicit approval for high-risk actions. No bypass path from natural language to actuation.",
+  "type": "object",
+  "required": [
+    "kind",
+    "receipt_id",
+    "action_proposal_id",
+    "action_class",
+    "capability_class",
+    "actuation_target",
+    "proposal_status",
+    "policy_decision_ref",
+    "non_claims",
+    "issued_at"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "kind": { "type": "string", "const": "DeviceActuationBoundaryReceipt" },
+    "receipt_id": { "type": "string", "minLength": 1 },
+    "action_proposal_id": { "type": "string", "minLength": 1 },
+    "action_class": {
+      "type": "string",
+      "enum": [
+        "phone",
+        "home",
+        "browser",
+        "shell",
+        "device_generic",
+        "lock",
+        "alarm",
+        "camera",
+        "vehicle",
+        "payment",
+        "identity_token",
+        "health_relevant",
+        "os_mutation",
+        "irreversible_deletion"
+      ]
+    },
+    "capability_class": {
+      "type": "string",
+      "enum": ["low_risk", "medium_risk", "high_risk"],
+      "description": "low_risk: read/observe, no side effects; medium_risk: reversible write; high_risk: irreversible, safety-relevant, or authorization-escalating"
+    },
+    "actuation_target": {
+      "type": "object",
+      "required": ["target_id", "target_type"],
+      "additionalProperties": false,
+      "properties": {
+        "target_id": { "type": "string", "minLength": 1 },
+        "target_type": { "type": "string", "minLength": 1 },
+        "target_description": { "type": "string" }
+      }
+    },
+    "proposal_status": {
+      "type": "string",
+      "enum": ["proposed", "denied", "approved", "executed", "rolled_back", "failed"],
+      "description": "proposed: agent recommendation only; denied: policy or approval gate refused; approved: explicit approval received; executed: action completed; rolled_back: execution reversed; failed: execution attempted but failed"
+    },
+    "approval_ref": {
+      "type": "string",
+      "description": "Required for high_risk actions when proposal_status=approved or executed"
+    },
+    "approval_authority_ref": {
+      "type": "string",
+      "description": "Post or authority ref of the approver for high_risk actions"
+    },
+    "delegated_authority_ref": {
+      "type": "string",
+      "description": "Narrow delegated authority ref, if applicable"
+    },
+    "policy_decision_ref": { "type": "string", "minLength": 1 },
+    "policy_outcome": {
+      "type": "string",
+      "enum": ["allow", "allow_with_constraints", "deny", "escalate"]
+    },
+    "denial_reason": { "type": "string" },
+    "rollback_artifact_ref": {
+      "type": "string",
+      "description": "Required when proposal_status=rolled_back"
+    },
+    "failure_artifact_ref": {
+      "type": "string",
+      "description": "Structured failure artifact when proposal_status=failed"
+    },
+    "evidence_refs": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "hellgraph_evidence_refs": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "upstream_anchors": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "non_claims": {
+      "type": "array",
+      "items": { "type": "string" },
+      "minItems": 1
+    },
+    "issued_at": { "type": "string", "format": "date-time" }
+  },
+  "if": {
+    "properties": { "capability_class": { "const": "high_risk" } },
+    "required": ["capability_class"]
+  },
+  "then": {
+    "if": {
+      "properties": {
+        "proposal_status": { "enum": ["approved", "executed"] }
+      }
+    },
+    "then": {
+      "required": ["approval_ref", "approval_authority_ref"]
+    }
+  }
+}
