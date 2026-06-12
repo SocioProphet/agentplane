@@ -1,0 +1,18 @@
+{
+  "kind": "AgenticRuntimeState",
+  "state_record_id": "runtime-state:run-001-node-a-succeeded",
+  "node_id": "node://agentplane/run-001/agent-a",
+  "run_ref": "governed-run://agentplane/run-001",
+  "from_state": "running",
+  "to_state": "succeeded",
+  "transition_cause": "execution_completed",
+  "evidence_refs": [
+    "evidence://agentplane/run-001/agent-a/execution-completed"
+  ],
+  "policy_decision_ref": "policy-fabric://decision/pd-run-001-node-a",
+  "non_claims": [
+    "This artifact records a state transition; it does not assert correctness of the node output.",
+    "No replay guarantee is implied by this state record alone."
+  ],
+  "issued_at": "2024-01-15T10:05:00Z"
+}

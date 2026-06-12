@@ -1,0 +1,13 @@
+{
+  "_reject_reason": "to_state=retry_scheduled requires retry_policy to be present (conditional)",
+  "kind": "AgenticRuntimeState",
+  "state_record_id": "runtime-state:reject-retry-no-policy",
+  "node_id": "node://agentplane/run-reject/agent-y",
+  "run_ref": "governed-run://agentplane/run-reject",
+  "from_state": "failed",
+  "to_state": "retry_scheduled",
+  "transition_cause": "retry_policy_applied",
+  "policy_decision_ref": "policy-fabric://decision/pd-reject",
+  "non_claims": ["placeholder"],
+  "issued_at": "2024-01-15T10:00:00Z"
+}

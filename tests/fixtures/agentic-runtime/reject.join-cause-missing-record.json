@@ -1,0 +1,13 @@
+{
+  "_reject_reason": "transition_cause=join_resolved requires join_record (conditional)",
+  "kind": "AgenticRuntimeState",
+  "state_record_id": "runtime-state:reject-join-no-record",
+  "node_id": "node://agentplane/run-reject/orchestrator",
+  "run_ref": "governed-run://agentplane/run-reject",
+  "from_state": "waiting_for_resource",
+  "to_state": "running",
+  "transition_cause": "join_resolved",
+  "policy_decision_ref": "policy-fabric://decision/pd-reject",
+  "non_claims": ["placeholder"],
+  "issued_at": "2024-01-15T10:00:00Z"
+}

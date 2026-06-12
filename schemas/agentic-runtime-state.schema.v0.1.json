@@ -1,0 +1,313 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12",
+  "$id": "https://schemas.socioprophet.io/agentplane/agentic-runtime-state.v0.1.json",
+  "title": "AgenticRuntimeState",
+  "description": "Evidence artifact capturing a state-machine transition for an agentic execution node. Every transition produces one of these; control signals, join outcomes, and scheduling events are recorded as sub-artifacts.",
+  "type": "object",
+  "required": [
+    "kind",
+    "state_record_id",
+    "node_id",
+    "run_ref",
+    "from_state",
+    "to_state",
+    "transition_cause",
+    "policy_decision_ref",
+    "non_claims",
+    "issued_at"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "kind": { "type": "string", "const": "AgenticRuntimeState" },
+    "state_record_id": { "type": "string", "minLength": 1 },
+    "node_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Identifies the agent/tool/step node within the execution graph."
+    },
+    "run_ref": { "type": "string", "minLength": 1 },
+    "from_state": { "$ref": "#/$defs/NodeState" },
+    "to_state": { "$ref": "#/$defs/NodeState" },
+    "transition_cause": { "$ref": "#/$defs/TransitionCause" },
+    "control_signal": { "$ref": "#/$defs/ControlSignal" },
+    "join_record": { "$ref": "#/$defs/JoinRecord" },
+    "fanout_record": { "$ref": "#/$defs/FanoutRecord" },
+    "scheduling_trigger": { "$ref": "#/$defs/SchedulingTrigger" },
+    "retry_policy": { "$ref": "#/$defs/RetryPolicy" },
+    "evidence_refs": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "description": "HellGraph evidence artifact refs produced by or linked to this transition."
+    },
+    "policy_decision_ref": { "type": "string", "minLength": 1 },
+    "non_claims": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "minItems": 1
+    },
+    "issued_at": { "type": "string", "format": "date-time" }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": { "to_state": { "const": "quarantined" } },
+        "required": ["to_state"]
+      },
+      "then": { "required": ["control_signal"] }
+    },
+    {
+      "if": {
+        "properties": { "to_state": { "const": "waiting_for_human" } },
+        "required": ["to_state"]
+      },
+      "then": { "required": ["control_signal"] }
+    },
+    {
+      "if": {
+        "properties": { "to_state": { "const": "retry_scheduled" } },
+        "required": ["to_state"]
+      },
+      "then": { "required": ["retry_policy"] }
+    },
+    {
+      "if": {
+        "properties": { "transition_cause": { "const": "join_resolved" } },
+        "required": ["transition_cause"]
+      },
+      "then": { "required": ["join_record"] }
+    },
+    {
+      "if": {
+        "properties": { "transition_cause": { "const": "fanout_launched" } },
+        "required": ["transition_cause"]
+      },
+      "then": { "required": ["fanout_record"] }
+    },
+    {
+      "if": {
+        "properties": { "transition_cause": { "const": "scheduling_trigger_fired" } },
+        "required": ["transition_cause"]
+      },
+      "then": { "required": ["scheduling_trigger"] }
+    }
+  ],
+  "$defs": {
+    "NodeState": {
+      "type": "string",
+      "enum": [
+        "created",
+        "queued",
+        "leased",
+        "running",
+        "succeeded",
+        "failed",
+        "retry_scheduled",
+        "requeued",
+        "pruned",
+        "quarantined",
+        "waiting_for_human",
+        "waiting_for_resource",
+        "superseded",
+        "reconciled"
+      ]
+    },
+    "TransitionCause": {
+      "type": "string",
+      "enum": [
+        "admission",
+        "lease_acquired",
+        "execution_started",
+        "execution_completed",
+        "execution_failed",
+        "retry_policy_applied",
+        "requeue_after_delay",
+        "control_signal_received",
+        "join_resolved",
+        "fanout_launched",
+        "scheduling_trigger_fired",
+        "human_approval_received",
+        "resource_available",
+        "supersede_signal",
+        "reconcile_signal",
+        "prune_signal",
+        "quarantine_signal",
+        "budget_exhausted",
+        "deadline_reached"
+      ]
+    },
+    "ControlSignal": {
+      "type": "object",
+      "required": ["signal_id", "signal_type", "issuer_ref", "idempotency_key"],
+      "additionalProperties": false,
+      "properties": {
+        "signal_id": { "type": "string", "minLength": 1 },
+        "signal_type": {
+          "type": "string",
+          "enum": [
+            "prune_branch",
+            "requeue_after_delay",
+            "quarantine",
+            "wait_for_human_approval",
+            "cancel_supersede",
+            "retry_with_policy",
+            "reconcile_missing_delivery",
+            "reconcile_failed_delivery"
+          ]
+        },
+        "issuer_ref": { "type": "string", "minLength": 1 },
+        "idempotency_key": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Stable key ensuring duplicate signal delivery is idempotent."
+        },
+        "delivery_confirmed": { "type": "boolean" },
+        "requeue_delay_seconds": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Required for requeue_after_delay signal."
+        },
+        "human_approval_ref": {
+          "type": "string",
+          "description": "Required when signal_type=wait_for_human_approval and approval has been received."
+        }
+      }
+    },
+    "JoinRecord": {
+      "type": "object",
+      "required": ["join_id", "join_strategy", "participating_node_ids", "join_outcome"],
+      "additionalProperties": false,
+      "properties": {
+        "join_id": { "type": "string", "minLength": 1 },
+        "join_strategy": {
+          "type": "string",
+          "enum": [
+            "all_success",
+            "all_terminal",
+            "quorum",
+            "first_success",
+            "best_of_n",
+            "deadline_reached",
+            "budget_exhausted",
+            "human_selected_subset",
+            "risk_approved_subset"
+          ]
+        },
+        "participating_node_ids": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "minItems": 1
+        },
+        "quorum_threshold": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Required for quorum strategy. Fraction of participants that must succeed."
+        },
+        "best_of_n": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Required for best_of_n strategy."
+        },
+        "join_outcome": {
+          "type": "string",
+          "enum": ["resolved_success", "resolved_partial", "resolved_failure", "pending", "overridden_human", "overridden_risk_approved"]
+        },
+        "selected_node_ids": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "description": "For human_selected_subset and risk_approved_subset: nodes selected to proceed."
+        },
+        "human_selection_ref": {
+          "type": "string",
+          "description": "Required for human_selected_subset outcome."
+        },
+        "risk_approval_ref": {
+          "type": "string",
+          "description": "Required for risk_approved_subset outcome."
+        }
+      }
+    },
+    "FanoutRecord": {
+      "type": "object",
+      "required": ["fanout_id", "fanout_strategy", "spawned_node_ids", "join_point_ref"],
+      "additionalProperties": false,
+      "properties": {
+        "fanout_id": { "type": "string", "minLength": 1 },
+        "fanout_strategy": {
+          "type": "string",
+          "enum": ["parallel_all", "parallel_bounded", "sequential", "priority_ordered"]
+        },
+        "spawned_node_ids": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "minItems": 1
+        },
+        "concurrency_limit": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Required for parallel_bounded strategy."
+        },
+        "join_point_ref": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Ref to the JoinRecord artifact that will collect this fanout."
+        }
+      }
+    },
+    "SchedulingTrigger": {
+      "type": "object",
+      "required": ["trigger_id", "trigger_type"],
+      "additionalProperties": false,
+      "properties": {
+        "trigger_id": { "type": "string", "minLength": 1 },
+        "trigger_type": {
+          "type": "string",
+          "enum": [
+            "cron",
+            "github_event",
+            "filesystem_event",
+            "webhook",
+            "ci_status",
+            "policy_event",
+            "budget_event",
+            "memory_drift_event",
+            "sync_conflict_event",
+            "human_approval_event"
+          ]
+        },
+        "trigger_source_ref": { "type": "string", "minLength": 1 },
+        "cron_expression": {
+          "type": "string",
+          "description": "Required for cron trigger type."
+        },
+        "cancellable": { "type": "boolean", "default": true },
+        "pause_resume_supported": { "type": "boolean", "default": false },
+        "fired_at": { "type": "string", "format": "date-time" }
+      }
+    },
+    "RetryPolicy": {
+      "type": "object",
+      "required": ["policy_id", "retry_scope", "max_attempts", "backoff_strategy"],
+      "additionalProperties": false,
+      "properties": {
+        "policy_id": { "type": "string", "minLength": 1 },
+        "retry_scope": {
+          "type": "string",
+          "enum": ["node", "tool", "provider", "risk_class", "graph"],
+          "description": "Granularity at which this retry policy applies."
+        },
+        "max_attempts": { "type": "integer", "minimum": 1 },
+        "attempt_number": { "type": "integer", "minimum": 1 },
+        "backoff_strategy": {
+          "type": "string",
+          "enum": ["immediate", "fixed_delay", "exponential_backoff", "policy_gated"]
+        },
+        "delay_seconds": { "type": "integer", "minimum": 0 },
+        "risk_class_scope": {
+          "type": "string",
+          "description": "When retry_scope=risk_class, identifies which risk class."
+        }
+      }
+    }
+  }
+}

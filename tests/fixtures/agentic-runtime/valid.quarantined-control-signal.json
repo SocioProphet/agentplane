@@ -1,0 +1,25 @@
+{
+  "kind": "AgenticRuntimeState",
+  "state_record_id": "runtime-state:run-005-quarantine",
+  "node_id": "node://agentplane/run-005/agent-f",
+  "run_ref": "governed-run://agentplane/run-005",
+  "from_state": "running",
+  "to_state": "quarantined",
+  "transition_cause": "quarantine_signal",
+  "control_signal": {
+    "signal_id": "signal://agentplane/run-005/quarantine-agent-f",
+    "signal_type": "quarantine",
+    "issuer_ref": "authority://agentplane/governed-runner-authority-001",
+    "idempotency_key": "quarantine:run-005:agent-f:2024-01-15T10:09",
+    "delivery_confirmed": true
+  },
+  "evidence_refs": [
+    "evidence://agentplane/run-005/agent-f/quarantine-applied"
+  ],
+  "policy_decision_ref": "policy-fabric://decision/pd-run-005-quarantine",
+  "non_claims": [
+    "Quarantine signal records the control decision; it does not assert the cause of the anomaly.",
+    "Quarantined state requires human review before node can be released."
+  ],
+  "issued_at": "2024-01-15T10:09:00Z"
+}

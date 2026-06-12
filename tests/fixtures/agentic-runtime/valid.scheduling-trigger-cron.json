@@ -1,0 +1,27 @@
+{
+  "kind": "AgenticRuntimeState",
+  "state_record_id": "runtime-state:run-004-cron-trigger",
+  "node_id": "node://agentplane/run-004/scheduler",
+  "run_ref": "governed-run://agentplane/run-004",
+  "from_state": "created",
+  "to_state": "queued",
+  "transition_cause": "scheduling_trigger_fired",
+  "scheduling_trigger": {
+    "trigger_id": "trigger://agentplane/nightly-evidence-harvest",
+    "trigger_type": "cron",
+    "trigger_source_ref": "schedule://agentplane/nightly-0200-utc",
+    "cron_expression": "0 2 * * *",
+    "cancellable": true,
+    "pause_resume_supported": true,
+    "fired_at": "2024-01-15T02:00:00Z"
+  },
+  "evidence_refs": [
+    "evidence://agentplane/run-004/cron-trigger-fired"
+  ],
+  "policy_decision_ref": "policy-fabric://decision/pd-run-004-cron",
+  "non_claims": [
+    "Trigger firing does not assert the run will complete successfully.",
+    "Scheduling trigger records when execution was initiated, not what it produced."
+  ],
+  "issued_at": "2024-01-15T02:00:01Z"
+}
