@@ -1,0 +1,17 @@
+{
+  "_reject_reason": "kind must be OrgGovWorkOrderEvidenceBridge (const violation)",
+  "kind": "OrgGovEvidenceBridge",
+  "bridge_id": "orggov-bridge:reject-wrong-kind",
+  "work_order_id": "github://SocioProphet/agentplane/issues/reject",
+  "workroom_id": "workroom://reject",
+  "actor_ref": "agent://reject",
+  "policy_decision_ref": "policy-fabric://decision/pd-reject",
+  "lifecycle": {
+    "bundle_validation": { "status": "passed" },
+    "placement": { "status": "placed" },
+    "run": { "status": "completed" },
+    "replay": { "replay_class": "exact" }
+  },
+  "non_claims": ["placeholder"],
+  "issued_at": "2024-01-15T18:00:00Z"
+}

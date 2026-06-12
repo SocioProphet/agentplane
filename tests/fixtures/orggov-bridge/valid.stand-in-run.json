@@ -1,0 +1,30 @@
+{
+  "kind": "OrgGovWorkOrderEvidenceBridge",
+  "bridge_id": "orggov-bridge:stand-in-run-002",
+  "work_order_id": "github://SocioProphet/agentplane/issues/109",
+  "workroom_id": "workroom://agentplane/workroom-reasoning-integration-002",
+  "actor_ref": "agent://agentplane/reasoning-integration-agent/v1",
+  "policy_decision_ref": "policy-fabric://decision/pd-orggov-bridge-issue-109-002",
+  "lifecycle": {
+    "bundle_validation": {
+      "status": "passed"
+    },
+    "placement": {
+      "status": "placed"
+    },
+    "run": {
+      "status": "stand_in",
+      "run_artifact_ref": "governed-run://agentplane/runs/stand-in-run-002"
+    },
+    "replay": {
+      "replay_class": "evidence-only",
+      "replay_verified": false
+    }
+  },
+  "review_status": "pending",
+  "non_claims": [
+    "stand_in run status means full execution was not performed; evidence is from fixture only.",
+    "evidence-only replay class: replay reconstructs the evidence envelope, not a live execution."
+  ],
+  "issued_at": "2024-01-15T18:10:00Z"
+}

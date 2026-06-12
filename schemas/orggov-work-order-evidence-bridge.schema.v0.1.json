@@ -1,0 +1,134 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://socioprophet.io/schemas/agentplane/orggov-work-order-evidence-bridge/v0.1",
+  "title": "OrgGovWorkOrderEvidenceBridge",
+  "description": "AgentPlane bridge artifact binding an OrgGov v0 work order to the full execution/evidence lifecycle: bundle validation → placement → policy gate → run artifact → replay artifact → session artifact → output ref → review/outcome → score reference. AgentPlane is the execution and evidence lane; it is not the product UX, policy authority, or external system executor.",
+  "type": "object",
+  "required": [
+    "kind",
+    "bridge_id",
+    "work_order_id",
+    "workroom_id",
+    "actor_ref",
+    "policy_decision_ref",
+    "lifecycle",
+    "non_claims",
+    "issued_at"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "kind": { "type": "string", "const": "OrgGovWorkOrderEvidenceBridge" },
+    "bridge_id": { "type": "string", "minLength": 1 },
+    "work_order_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "OrgGov work order ID (e.g., GitHub issue or work order ref)"
+    },
+    "workroom_id": { "type": "string", "minLength": 1 },
+    "actor_ref": { "type": "string", "minLength": 1 },
+    "role_ref": { "type": "string" },
+    "authority_ref": { "type": "string" },
+    "policy_decision_ref": {
+      "type": "string",
+      "minLength": 1,
+      "description": "PolicyFabric decision ref for this execution; no secrets or raw prompts"
+    },
+    "lifecycle": { "$ref": "#/$defs/ExecutionLifecycle" },
+    "output_ref": {
+      "type": "string",
+      "description": "Hash or opaque ref to output artifact; no raw content"
+    },
+    "output_hash": {
+      "type": "string",
+      "pattern": "^sha256:[A-Fa-f0-9]{64}$",
+      "description": "sha256 hash of output artifact"
+    },
+    "review_outcome_ref": { "type": "string" },
+    "review_status": {
+      "type": "string",
+      "enum": ["pending", "approved", "rejected", "escalated"]
+    },
+    "reversal_ref": {
+      "type": "string",
+      "description": "Reversal or remediation ref when applicable"
+    },
+    "score_ref": { "type": "string" },
+    "canonical_fields": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Fields whose values are canonical to AgentPlane (not imported from platform/registry/policy)"
+    },
+    "imported_fields": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Fields imported from platform, registry, or policy systems"
+    },
+    "hellgraph_evidence_refs": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "upstream_anchors": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "non_claims": {
+      "type": "array",
+      "items": { "type": "string" },
+      "minItems": 1
+    },
+    "issued_at": { "type": "string", "format": "date-time" }
+  },
+  "$defs": {
+    "ExecutionLifecycle": {
+      "type": "object",
+      "required": ["bundle_validation", "placement", "run", "replay"],
+      "additionalProperties": false,
+      "properties": {
+        "bundle_validation": {
+          "type": "object",
+          "required": ["status"],
+          "additionalProperties": false,
+          "properties": {
+            "status": { "type": "string", "enum": ["passed", "failed", "skipped"] },
+            "receipt_ref": { "type": "string" }
+          }
+        },
+        "placement": {
+          "type": "object",
+          "required": ["status"],
+          "additionalProperties": false,
+          "properties": {
+            "status": { "type": "string", "enum": ["placed", "deferred", "denied"] },
+            "placement_ref": { "type": "string" }
+          }
+        },
+        "run": {
+          "type": "object",
+          "required": ["status"],
+          "additionalProperties": false,
+          "properties": {
+            "status": {
+              "type": "string",
+              "enum": ["completed", "failed", "stand_in", "pending"]
+            },
+            "run_artifact_ref": { "type": "string" },
+            "session_artifact_ref": { "type": "string" }
+          }
+        },
+        "replay": {
+          "type": "object",
+          "required": ["replay_class"],
+          "additionalProperties": false,
+          "properties": {
+            "replay_class": {
+              "type": "string",
+              "enum": ["exact", "best-effort", "evidence-only", "non-replayable-side-effect"]
+            },
+            "replay_artifact_ref": { "type": "string" },
+            "replay_verified": { "type": "boolean" }
+          }
+        }
+      }
+    }
+  }
+}
