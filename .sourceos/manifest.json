@@ -11,7 +11,13 @@
     "ReplayArtifact",
     "StopGateArtifact",
     "SourceOSContextToolProviderEvidence",
-    "SourceOSContextCuminRun"
+    "SourceOSContextCuminRun",
+    "SourceOSInteractionEvidenceBinding",
+    "AgentCycleHealth",
+    "AuthorityDependencyEvidence",
+    "RuntimeSandboxRun",
+    "WorkspaceProphetControlReceipt",
+    "ReasoningFailureTrace"
   ],
   "syncEngines": [],
   "sourceChannels": [],
