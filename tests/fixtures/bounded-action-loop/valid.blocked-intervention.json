@@ -1,0 +1,30 @@
+{
+  "schema_version": "0.1",
+  "kind": "bounded_action_loop",
+  "loop_id": "loop-blocked-intervention-001",
+  "action_proposal": {
+    "proposal_id": "proposal-blocked-intervention-001",
+    "action_type": "emit_audit_packet",
+    "risk_class": "high",
+    "evidence_refs": [
+      "evidence://agentplane/run/blocked-intervention-001/anomaly-signal"
+    ],
+    "requested_result": "emit audit packet for high-risk anomalous action"
+  },
+  "policy_decision_ref": "SocioProphet/policy-fabric#85:pd-block-high-risk-001",
+  "runtime_trace": {
+    "trace_id": "trace-blocked-intervention-001",
+    "proposal_ref": "proposal-blocked-intervention-001",
+    "policy_decision_ref": "SocioProphet/policy-fabric#85:pd-block-high-risk-001",
+    "trace_status": "blocked",
+    "no_external_side_effects": true,
+    "audit_ref": "SocioProphet/model-governance-ledger#20:audit-block-001"
+  },
+  "outcome_record": {
+    "outcome_id": "outcome-blocked-intervention-001",
+    "proposal_ref": "proposal-blocked-intervention-001",
+    "policy_decision_ref": "SocioProphet/policy-fabric#85:pd-block-high-risk-001",
+    "result": "blocked",
+    "audit_ref": "SocioProphet/model-governance-ledger#20:audit-block-001"
+  }
+}
