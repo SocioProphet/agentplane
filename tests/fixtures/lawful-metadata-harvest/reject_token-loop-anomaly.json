@@ -1,0 +1,33 @@
+{
+  "_reject_reason": "token_loop_anomaly.detected=true with anomaly_type=resumption_loop — validator must reject this run artifact as it indicates a harvesting anomaly that invalidates replay",
+  "kind": "LawfulMetadataHarvestRunArtifact",
+  "artifact_id": "lmh_run_artifact_reject_001",
+  "run_ref": "agentplane://run/lawful-metadata-harvest-smoke/run_reject_001",
+  "harvest_batches": [
+    {
+      "batch_id": "batch_reject_001",
+      "verb": "ListRecords",
+      "records_harvested": 50,
+      "records_valid": 30,
+      "batch_status": "partial",
+      "resumption_token": "TOKEN_LOOP_001",
+      "evidence_ref": "evidence://agentplane/lmh/batch_reject_001"
+    }
+  ],
+  "envelope_ref": "procybernetica://lawful-metadata-harvest-envelope/lmh_reject_001",
+  "replay_ref": "agentplane://replay/lawful-metadata-harvest-smoke/replay_reject_001",
+  "promotion_decision": {
+    "decision": "reject",
+    "decided_by": "agentplane/lawful-harvest-promotion-gate",
+    "promotion_is_explicit": true,
+    "reason": "Token loop anomaly detected — replay invalidated"
+  },
+  "token_loop_anomaly": {
+    "detected": true,
+    "anomaly_type": "resumption_loop",
+    "affected_batch_ids": ["batch_reject_001"]
+  },
+  "no_live_network_harvest": true,
+  "policy_ref": "policy://agentplane/lawful-harvest-smoke-v1",
+  "issued_at": "2026-06-11T10:30:00Z"
+}

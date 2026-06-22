@@ -1,0 +1,42 @@
+{
+  "repo": "SocioProphet/agentplane",
+  "domain": "agent-execution",
+  "specVersion": "0.1.0",
+  "ownedSchemas": [
+    "Bundle",
+    "GovernanceContext",
+    "ValidationArtifact",
+    "PlacementDecision",
+    "RunArtifact",
+    "ReplayArtifact",
+    "StopGateArtifact",
+    "SourceOSContextToolProviderEvidence",
+    "SourceOSContextCuminRun",
+    "SourceOSInteractionEvidenceBinding",
+    "AgentCycleHealth",
+    "AuthorityDependencyEvidence",
+    "RuntimeSandboxRun",
+    "WorkspaceProphetControlReceipt",
+    "ReasoningFailureTrace"
+  ],
+  "syncEngines": [],
+  "sourceChannels": [],
+  "policyClasses": [
+    "critical"
+  ],
+  "auditEvents": [
+    "bundle.validated",
+    "bundle.placed",
+    "bundle.executed",
+    "sourceos.delegated.recorded",
+    "stop-gate.evaluated"
+  ],
+  "dangerousSurfaces": [
+    "sourceos.delegated.live_tekton_mutation",
+    "bundle.stop_gate.override"
+  ],
+  "authorityRepos": [
+    "SocioProphet/agentplane"
+  ],
+  "notes": "Execution control plane for the SocioProphet AI+HW+State stack. Bridges agentplane bundles to SourceOS image production surfaces (Tekton, Katello). Delegated execution records are the evidence boundary between agent intent and SourceOS content lifecycle."
+}

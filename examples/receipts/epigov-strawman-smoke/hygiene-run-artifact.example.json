@@ -1,0 +1,30 @@
+{
+  "kind": "HygieneRunArtifact",
+  "artifact_id": "epigov_hygiene_run_strawman_001",
+  "run_ref": "agentplane://run/epigov-hygiene-detector-smoke/run_strawman_001",
+  "detector_id": "LOGFALL.STRAWMAN.V2",
+  "ruleset_hash": "sha256:a3f1e2b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2",
+  "input_hash": "sha256:b4e2f1c3d5a6b7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0d1e2",
+  "claims_evaluated": 5,
+  "hygiene_findings": [
+    {
+      "finding_id": "finding_strawman_001",
+      "claim_ref": "claim://epigov/strawman-test/claim_001",
+      "finding_type": "logfall",
+      "severity": "warning",
+      "description": "Claim presents a weakened version of the opposing position without citation"
+    }
+  ],
+  "repair_suggestions": [
+    {
+      "suggestion_id": "repair_001",
+      "finding_ref": "finding_strawman_001",
+      "action": "Add citation to primary source and represent opposing position using its strongest formulation"
+    }
+  ],
+  "validation_artifact_ref": "agentplane://validation/epigov-hygiene-detector-smoke/val_strawman_001",
+  "replay_artifact_ref": "agentplane://replay/epigov-hygiene-detector-smoke/replay_strawman_001",
+  "sociosphere_protocol_ref": "protocol/epistemic-governance/v1",
+  "replay_verified": true,
+  "issued_at": "2026-06-11T10:00:00Z"
+}
