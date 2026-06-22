@@ -1,0 +1,37 @@
+{
+  "kind": "GraphAwareWorkOrder",
+  "work_order_id": "work-order:pr-impact-review-stale-graph-002",
+  "work_order_type": "pr_impact_review",
+  "repo_graph_context": {
+    "repo": "SocioProphet/agentplane",
+    "commit_ref": "sha:b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1",
+    "changed_paths": ["schemas/bounded-action-loop.v0.schema.json"],
+    "affected_node_ids": [],
+    "affected_edge_ids": [],
+    "policy_status": "unknown",
+    "graph_artifact_staleness": "stale"
+  },
+  "scope_warnings": [
+    {
+      "warning_type": "stale_graph_artifact",
+      "message": "Prophet Understand graph artifact is stale; affected node/edge IDs may be incomplete.",
+      "artifact_ref": "prophet-understand://artifact/agentplane/schemas/stale-impact-b2c3"
+    },
+    {
+      "warning_type": "unknown_affected_nodes",
+      "message": "Affected nodes could not be resolved from stale graph; citation requirements relaxed but must be noted in output."
+    }
+  ],
+  "output_citation_requirements": {
+    "must_cite_affected_nodes": false,
+    "must_cite_affected_edges": false,
+    "must_cite_source_anchors": true,
+    "architectural_impact_claim_requires_graph_evidence": true
+  },
+  "policy_decision_ref": "policy-fabric://decision/pd-graph-work-order-pr-impact-002",
+  "non_claims": [
+    "Stale graph artifact means affected node/edge coverage is incomplete; output must not claim full architectural coverage.",
+    "Unknown policy_status means this work order cannot claim compliance; human review required."
+  ],
+  "issued_at": "2024-01-15T09:15:00Z"
+}

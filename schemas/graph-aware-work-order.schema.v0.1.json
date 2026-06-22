@@ -1,0 +1,132 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://socioprophet.io/schemas/agentplane/graph-aware-work-order/v0.1",
+  "title": "GraphAwareWorkOrder",
+  "description": "AgentPlane work order informed by Prophet Understand repo graph artifacts. Repo graph context informs scope; it does not grant mutation authority. PolicyFabric governs execution boundaries. Agent output must cite affected node/edge IDs and source anchors when available.",
+  "type": "object",
+  "required": [
+    "kind",
+    "work_order_id",
+    "work_order_type",
+    "repo_graph_context",
+    "policy_decision_ref",
+    "non_claims",
+    "issued_at"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "kind": { "type": "string", "const": "GraphAwareWorkOrder" },
+    "work_order_id": { "type": "string", "minLength": 1 },
+    "work_order_type": {
+      "type": "string",
+      "enum": ["code_fix", "documentation_update", "policy_review", "pr_impact_review"]
+    },
+    "repo_graph_context": { "$ref": "#/$defs/RepoGraphContext" },
+    "scope_warnings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["warning_type", "message"],
+        "additionalProperties": false,
+        "properties": {
+          "warning_type": {
+            "type": "string",
+            "enum": ["missing_graph_artifact", "stale_graph_artifact", "unknown_affected_nodes", "unknown_affected_edges"]
+          },
+          "message": { "type": "string", "minLength": 1 },
+          "artifact_ref": { "type": "string" }
+        }
+      },
+      "description": "Missing or stale graph artifacts are explicit warnings, not silent failures"
+    },
+    "output_citation_requirements": { "$ref": "#/$defs/CitationRequirements" },
+    "policy_decision_ref": { "type": "string", "minLength": 1 },
+    "evidence_required_before_handoff": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Evidence artifact kinds required before PR or execution handoff"
+    },
+    "hellgraph_evidence_refs": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "upstream_anchors": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "non_claims": {
+      "type": "array",
+      "items": { "type": "string" },
+      "minItems": 1
+    },
+    "issued_at": { "type": "string", "format": "date-time" }
+  },
+  "$defs": {
+    "RepoGraphContext": {
+      "type": "object",
+      "required": ["repo", "commit_ref"],
+      "additionalProperties": false,
+      "properties": {
+        "repo": { "type": "string", "minLength": 1 },
+        "commit_ref": { "type": "string", "minLength": 1 },
+        "changed_paths": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "affected_node_ids": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "affected_edge_ids": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "source_anchor_refs": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "required_tests": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "required_docs": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "required_policies": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "provenance_receipt_refs": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "policy_status": {
+          "type": "string",
+          "enum": ["compliant", "review_required", "blocked", "unknown"]
+        },
+        "prophet_understand_artifact_ref": {
+          "type": "string",
+          "description": "Ref to the Prophet Understand repo intelligence artifact"
+        },
+        "graph_artifact_staleness": {
+          "type": "string",
+          "enum": ["current", "stale", "missing", "unknown"]
+        }
+      }
+    },
+    "CitationRequirements": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "must_cite_affected_nodes": { "type": "boolean" },
+        "must_cite_affected_edges": { "type": "boolean" },
+        "must_cite_source_anchors": { "type": "boolean" },
+        "architectural_impact_claim_requires_graph_evidence": {
+          "type": "boolean",
+          "description": "When true, any claim of architectural impact in agent output requires graph evidence"
+        }
+      }
+    }
+  }
+}

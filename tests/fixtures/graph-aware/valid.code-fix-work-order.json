@@ -1,0 +1,62 @@
+{
+  "kind": "GraphAwareWorkOrder",
+  "work_order_id": "work-order:code-fix-auth-middleware-001",
+  "work_order_type": "code_fix",
+  "repo_graph_context": {
+    "repo": "SocioProphet/prophet-platform",
+    "commit_ref": "sha:a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0",
+    "changed_paths": [
+      "src/auth/middleware.ts",
+      "tests/auth/middleware.test.ts"
+    ],
+    "affected_node_ids": [
+      "node://prophet-platform/auth/AuthMiddleware",
+      "node://prophet-platform/auth/SessionHandler"
+    ],
+    "affected_edge_ids": [
+      "edge://prophet-platform/auth/AuthMiddleware->SessionHandler/depends"
+    ],
+    "source_anchor_refs": [
+      "source://prophet-platform/src/auth/middleware.ts#L42-L78"
+    ],
+    "required_tests": [
+      "tests/auth/middleware.test.ts"
+    ],
+    "required_docs": [
+      "docs/auth/session-token-storage.md"
+    ],
+    "required_policies": [
+      "policy-fabric://policy/session-token-compliance"
+    ],
+    "provenance_receipt_refs": [
+      "provenance://agentplane/code-fix/auth-middleware-001"
+    ],
+    "policy_status": "review_required",
+    "prophet_understand_artifact_ref": "prophet-understand://artifact/prophet-platform/auth/impact-a1b2",
+    "graph_artifact_staleness": "current"
+  },
+  "output_citation_requirements": {
+    "must_cite_affected_nodes": true,
+    "must_cite_affected_edges": true,
+    "must_cite_source_anchors": true,
+    "architectural_impact_claim_requires_graph_evidence": true
+  },
+  "policy_decision_ref": "policy-fabric://decision/pd-graph-work-order-code-fix-001",
+  "evidence_required_before_handoff": [
+    "GovernedRunContract",
+    "ModelRoutingLaneDecisionReceipt"
+  ],
+  "hellgraph_evidence_refs": [
+    "evidence://hellgraph/graph-aware/code-fix-auth-middleware-001"
+  ],
+  "upstream_anchors": [
+    "prophet-platform#407",
+    "agentplane#106"
+  ],
+  "non_claims": [
+    "Graph context informs scope; it does not grant mutation authority.",
+    "Inferred graph facts are not mutation authority; PolicyFabric governs execution.",
+    "This work order does not claim to represent the full repo dependency graph."
+  ],
+  "issued_at": "2024-01-15T09:00:00Z"
+}
