@@ -1,0 +1,13 @@
+{
+  "_reject_reason": "gate_decision=allow_degraded requires degraded_mode_authorization_ref (conditional)",
+  "kind": "SubstrateTrustGate",
+  "gate_id": "trust-gate:reject-degraded-no-auth",
+  "substrate_ref": "memory://reject",
+  "substrate_type": "memory_lane",
+  "report_ref": "sourceos-syncd://report/reject",
+  "diagnosis_status": "degraded",
+  "gate_decision": "allow_degraded",
+  "policy_decision_ref": "policy-fabric://decision/pd-reject",
+  "non_claims": ["placeholder"],
+  "evaluated_at": "2024-01-15T10:00:00Z"
+}

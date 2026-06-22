@@ -1,0 +1,89 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://socioprophet.io/schemas/agentplane/substrate-trust-gate/v0.1",
+  "title": "SubstrateTrustGate",
+  "description": "AgentPlane substrate trust gate consuming SourceOS State Integrity Report (sourceos-syncd). Evaluated before agents act against local-first state, memory, repo indexes, policy state, or repair/quarantine lanes. Secure lane access fails closed by default.",
+  "type": "object",
+  "required": [
+    "kind",
+    "gate_id",
+    "substrate_ref",
+    "substrate_type",
+    "report_ref",
+    "diagnosis_status",
+    "gate_decision",
+    "policy_decision_ref",
+    "non_claims",
+    "evaluated_at"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "kind": { "type": "string", "const": "SubstrateTrustGate" },
+    "gate_id": { "type": "string", "minLength": 1 },
+    "substrate_ref": { "type": "string", "minLength": 1 },
+    "substrate_type": {
+      "type": "string",
+      "enum": [
+        "local_state",
+        "memory_lane",
+        "repo_index",
+        "policy_state",
+        "repair_lane",
+        "quarantine_lane",
+        "secure_lane"
+      ]
+    },
+    "report_ref": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Ref to the SourceOS State Integrity Report from sourceos-syncd"
+    },
+    "report_schema_valid": { "type": "boolean" },
+    "report_freshness": {
+      "type": "string",
+      "enum": ["current", "stale", "expired", "missing"]
+    },
+    "diagnosis_status": {
+      "type": "string",
+      "enum": ["healthy", "degraded", "stale", "repairing", "unsafe", "unknown"],
+      "description": "From State Integrity Report. unsafe and unknown fail closed by default."
+    },
+    "lane_status": {
+      "type": "string",
+      "enum": ["compliant", "degraded", "blocked", "sla_breach", "unknown"]
+    },
+    "replay_lag_acceptable": { "type": "boolean" },
+    "heartbeat_fresh": { "type": "boolean" },
+    "migration_complete": { "type": "boolean" },
+    "repair_complete": { "type": "boolean" },
+    "attestation_required": { "type": "boolean" },
+    "attestation_ref": { "type": "string" },
+    "secure_lane_redaction_required": { "type": "boolean" },
+    "gate_decision": {
+      "type": "string",
+      "enum": ["allow", "allow_degraded", "deny", "fail_closed"],
+      "description": "allow: substrate is healthy and current; allow_degraded: requires explicit policy authorization; deny: blocked by policy; fail_closed: unsafe/unknown/missing report"
+    },
+    "degraded_mode_authorization_ref": {
+      "type": "string",
+      "description": "Required for allow_degraded; explicit policy authorization for degraded-mode access"
+    },
+    "trusted_report_ref": {
+      "type": "string",
+      "description": "Which report and diagnosis the agent action trusted — preserved in evidence"
+    },
+    "policy_decision_ref": { "type": "string", "minLength": 1 },
+    "non_claims": {
+      "type": "array",
+      "items": { "type": "string" },
+      "minItems": 1
+    },
+    "evaluated_at": { "type": "string", "format": "date-time" }
+  },
+  "if": {
+    "properties": { "gate_decision": { "const": "allow_degraded" } }
+  },
+  "then": {
+    "required": ["degraded_mode_authorization_ref"]
+  }
+}
