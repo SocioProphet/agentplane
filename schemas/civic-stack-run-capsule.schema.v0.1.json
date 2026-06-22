@@ -1,0 +1,270 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://socioprophet.io/schemas/agentplane/civic-stack-run-capsule/v0.1",
+  "title": "CivicStackRunCapsule",
+  "description": "AgentPlane runtime evidence capsule for Seven-Model Civic Operating Architecture execution. Emits OQL plan acceptance, OAC compiler invocation, tool grants, action dispatch, and RationalGRL trace links. AgentPlane emits governed runtime evidence; it does not own the ontology, policy evaluation, or Delivery Excellence scoring.",
+  "type": "object",
+  "required": [
+    "kind",
+    "run_id",
+    "actor_ref",
+    "oql_plan_id",
+    "artifact_manifest_id",
+    "policy_decision_id",
+    "timestamps",
+    "provenance_refs",
+    "rationalgrl_trace",
+    "hellgraph_evidence_refs",
+    "issued_at"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "kind": { "type": "string", "const": "CivicStackRunCapsule" },
+    "run_id": { "type": "string", "minLength": 1 },
+    "actor_ref": { "type": "string", "description": "Agent or human actor reference" },
+    "post_authority_ref": {
+      "type": "string",
+      "description": "Post or authority binding reference, if applicable"
+    },
+    "oql_plan_id": { "type": "string", "minLength": 1 },
+    "artifact_manifest_id": { "type": "string", "minLength": 1 },
+    "service_id": { "type": "string" },
+    "policy_decision_id": { "type": "string", "minLength": 1 },
+    "policy_decision_outcome": {
+      "type": "string",
+      "enum": ["allow", "allow_with_constraints", "deny", "escalate"]
+    },
+    "dataset_ids": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "resource_ids": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "tool_grants": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/ToolGrant" }
+    },
+    "action_dispatch_records": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/ActionDispatchRecord" }
+    },
+    "oql_plan_acceptance": { "$ref": "#/$defs/OQLPlanAcceptance" },
+    "oac_compiler_invocation": { "$ref": "#/$defs/OACCompilerInvocation" },
+    "subagent_delegations": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/SubagentDelegation" }
+    },
+    "attestation_events": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/AttestationEvent" }
+    },
+    "timestamps": {
+      "type": "object",
+      "required": ["started_at", "completed_at"],
+      "additionalProperties": false,
+      "properties": {
+        "started_at": { "type": "string", "format": "date-time" },
+        "completed_at": { "type": "string", "format": "date-time" }
+      }
+    },
+    "provenance_refs": {
+      "type": "array",
+      "items": { "type": "string" },
+      "minItems": 1
+    },
+    "rationalgrl_trace": { "$ref": "#/$defs/RationalGRLTrace" },
+    "hellgraph_evidence_refs": {
+      "type": "array",
+      "items": { "type": "string" },
+      "minItems": 1,
+      "description": "Evidence refs emitted to HellGraph/Prophet Core"
+    },
+    "delivery_excellence_signal_ref": {
+      "type": "string",
+      "description": "Score signal ref emitted to Delivery Excellence"
+    },
+    "upstream_anchors": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "issued_at": { "type": "string", "format": "date-time" }
+  },
+  "$defs": {
+    "ToolGrant": {
+      "type": "object",
+      "required": ["grant_id", "tool_id", "granted_to", "policy_decision_ref"],
+      "additionalProperties": false,
+      "properties": {
+        "grant_id": { "type": "string", "minLength": 1 },
+        "tool_id": { "type": "string", "minLength": 1 },
+        "granted_to": { "type": "string", "minLength": 1 },
+        "policy_decision_ref": { "type": "string", "minLength": 1 },
+        "cgrm_decision_ref": { "type": "string" },
+        "scope_constraints": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "ActionDispatchRecord": {
+      "type": "object",
+      "required": ["dispatch_id", "action_type", "policy_decision_ref", "dispatch_status"],
+      "additionalProperties": false,
+      "properties": {
+        "dispatch_id": { "type": "string", "minLength": 1 },
+        "action_type": { "type": "string", "minLength": 1 },
+        "policy_decision_ref": { "type": "string", "minLength": 1 },
+        "dispatch_status": {
+          "type": "string",
+          "enum": ["dispatched", "blocked", "deferred", "completed"]
+        },
+        "rationalgrl_task_ref": { "type": "string" },
+        "defeater_reason": {
+          "type": "string",
+          "description": "RationalGRL defeater description when dispatch_status=blocked"
+        }
+      }
+    },
+    "OQLPlanAcceptance": {
+      "type": "object",
+      "required": ["acceptance_id", "oql_plan_id", "acceptance_status"],
+      "additionalProperties": false,
+      "properties": {
+        "acceptance_id": { "type": "string", "minLength": 1 },
+        "oql_plan_id": { "type": "string", "minLength": 1 },
+        "acceptance_status": {
+          "type": "string",
+          "enum": ["accepted", "rejected", "partial", "pending_review"]
+        },
+        "interpretation_ref": { "type": "string" },
+        "oql_task_mappings": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/OQLTaskMapping" }
+        }
+      }
+    },
+    "OQLTaskMapping": {
+      "type": "object",
+      "required": ["task_id", "oql_task_ref", "agent_action_ref"],
+      "additionalProperties": false,
+      "properties": {
+        "task_id": { "type": "string" },
+        "oql_task_ref": { "type": "string" },
+        "agent_action_ref": { "type": "string" }
+      }
+    },
+    "OACCompilerInvocation": {
+      "type": "object",
+      "required": ["invocation_id", "compiler_id", "artifact_manifest_id", "invocation_status"],
+      "additionalProperties": false,
+      "properties": {
+        "invocation_id": { "type": "string", "minLength": 1 },
+        "compiler_id": { "type": "string", "minLength": 1 },
+        "artifact_manifest_id": { "type": "string", "minLength": 1 },
+        "invocation_status": {
+          "type": "string",
+          "enum": ["success", "failure", "partial"]
+        },
+        "artifact_emission_refs": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "SubagentDelegation": {
+      "type": "object",
+      "required": ["delegation_id", "delegated_to", "task_ref", "policy_decision_ref"],
+      "additionalProperties": false,
+      "properties": {
+        "delegation_id": { "type": "string", "minLength": 1 },
+        "delegated_to": { "type": "string", "minLength": 1 },
+        "task_ref": { "type": "string", "minLength": 1 },
+        "policy_decision_ref": { "type": "string", "minLength": 1 }
+      }
+    },
+    "AttestationEvent": {
+      "type": "object",
+      "required": ["attestation_id", "attestation_type", "attested_by"],
+      "additionalProperties": false,
+      "properties": {
+        "attestation_id": { "type": "string", "minLength": 1 },
+        "attestation_type": {
+          "type": "string",
+          "enum": ["policy_compliance", "provenance_chain", "dataset_access", "tool_grant", "oql_plan_acceptance"]
+        },
+        "attested_by": { "type": "string", "minLength": 1 },
+        "ref": { "type": "string" }
+      }
+    },
+    "RationalGRLTrace": {
+      "type": "object",
+      "required": ["trace_id", "goals_addressed", "tasks_executed"],
+      "additionalProperties": false,
+      "properties": {
+        "trace_id": { "type": "string", "minLength": 1 },
+        "goals_addressed": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["goal_ref", "goal_type", "satisfaction_status"],
+            "additionalProperties": false,
+            "properties": {
+              "goal_ref": { "type": "string" },
+              "goal_type": {
+                "type": "string",
+                "enum": ["goal", "softgoal"]
+              },
+              "satisfaction_status": {
+                "type": "string",
+                "enum": ["satisfied", "partially_satisfied", "denied", "unknown"]
+              },
+              "contribution_refs": {
+                "type": "array",
+                "items": { "type": "string" }
+              }
+            }
+          }
+        },
+        "tasks_executed": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["task_ref", "execution_status"],
+            "additionalProperties": false,
+            "properties": {
+              "task_ref": { "type": "string" },
+              "execution_status": {
+                "type": "string",
+                "enum": ["completed", "blocked", "delegated", "deferred"]
+              },
+              "resource_used_refs": {
+                "type": "array",
+                "items": { "type": "string" }
+              },
+              "dependency_satisfied_refs": {
+                "type": "array",
+                "items": { "type": "string" }
+              },
+              "defeater_reason": { "type": "string" }
+            }
+          }
+        },
+        "dependencies_blocked": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["dependency_ref", "blocking_policy_ref"],
+            "additionalProperties": false,
+            "properties": {
+              "dependency_ref": { "type": "string" },
+              "blocking_policy_ref": { "type": "string" },
+              "defeater_reason": { "type": "string" }
+            }
+          }
+        }
+      }
+    }
+  }
+}

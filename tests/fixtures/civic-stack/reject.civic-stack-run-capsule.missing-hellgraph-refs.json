@@ -1,0 +1,20 @@
+{
+  "_reject_reason": "hellgraph_evidence_refs is required but absent",
+  "kind": "CivicStackRunCapsule",
+  "run_id": "civic-stack-run:reject-no-hellgraph",
+  "actor_ref": "agent://agentplane/civic-stack-agent/v1",
+  "oql_plan_id": "oql://plan/service-delivery-v1/step-1",
+  "artifact_manifest_id": "manifest://civic-stack/artifacts/reject-no-hellgraph",
+  "policy_decision_id": "policy-fabric://decision/pd-reject-no-hellgraph",
+  "timestamps": {
+    "started_at": "2024-01-15T10:00:00Z",
+    "completed_at": "2024-01-15T10:01:00Z"
+  },
+  "provenance_refs": ["provenance://sociosphere/civic-stack-run/reject-no-hellgraph"],
+  "rationalgrl_trace": {
+    "trace_id": "rationalgrl-trace:reject-no-hellgraph",
+    "goals_addressed": [],
+    "tasks_executed": []
+  },
+  "issued_at": "2024-01-15T10:01:01Z"
+}
