@@ -1,0 +1,36 @@
+{
+  "schemaVersion": "0.1.0",
+  "runtimeRunId": "agentplane:runtime-sandbox-run:teardown:scope-d-example",
+  "requestRef": "environment:validate-change-v2-request:scope-d-example",
+  "executorPlane": "AgentPlane",
+  "executionMode": "runtime_contract",
+  "runtimeParityLevel": "runtime_observed",
+  "runStatus": "runtime_teardown_complete",
+  "environmentRef": "environment://runtime/scope-d-example/teardown",
+  "baselineRef": "workspace://scope-d/main",
+  "changedServiceRefs": [
+    "service://scope-d/api"
+  ],
+  "dependencyGraphRef": "dependency-graph://runtime/scope-d-example/teardown",
+  "routingRef": "routing://runtime/scope-d-example/teardown",
+  "isolationRefs": {
+    "network": "isolation://runtime/scope-d-example/network/teardown",
+    "async": "isolation://runtime/scope-d-example/async/teardown",
+    "stateful": "isolation://runtime/scope-d-example/stateful/teardown"
+  },
+  "evidenceRefs": [
+    "evidence://agentplane/runtime-sandbox-run/scope-d-example/teardown"
+  ],
+  "receiptRefs": [
+    "receipt://devsecops-workroom/sandbox-evidence/scope-d-example/teardown-001"
+  ],
+  "failureCodes": [],
+  "teardownState": "teardown_complete",
+  "leakCheckRef": "leak-check://runtime/scope-d-example/teardown-complete",
+  "issuedAt": "2026-06-11T14:00:00Z",
+  "nonClaims": [
+    "Teardown complete does not certify full Signadot runtime parity.",
+    "Teardown complete does not imply leak-free outcome without inspecting leakCheckRef.",
+    "Teardown complete does not authorize future re-use of the same environment identity."
+  ]
+}
