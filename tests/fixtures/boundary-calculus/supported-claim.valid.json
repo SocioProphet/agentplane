@@ -1,0 +1,22 @@
+{
+  "kind": "BoundaryCalculusEvidenceEnvelope",
+  "envelope_id": "bcee_supported_claim_001",
+  "run_ref": "agentplane://run/boundary-calculus/run_20260611_001",
+  "claim_id": "claim://boundary-calculus/auth-bypass-absent-001",
+  "claim_status": "supported",
+  "local_model": "claude-sonnet-4-6",
+  "boundary_or_interface": "API.Authorization.PolicyGate",
+  "load_bearing": false,
+  "non_claims": [
+    "This envelope does not assert that the boundary is secure against all attack vectors.",
+    "This envelope does not certify that upstream policy gates are correctly configured.",
+    "This envelope does not authorize deployment."
+  ],
+  "evidence_refs": [
+    "evidence://agentplane/run/boundary-calculus/run_20260611_001/policy-gate-trace",
+    "evidence://agentplane/run/boundary-calculus/run_20260611_001/test-harness-output"
+  ],
+  "promotion_gate": "peer_review",
+  "policy_result": "allow",
+  "captured_at": "2026-06-11T10:00:00Z"
+}
