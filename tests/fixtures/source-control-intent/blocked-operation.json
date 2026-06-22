@@ -1,0 +1,19 @@
+{
+  "kind": "SourceControlIntentBridgeArtifact",
+  "artifact_id": "scib_commit_push_blocked_20260611_001",
+  "captured_at": "2026-06-11T11:00:00Z",
+  "scaffold_baseline": "5d85ab6a24502f60f15ef829235b6288a289d47e",
+  "service_id": "svc.substrate.source-control",
+  "operation": "commit_push",
+  "intent_status": "blocked",
+  "agentplane_admission_ref": "agentplane://admission/scib_admission_blocked_20260611_001",
+  "policy_decision": "block",
+  "policy_ref": "policy://platform/source-control-commit-push-v1",
+  "replay_eligible": false,
+  "evidence_refs": [
+    "ev://agentplane/block-receipt/scib_block_20260611_001"
+  ],
+  "runtime_ready": false,
+  "pr_ref": "github://SocioProphet/gitea-sovereign/pull/3",
+  "actor_ref": "actor://agent/governed-runner-002"
+}

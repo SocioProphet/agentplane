@@ -1,0 +1,45 @@
+{
+  "apiVersion": "agentplane.socioprophet.org/v0.1",
+  "kind": "Bundle",
+  "metadata": {
+    "name": "lawful-metadata-harvest-smoke",
+    "version": "0.1.0",
+    "createdAt": "2026-06-11T00:00:00Z",
+    "licensePolicy": {
+      "allowAGPL": false,
+      "notes": "Lawful metadata harvest bundle is evidence-forward. No live network harvesting."
+    },
+    "source": {
+      "git": { "dirty": false, "rev": "UNSET" }
+    }
+  },
+  "spec": {
+    "upstreamAnchors": [
+      "SocioProphet/ProCybernetica:lawful-metadata-harvest-envelope",
+      "SocioProphet/sociosphere#322:epistemic-governance"
+    ],
+    "nonClaims": [
+      "This bundle performs no live network harvesting.",
+      "This bundle does not constitute a harvesting right or legal authorization.",
+      "This bundle does not certify the authenticity of harvested metadata."
+    ],
+    "artifacts": {
+      "outDir": "./artifacts/lawful-metadata-harvest-smoke"
+    },
+    "policy": {
+      "lane": "smoke",
+      "humanGateRequired": false,
+      "failOnTimeout": true,
+      "maxRunSeconds": 60,
+      "policyPackRef": "policy://agentplane/lawful-harvest-smoke-v1",
+      "policyPackHash": "UNSET"
+    },
+    "smoke": {
+      "script": "bundles/lawful-metadata-harvest-smoke/smoke.sh"
+    },
+    "secrets": {
+      "required": [],
+      "secretRefRoot": "secrets://tenant"
+    }
+  }
+}
