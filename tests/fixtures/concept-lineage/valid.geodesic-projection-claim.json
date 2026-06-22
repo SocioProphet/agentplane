@@ -1,0 +1,54 @@
+{
+  "kind": "ConceptToArtifactLineageReceipt",
+  "receipt_id": "c2a-receipt:geodesic-projection-claim-001",
+  "concept_id": "ontogenesis://concept/fluid-geography-projection/entry-002",
+  "concept_kind": "projection_relation",
+  "source_anchor": {
+    "source_ref": "ontogenesis://source/fuller-synergetics-1979/chapter-1009",
+    "anchor_type": "figure",
+    "page_or_section": "Fig. 1009.10",
+    "extraction_confidence": "medium",
+    "assumptions": [
+      "Figure caption is taken as authoritative for the projection type label.",
+      "Scale bar on the figure is assumed to be accurate to the published edition."
+    ]
+  },
+  "geometry_projection": {
+    "geometry_type": "fluid_geography",
+    "projection_type": "dymaxion",
+    "distortion_assumptions": [
+      "Edge distortion at icosahedron seams is not represented in the flat map.",
+      "Area preservation is approximate; this projection prioritizes shape over area.",
+      "Continental coastline accuracy varies by edition and has not been independently verified."
+    ],
+    "relation_refs": [
+      "ontogenesis://concept/icosahedron-unfolding/geometry_relation",
+      "ontogenesis://concept/geodesic-great-circle/geometry_relation"
+    ]
+  },
+  "cross_reference_refs": [
+    "ontogenesis://concept/azimuthal-projection/cross_reference"
+  ],
+  "extraction_mode": "human_review",
+  "validation_state": "validated",
+  "replay_semantics": {
+    "is_replayable": true,
+    "replay_fidelity": "indicative_only",
+    "replay_artifact_ref": "replay://agentplane/concept-lineage/geodesic-projection-claim-001"
+  },
+  "policy_decision_ref": "policy-fabric://decision/pd-concept-lineage-geodesic-001",
+  "hellgraph_evidence_refs": [
+    "evidence://hellgraph/concept-lineage/geodesic-projection-claim-001"
+  ],
+  "upstream_anchors": [
+    "ontogenesis#61",
+    "gaia-world-model#21",
+    "agentplane#134"
+  ],
+  "non_claims": [
+    "This receipt does not claim the Dymaxion projection is superior to other projections.",
+    "Human review provides indicative replay only; exact re-extraction is not possible from a figure.",
+    "This receipt does not claim geographic accuracy of the underlying source figure."
+  ],
+  "issued_at": "2024-01-15T12:30:00Z"
+}

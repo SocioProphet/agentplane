@@ -1,0 +1,229 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://socioprophet.io/schemas/agentplane/concept-to-artifact-lineage-receipt/v0.1",
+  "title": "ConceptToArtifactLineageReceipt",
+  "description": "AgentPlane evidence receipt for Phase 4 Fuller/Synergetics concept-to-artifact lineage work. Records concept extraction, source anchors, definition families, cross-references, geometry/projection relations, artifact linkage, commons impact claims, and promotion/rejection state. AgentPlane owns the receipt and replay semantics; Ontogenesis owns the concept ontology.",
+  "type": "object",
+  "required": [
+    "kind",
+    "receipt_id",
+    "concept_id",
+    "concept_kind",
+    "source_anchor",
+    "extraction_mode",
+    "validation_state",
+    "replay_semantics",
+    "non_claims",
+    "issued_at"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "kind": { "type": "string", "const": "ConceptToArtifactLineageReceipt" },
+    "receipt_id": { "type": "string", "minLength": 1 },
+    "concept_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Ref to ConceptEntry in Ontogenesis"
+    },
+    "concept_kind": {
+      "type": "string",
+      "enum": [
+        "term",
+        "definition",
+        "geometry_relation",
+        "projection_relation",
+        "scenario",
+        "prototype",
+        "artifact",
+        "commons_impact_claim",
+        "dymaxion_metric_claim",
+        "cross_reference"
+      ]
+    },
+    "source_anchor": { "$ref": "#/$defs/SourceAnchor" },
+    "definition_family_refs": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Refs to related definition-family entries in the concept ontology"
+    },
+    "cross_reference_refs": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "geometry_projection": { "$ref": "#/$defs/GeometryProjection" },
+    "artifact_linkage": { "$ref": "#/$defs/ArtifactLinkage" },
+    "commons_impact": { "$ref": "#/$defs/CommonsImpact" },
+    "dymaxion_metric": { "$ref": "#/$defs/DymaxionMetric" },
+    "extraction_mode": {
+      "type": "string",
+      "enum": [
+        "deterministic_extraction",
+        "model_assisted_extraction",
+        "human_review",
+        "non_replayable_interpretive_judgment"
+      ],
+      "description": "Distinguishes replay fidelity class: deterministic_extraction and model_assisted_extraction are replayable; human_review and non_replayable_interpretive_judgment are not"
+    },
+    "validation_state": {
+      "type": "string",
+      "enum": ["proposed", "validated", "rejected", "under_review", "promoted"]
+    },
+    "promotion_gate_ref": {
+      "type": "string",
+      "description": "Ref to the policy/review gate that must pass before promotion"
+    },
+    "replay_semantics": { "$ref": "#/$defs/ReplaySemantics" },
+    "policy_decision_ref": { "type": "string" },
+    "hellgraph_evidence_refs": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "upstream_anchors": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "non_claims": {
+      "type": "array",
+      "items": { "type": "string" },
+      "minItems": 1
+    },
+    "issued_at": { "type": "string", "format": "date-time" }
+  },
+  "$defs": {
+    "SourceAnchor": {
+      "type": "object",
+      "required": ["source_ref", "anchor_type", "extraction_confidence"],
+      "additionalProperties": false,
+      "properties": {
+        "source_ref": { "type": "string", "minLength": 1 },
+        "anchor_type": {
+          "type": "string",
+          "enum": ["text_passage", "figure", "table", "mathematical_expression", "oral_record", "derived"]
+        },
+        "page_or_section": { "type": "string" },
+        "extraction_confidence": {
+          "type": "string",
+          "enum": ["high", "medium", "low", "unverifiable"]
+        },
+        "assumptions": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Explicit assumptions made during extraction"
+        }
+      }
+    },
+    "GeometryProjection": {
+      "type": "object",
+      "required": ["geometry_type", "projection_type", "distortion_assumptions"],
+      "additionalProperties": false,
+      "properties": {
+        "geometry_type": {
+          "type": "string",
+          "enum": ["geodesic", "polyhedral", "great_circle", "vector_equilibrium", "fluid_geography", "other"]
+        },
+        "projection_type": {
+          "type": "string",
+          "enum": ["dymaxion", "gnomonic", "azimuthal", "cylindrical", "other"]
+        },
+        "distortion_assumptions": {
+          "type": "array",
+          "items": { "type": "string" },
+          "minItems": 1,
+          "description": "Explicit assumptions about projection distortions — required because all projections distort; these must not be suppressed"
+        },
+        "relation_refs": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "ArtifactLinkage": {
+      "type": "object",
+      "required": ["artifact_ref", "linkage_type"],
+      "additionalProperties": false,
+      "properties": {
+        "artifact_ref": { "type": "string", "minLength": 1 },
+        "linkage_type": {
+          "type": "string",
+          "enum": ["prototype", "realized_artifact", "referenced_artifact", "computational_model", "commons_output"]
+        },
+        "lineage_chain_refs": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Ordered chain: term → definition → geometry → scenario → prototype → artifact"
+        }
+      }
+    },
+    "CommonsImpact": {
+      "type": "object",
+      "required": ["impact_claim", "evidence_basis", "validation_state"],
+      "additionalProperties": false,
+      "properties": {
+        "impact_claim": { "type": "string", "minLength": 1 },
+        "evidence_basis": {
+          "type": "string",
+          "enum": ["empirical", "modeled", "theoretical", "asserted_without_evidence"]
+        },
+        "validation_state": {
+          "type": "string",
+          "enum": ["unvalidated", "peer_reviewed", "rejected", "disputed"]
+        },
+        "evidence_refs": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "DymaxionMetric": {
+      "type": "object",
+      "required": ["metric_name", "metric_value", "unit", "source_anchor_ref", "assumptions"],
+      "additionalProperties": false,
+      "properties": {
+        "metric_name": { "type": "string", "minLength": 1 },
+        "metric_value": {},
+        "unit": { "type": "string", "minLength": 1 },
+        "source_anchor_ref": { "type": "string", "minLength": 1 },
+        "assumptions": {
+          "type": "array",
+          "items": { "type": "string" },
+          "minItems": 1
+        },
+        "validation_state": {
+          "type": "string",
+          "enum": ["proposed", "validated", "disputed", "rejected"]
+        }
+      }
+    },
+    "ReplaySemantics": {
+      "type": "object",
+      "required": ["is_replayable", "replay_fidelity"],
+      "additionalProperties": false,
+      "properties": {
+        "is_replayable": { "type": "boolean" },
+        "replay_fidelity": {
+          "type": "string",
+          "enum": ["exact", "near_equivalent", "indicative_only", "not_replayable"],
+          "description": "deterministic_extraction → exact; model_assisted → near_equivalent; human_review → indicative_only; interpretive → not_replayable"
+        },
+        "replay_artifact_ref": { "type": "string" },
+        "non_replayable_reason": {
+          "type": "string",
+          "description": "Required when is_replayable=false; must explain why rather than suppress"
+        }
+      }
+    }
+  },
+  "if": {
+    "properties": { "extraction_mode": { "const": "non_replayable_interpretive_judgment" } }
+  },
+  "then": {
+    "properties": {
+      "replay_semantics": {
+        "properties": {
+          "is_replayable": { "const": false }
+        }
+      }
+    },
+    "required": ["non_claims"]
+  }
+}

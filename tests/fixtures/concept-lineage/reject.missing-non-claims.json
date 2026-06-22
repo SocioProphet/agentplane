@@ -1,0 +1,20 @@
+{
+  "_reject_reason": "non_claims is required (minItems: 1) but absent",
+  "kind": "ConceptToArtifactLineageReceipt",
+  "receipt_id": "c2a-receipt:reject-missing-non-claims",
+  "concept_id": "ontogenesis://concept/reject-test/entry",
+  "concept_kind": "term",
+  "source_anchor": {
+    "source_ref": "ontogenesis://source/reject-test/chapter-1",
+    "anchor_type": "text_passage",
+    "extraction_confidence": "high",
+    "assumptions": []
+  },
+  "extraction_mode": "deterministic_extraction",
+  "validation_state": "proposed",
+  "replay_semantics": {
+    "is_replayable": true,
+    "replay_fidelity": "exact"
+  },
+  "issued_at": "2024-01-15T13:00:00Z"
+}
