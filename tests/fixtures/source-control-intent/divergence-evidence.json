@@ -1,0 +1,25 @@
+{
+  "kind": "SourceControlIntentBridgeArtifact",
+  "artifact_id": "scib_divergence_20260611_001",
+  "captured_at": "2026-06-11T12:00:00Z",
+  "scaffold_baseline": "5d85ab6a24502f60f15ef829235b6288a289d47e",
+  "service_id": "svc.substrate.source-control",
+  "operation": "divergence_check",
+  "intent_status": "diverged",
+  "agentplane_admission_ref": "agentplane://admission/scib_admission_diverge_20260611_001",
+  "policy_decision": "escalate",
+  "policy_ref": "policy://platform/source-control-divergence-v1",
+  "replay_eligible": false,
+  "divergence_evidence": {
+    "detected_at": "2026-06-11T12:00:00Z",
+    "divergence_type": "scaffold_mismatch",
+    "baseline_ref": "git://SocioProphet/gitea-sovereign@5d85ab6a24502f60f15ef829235b6288a289d47e",
+    "observed_ref": "git://SocioProphet/gitea-sovereign@deadbeefdeadbeefdeadbeefdeadbeefdeadbeef",
+    "resolution_status": "escalated"
+  },
+  "evidence_refs": [
+    "ev://agentplane/divergence-receipt/scib_diverge_20260611_001"
+  ],
+  "runtime_ready": false,
+  "actor_ref": "actor://agent/governed-runner-003"
+}

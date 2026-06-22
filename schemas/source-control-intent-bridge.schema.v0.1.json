@@ -1,0 +1,108 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://socioprophet.io/schemas/agentplane/source-control-intent-bridge/v0.1",
+  "title": "SourceControlIntentBridgeArtifact",
+  "description": "AgentPlane bridge artifact for source-control intent registration and post-execution evidence emitted by gitea-sovereign. AgentPlane remains canonical execution admission authority; gitea-sovereign registers intent surfaces and consumes AgentPlane semantics.",
+  "type": "object",
+  "required": [
+    "kind",
+    "artifact_id",
+    "captured_at",
+    "scaffold_baseline",
+    "service_id",
+    "operation",
+    "intent_status",
+    "agentplane_admission_ref",
+    "policy_decision",
+    "replay_eligible"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "kind": { "type": "string", "const": "SourceControlIntentBridgeArtifact" },
+    "artifact_id": { "type": "string", "minLength": 1 },
+    "captured_at": { "type": "string", "format": "date-time" },
+    "scaffold_baseline": {
+      "type": "string",
+      "description": "git commit SHA of the gitea-sovereign scaffold baseline",
+      "pattern": "^[a-f0-9]{40}$"
+    },
+    "service_id": {
+      "type": "string",
+      "description": "Service identity; must match svc.substrate.source-control for gitea-sovereign"
+    },
+    "operation": {
+      "type": "string",
+      "enum": [
+        "intent_registration",
+        "branch_create",
+        "branch_protect",
+        "pr_open",
+        "pr_merge",
+        "pr_close",
+        "commit_push",
+        "tag_create",
+        "webhook_emit",
+        "divergence_check"
+      ]
+    },
+    "intent_status": {
+      "type": "string",
+      "enum": ["registered", "admitted", "blocked", "diverged", "replayed", "pending_review"]
+    },
+    "agentplane_admission_ref": {
+      "type": "string",
+      "description": "Reference to the AgentPlane admission record that authorized this operation. Must be non-null for admitted and replayed status."
+    },
+    "policy_decision": {
+      "type": "string",
+      "enum": ["allow", "allow_with_audit", "block", "escalate", "pending"]
+    },
+    "policy_ref": { "type": "string" },
+    "replay_eligible": { "type": "boolean" },
+    "replay_artifact_ref": {
+      "type": "string",
+      "description": "Reference to non-mutating replay artifact, if replay has been performed"
+    },
+    "divergence_evidence": { "$ref": "#/$defs/DivergenceEvidence" },
+    "evidence_refs": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "runtime_ready": {
+      "type": "boolean",
+      "const": false,
+      "description": "Scaffold baseline does not imply runtime readiness; this field must remain false until runtime prerequisites are satisfied"
+    },
+    "pr_ref": { "type": "string" },
+    "actor_ref": { "type": "string" }
+  },
+  "if": {
+    "properties": { "intent_status": { "enum": ["admitted", "replayed"] } }
+  },
+  "then": {
+    "required": ["agentplane_admission_ref"],
+    "properties": {
+      "agentplane_admission_ref": { "type": "string", "minLength": 1 }
+    }
+  },
+  "$defs": {
+    "DivergenceEvidence": {
+      "type": "object",
+      "required": ["detected_at", "divergence_type", "baseline_ref", "observed_ref"],
+      "additionalProperties": false,
+      "properties": {
+        "detected_at": { "type": "string", "format": "date-time" },
+        "divergence_type": {
+          "type": "string",
+          "enum": ["branch_diverged", "policy_drift", "scaffold_mismatch", "replay_hash_mismatch"]
+        },
+        "baseline_ref": { "type": "string", "minLength": 1 },
+        "observed_ref": { "type": "string", "minLength": 1 },
+        "resolution_status": {
+          "type": "string",
+          "enum": ["unresolved", "escalated", "resolved", "accepted_as_known"]
+        }
+      }
+    }
+  }
+}
