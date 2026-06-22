@@ -1,0 +1,42 @@
+{
+  "kind": "OversteerGovernanceSignalExample",
+  "description": "Example of an oversteer governance signal fired during a run that exhibited policy flip-flops and repeated failed validations.",
+  "signal_id": "oversteer-signal:example-run-policy-flipflop-001",
+  "run_capsule_ref": "civic-stack-run:oversteer-example-001",
+  "actor_ref": "agent://agentplane/civic-stack-agent/v1",
+  "session_window": {
+    "started_at": "2024-01-15T10:00:00Z",
+    "ended_at": "2024-01-15T10:45:00Z"
+  },
+  "indicators_fired": [
+    {
+      "indicator": "policy_flip_flops",
+      "count": 3,
+      "evidence": "Policy decision pd-civic-run-001 was overridden to deny, reinstated to allow, overridden to deny again within the same run capsule.",
+      "tension_member_under_strain": "policy",
+      "first_detected_at": "2024-01-15T10:12:00Z"
+    },
+    {
+      "indicator": "repeated_failed_validations",
+      "count": 4,
+      "evidence": "validate-civic-stack-runtime-evidence failed 4 consecutive times on the same input without new evidence_refs added.",
+      "tension_member_under_strain": "evidence",
+      "first_detected_at": "2024-01-15T10:22:00Z"
+    }
+  ],
+  "simultaneous_indicators": 2,
+  "policy_escalation_triggered": true,
+  "next_policy_decision_elevated_to": "escalate",
+  "hellgraph_evidence_refs": [
+    "evidence://hellgraph/oversteer/signal-example-run-policy-flipflop-001"
+  ],
+  "delivery_excellence_signal_ref": "de://signal/oversteer/example-run-policy-flipflop-001/degraded",
+  "rationalgrl_softgoal_degradation_refs": [
+    "goal://rationalgrl/civic-service-delivery/quality"
+  ],
+  "non_claims": [
+    "This signal does not halt execution; it elevates the next policy decision to escalate.",
+    "Threshold values for indicator counts are set by PolicyFabric configuration, not this signal."
+  ],
+  "issued_at": "2024-01-15T10:45:05Z"
+}

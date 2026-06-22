@@ -1,0 +1,33 @@
+{
+  "kind": "AgentActionTensionMembersExample",
+  "description": "Example demonstrating full tension member declaration for a write-governed action at R3 capability radius.",
+  "action_id": "action:tensegrity-example-write-governed-001",
+  "compression_member": "agent",
+  "action_type": "write",
+  "capability_radius": "R3",
+  "policy_ref": "policy-fabric://decision/pd-write-governed-example-001",
+  "identity_ref": "agent://agentplane/evidence-writer/v2",
+  "provenance_refs": [
+    "provenance://run-capsule/run-tensegrity-example-001",
+    "provenance://governed-run/governed-run-tensegrity-example-001",
+    "upstream:agentplane#136"
+  ],
+  "evidence_refs": [
+    "evidence://hellgraph/tensegrity-example-write/evidence-001",
+    "evidence://prophet-core/tensegrity-example-write/emission-001"
+  ],
+  "replay_ref": "replay://agentplane/tensegrity-example-write/replay-001",
+  "revocation_path": "revocation://agentplane/capability-grants/evidence-writer-v2/revoke",
+  "audit_ref": null,
+  "tension_member_status": {
+    "policy": "satisfied",
+    "identity": "satisfied",
+    "provenance": "satisfied",
+    "evidence": "satisfied",
+    "replay": "satisfied",
+    "revocation": "satisfied",
+    "audit": "not_required"
+  },
+  "tensegrity_valid": true,
+  "notes": "All required tension members for R3 write action are present. audit_ref not required because outcome is not denied or blocked."
+}
