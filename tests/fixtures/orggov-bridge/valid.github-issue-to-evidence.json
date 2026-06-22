@@ -1,0 +1,64 @@
+{
+  "kind": "OrgGovWorkOrderEvidenceBridge",
+  "bridge_id": "orggov-bridge:agentplane-issue-106-run-001",
+  "work_order_id": "github://SocioProphet/agentplane/issues/106",
+  "workroom_id": "workroom://agentplane/workroom-graph-dispatch-001",
+  "actor_ref": "agent://agentplane/graph-dispatch-agent/v1",
+  "role_ref": "role://agentplane/execution-agent",
+  "authority_ref": "authority://agentplane/governed-run-authority",
+  "policy_decision_ref": "policy-fabric://decision/pd-orggov-bridge-issue-106-001",
+  "lifecycle": {
+    "bundle_validation": {
+      "status": "passed",
+      "receipt_ref": "receipt://agentplane/bundle-validation/issue-106-001"
+    },
+    "placement": {
+      "status": "placed",
+      "placement_ref": "placement://agentplane/governed-run/issue-106-001"
+    },
+    "run": {
+      "status": "completed",
+      "run_artifact_ref": "governed-run://agentplane/runs/issue-106-run-001",
+      "session_artifact_ref": "session://agentplane/sessions/issue-106-session-001"
+    },
+    "replay": {
+      "replay_class": "best-effort",
+      "replay_artifact_ref": "replay://agentplane/orggov-bridge/issue-106-run-001",
+      "replay_verified": true
+    }
+  },
+  "output_ref": "artifact://agentplane/orggov-bridge/issue-106-run-001/output",
+  "output_hash": "sha256:a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2",
+  "review_outcome_ref": "review://agentplane/orggov/issue-106-review-001",
+  "review_status": "approved",
+  "score_ref": "de://signal/orggov/issue-106-run-001/score",
+  "canonical_fields": [
+    "bridge_id",
+    "lifecycle",
+    "output_hash",
+    "hellgraph_evidence_refs",
+    "issued_at"
+  ],
+  "imported_fields": [
+    "work_order_id",
+    "workroom_id",
+    "actor_ref",
+    "role_ref",
+    "authority_ref",
+    "policy_decision_ref"
+  ],
+  "hellgraph_evidence_refs": [
+    "evidence://hellgraph/orggov-bridge/issue-106-run-001",
+    "evidence://prophet-core/orggov-bridge/issue-106-run-001"
+  ],
+  "upstream_anchors": [
+    "prophet-platform#406",
+    "agentplane#104"
+  ],
+  "non_claims": [
+    "This bridge does not store secrets, raw prompts, or raw private reasoning.",
+    "AgentPlane is not the product UX or policy authority; it is the execution and evidence lane.",
+    "output_hash is an opaque ref; no raw output content is stored in this artifact."
+  ],
+  "issued_at": "2024-01-15T18:00:00Z"
+}
