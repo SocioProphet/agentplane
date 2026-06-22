@@ -1,0 +1,29 @@
+{
+  "kind": "ReasoningRunEvidenceReceipt",
+  "receipt_id": "reasoning-evidence:agentplane-best-effort-002",
+  "run_id": "urn:srcos:reasoning-run:agentplane-best-effort-fixture",
+  "sourceos_receipt_ref": "urn:srcos:receipt:reasoning:agentplane-best-effort-fixture",
+  "sourceos_replay_plan_ref": "urn:srcos:reasoning-replay-plan:agentplane-best-effort-fixture",
+  "replay_class": "best-effort",
+  "safe_trace_posture": {
+    "mode": "operational-trace-only",
+    "raw_private_reasoning": "not-collected"
+  },
+  "benchmark_passed": true,
+  "benchmark_suite": "m1-best-effort-smoke",
+  "event_count": 5,
+  "reasoning_status": "completed",
+  "policy_decision_ref": "policy-fabric://decision/pd-reasoning-run-best-effort-002",
+  "hellgraph_evidence_refs": [
+    "evidence://hellgraph/reasoning-run/agentplane-best-effort-002"
+  ],
+  "upstream_anchors": [
+    "sourceos-spec://contracts/ReasoningReplayPlan",
+    "agentplane#109"
+  ],
+  "non_claims": [
+    "best-effort replay class means replay may not produce identical output; near-equivalent fidelity only.",
+    "This receipt does not certify replay parity; it records the replay class declared by sourceos-spec."
+  ],
+  "issued_at": "2024-01-15T17:10:00Z"
+}

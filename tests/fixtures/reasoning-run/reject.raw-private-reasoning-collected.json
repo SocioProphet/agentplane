@@ -1,0 +1,17 @@
+{
+  "_reject_reason": "safe_trace_posture.raw_private_reasoning must be not-collected (const violation)",
+  "kind": "ReasoningRunEvidenceReceipt",
+  "receipt_id": "reasoning-evidence:reject-raw-reasoning",
+  "run_id": "urn:srcos:reasoning-run:reject",
+  "sourceos_receipt_ref": "urn:srcos:receipt:reasoning:reject",
+  "replay_class": "exact",
+  "safe_trace_posture": {
+    "mode": "operational-trace-only",
+    "raw_private_reasoning": "collected"
+  },
+  "benchmark_passed": true,
+  "policy_decision_ref": "policy-fabric://decision/pd-reject-raw",
+  "hellgraph_evidence_refs": ["evidence://hellgraph/reject"],
+  "non_claims": ["placeholder"],
+  "issued_at": "2024-01-15T17:00:00Z"
+}

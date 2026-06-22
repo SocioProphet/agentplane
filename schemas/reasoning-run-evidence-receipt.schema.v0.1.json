@@ -1,0 +1,95 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://socioprophet.io/schemas/agentplane/reasoning-run-evidence-receipt/v0.1",
+  "title": "ReasoningRunEvidenceReceipt",
+  "description": "AgentPlane evidence receipt sealing a SourceOS ReasoningRun import. Translates ReasoningReceipt and ReasoningReplayPlan from sourceos-spec into AgentPlane evidence and replay lifecycle. AgentPlane owns evidence sealing and replay authority; cognition loop remains in Superconscious; schemas remain in sourceos-spec.",
+  "type": "object",
+  "required": [
+    "kind",
+    "receipt_id",
+    "run_id",
+    "sourceos_receipt_ref",
+    "replay_class",
+    "safe_trace_posture",
+    "benchmark_passed",
+    "policy_decision_ref",
+    "hellgraph_evidence_refs",
+    "non_claims",
+    "issued_at"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "kind": { "type": "string", "const": "ReasoningRunEvidenceReceipt" },
+    "receipt_id": { "type": "string", "minLength": 1 },
+    "run_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "SourceOS ReasoningRun.id — must match sourceos_receipt_ref.runRef"
+    },
+    "sourceos_receipt_ref": { "type": "string", "minLength": 1 },
+    "sourceos_replay_plan_ref": { "type": "string" },
+    "sourceos_benchmark_ref": { "type": "string" },
+    "replay_class": {
+      "type": "string",
+      "enum": ["exact", "best-effort", "evidence-only", "non-replayable-side-effect"],
+      "description": "Preserved from ReasoningReplayPlan.replayClass. Governs AgentPlane replay semantics."
+    },
+    "replay_artifact_ref": {
+      "type": "string",
+      "description": "AgentPlane replay artifact ref derived from ReasoningReplayPlan"
+    },
+    "safe_trace_posture": {
+      "type": "object",
+      "required": ["mode", "raw_private_reasoning"],
+      "additionalProperties": false,
+      "properties": {
+        "mode": {
+          "type": "string",
+          "const": "operational-trace-only",
+          "description": "Must be operational-trace-only; raw private reasoning is never ingested"
+        },
+        "raw_private_reasoning": {
+          "type": "string",
+          "const": "not-collected"
+        }
+      }
+    },
+    "benchmark_passed": {
+      "type": "boolean",
+      "description": "Must be true for promotion. From ReasoningBenchmark.passed."
+    },
+    "benchmark_suite": { "type": "string" },
+    "event_count": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "reasoning_status": {
+      "type": "string",
+      "enum": ["completed", "failed", "interrupted", "pending"]
+    },
+    "policy_decision_ref": { "type": "string", "minLength": 1 },
+    "hellgraph_evidence_refs": {
+      "type": "array",
+      "items": { "type": "string" },
+      "minItems": 1
+    },
+    "upstream_anchors": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "non_claims": {
+      "type": "array",
+      "items": { "type": "string" },
+      "minItems": 1
+    },
+    "issued_at": { "type": "string", "format": "date-time" }
+  },
+  "if": {
+    "properties": { "benchmark_passed": { "const": false } }
+  },
+  "then": {
+    "properties": {
+      "reasoning_status": { "not": { "const": "completed" } }
+    }
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "kind": "ReasoningRunEvidenceReceipt",
+  "receipt_id": "reasoning-evidence:agentplane-m1-deterministic-001",
+  "run_id": "urn:srcos:reasoning-run:agentplane-fixture",
+  "sourceos_receipt_ref": "urn:srcos:receipt:reasoning:agentplane-fixture",
+  "sourceos_replay_plan_ref": "urn:srcos:reasoning-replay-plan:agentplane-fixture",
+  "sourceos_benchmark_ref": "urn:srcos:reasoning-benchmark:agentplane-fixture",
+  "replay_class": "exact",
+  "replay_artifact_ref": "replay://agentplane/reasoning-run/agentplane-m1-deterministic-001",
+  "safe_trace_posture": {
+    "mode": "operational-trace-only",
+    "raw_private_reasoning": "not-collected"
+  },
+  "benchmark_passed": true,
+  "benchmark_suite": "m1-deterministic-smoke",
+  "event_count": 2,
+  "reasoning_status": "completed",
+  "policy_decision_ref": "policy-fabric://decision/pd-reasoning-run-m1-deterministic-001",
+  "hellgraph_evidence_refs": [
+    "evidence://hellgraph/reasoning-run/agentplane-m1-deterministic-001",
+    "evidence://prophet-core/reasoning-run/agentplane-m1-deterministic-001"
+  ],
+  "upstream_anchors": [
+    "superconscious://run/agentplane-fixture",
+    "sourceos-spec://contracts/ReasoningRun",
+    "sourceos-spec://contracts/ReasoningReceipt",
+    "sourceos-spec://contracts/ReasoningReplayPlan",
+    "agentplane#109"
+  ],
+  "non_claims": [
+    "This receipt does not store raw private reasoning content; safe_trace_posture.raw_private_reasoning=not-collected.",
+    "AgentPlane does not own the cognition loop; this receipt seals the evidence handoff only.",
+    "AgentPlane does not own SourceOS canonical schemas; sourceos-spec remains the authority."
+  ],
+  "issued_at": "2024-01-15T17:00:00Z"
+}
