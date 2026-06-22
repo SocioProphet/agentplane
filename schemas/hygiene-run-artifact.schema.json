@@ -1,0 +1,93 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://socioprophet.io/schemas/agentplane/hygiene-run-artifact/v0.1",
+  "title": "HygieneRunArtifact",
+  "description": "AgentPlane run artifact for epistemic hygiene detector runs (LOGFALL.STRAWMAN.V2 and variants). Deterministic: same input + same ruleset hash must produce same output.",
+  "type": "object",
+  "required": [
+    "kind",
+    "artifact_id",
+    "run_ref",
+    "detector_id",
+    "ruleset_hash",
+    "input_hash",
+    "claims_evaluated",
+    "hygiene_findings",
+    "validation_artifact_ref",
+    "replay_artifact_ref",
+    "sociosphere_protocol_ref",
+    "issued_at"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "kind": { "type": "string", "const": "HygieneRunArtifact" },
+    "artifact_id": { "type": "string", "minLength": 1 },
+    "run_ref": { "type": "string", "minLength": 1 },
+    "detector_id": {
+      "type": "string",
+      "description": "Detector identifier, e.g. LOGFALL.STRAWMAN.V2"
+    },
+    "ruleset_hash": {
+      "type": "string",
+      "pattern": "^sha256:[A-Fa-f0-9]{64}$"
+    },
+    "input_hash": {
+      "type": "string",
+      "pattern": "^sha256:[A-Fa-f0-9]{64}$"
+    },
+    "claims_evaluated": { "type": "integer", "minimum": 0 },
+    "hygiene_findings": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/HygieneFinding" }
+    },
+    "repair_suggestions": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/RepairSuggestion" }
+    },
+    "validation_artifact_ref": { "type": "string", "minLength": 1 },
+    "replay_artifact_ref": { "type": "string", "minLength": 1 },
+    "sociosphere_protocol_ref": {
+      "type": "string",
+      "const": "protocol/epistemic-governance/v1"
+    },
+    "replay_verified": { "type": "boolean" },
+    "issued_at": { "type": "string", "format": "date-time" }
+  },
+  "$defs": {
+    "HygieneFinding": {
+      "type": "object",
+      "required": ["finding_id", "claim_ref", "finding_type", "severity"],
+      "additionalProperties": false,
+      "properties": {
+        "finding_id": { "type": "string", "minLength": 1 },
+        "claim_ref": { "type": "string", "minLength": 1 },
+        "finding_type": {
+          "type": "string",
+          "enum": [
+            "logfall",
+            "strawman",
+            "attribution_without_evidence",
+            "load_bearing_metaphor",
+            "missing_non_claim",
+            "circular_evidence"
+          ]
+        },
+        "severity": {
+          "type": "string",
+          "enum": ["info", "warning", "error", "critical"]
+        },
+        "description": { "type": "string" }
+      }
+    },
+    "RepairSuggestion": {
+      "type": "object",
+      "required": ["suggestion_id", "finding_ref", "action"],
+      "additionalProperties": false,
+      "properties": {
+        "suggestion_id": { "type": "string", "minLength": 1 },
+        "finding_ref": { "type": "string", "minLength": 1 },
+        "action": { "type": "string", "minLength": 1 }
+      }
+    }
+  }
+}

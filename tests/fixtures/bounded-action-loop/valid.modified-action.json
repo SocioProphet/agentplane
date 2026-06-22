@@ -1,0 +1,40 @@
+{
+  "schema_version": "0.1",
+  "kind": "bounded_action_loop",
+  "loop_id": "loop-modified-action-001",
+  "action_proposal": {
+    "proposal_id": "proposal-modified-action-001",
+    "action_type": "record_diagnostic_finding",
+    "risk_class": "moderate",
+    "evidence_refs": [
+      "evidence://agentplane/run/modified-action-001/diagnostic-signal",
+      "evidence://agentplane/run/modified-action-001/policy-constraint"
+    ],
+    "requested_result": "record diagnostic finding with scope modification applied"
+  },
+  "policy_decision_ref": "SocioProphet/policy-fabric#85:pd-modify-scope-001",
+  "runtime_trace": {
+    "trace_id": "trace-modified-action-001",
+    "proposal_ref": "proposal-modified-action-001",
+    "policy_decision_ref": "SocioProphet/policy-fabric#85:pd-modify-scope-001",
+    "trace_status": "modified",
+    "no_external_side_effects": true,
+    "audit_ref": "SocioProphet/model-governance-ledger#20:audit-modified-001"
+  },
+  "outcome_record": {
+    "outcome_id": "outcome-modified-action-001",
+    "proposal_ref": "proposal-modified-action-001",
+    "policy_decision_ref": "SocioProphet/policy-fabric#85:pd-modify-scope-001",
+    "result": "modified",
+    "audit_ref": "SocioProphet/model-governance-ledger#20:audit-modified-001"
+  },
+  "trait_baseline": {
+    "baseline_id": "baseline-modified-observational-001",
+    "observational_only": true
+  },
+  "trait_drift_metric": {
+    "metric_id": "trait-drift-modified-001",
+    "observational_only": true,
+    "value": 0.15
+  }
+}
