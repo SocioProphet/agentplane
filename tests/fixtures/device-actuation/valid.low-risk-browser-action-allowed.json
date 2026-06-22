@@ -1,0 +1,30 @@
+{
+  "kind": "DeviceActuationBoundaryReceipt",
+  "receipt_id": "actuation-receipt:low-risk-browser-nav-001",
+  "action_proposal_id": "proposal:browser-navigate-search-results",
+  "action_class": "browser",
+  "capability_class": "low_risk",
+  "actuation_target": {
+    "target_id": "browser://tab/active",
+    "target_type": "browser_tab",
+    "target_description": "Navigate active tab to search results page"
+  },
+  "proposal_status": "executed",
+  "policy_decision_ref": "policy-fabric://decision/pd-browser-nav-low-risk-001",
+  "policy_outcome": "allow",
+  "evidence_refs": [
+    "evidence://agentplane/device-actuation/low-risk-browser-nav-001"
+  ],
+  "hellgraph_evidence_refs": [
+    "evidence://hellgraph/device-actuation/low-risk-browser-nav-001"
+  ],
+  "upstream_anchors": [
+    "prophet-platform://strategy/sovereign-device-orchestration",
+    "agentplane#111"
+  ],
+  "non_claims": [
+    "This receipt does not represent direct browser DOM access or script injection.",
+    "Low-risk browser actions are bounded to read/navigate operations; no credential access."
+  ],
+  "issued_at": "2024-01-15T14:00:00Z"
+}

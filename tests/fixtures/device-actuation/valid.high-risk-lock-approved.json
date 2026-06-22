@@ -1,0 +1,32 @@
+{
+  "kind": "DeviceActuationBoundaryReceipt",
+  "receipt_id": "actuation-receipt:high-risk-lock-approved-003",
+  "action_proposal_id": "proposal:lock-front-door",
+  "action_class": "lock",
+  "capability_class": "high_risk",
+  "actuation_target": {
+    "target_id": "device://smart-lock/front-door/lock-001",
+    "target_type": "smart_lock",
+    "target_description": "Lock front door smart lock"
+  },
+  "proposal_status": "executed",
+  "approval_ref": "approval://user/explicit-approval/lock-front-door-2024-01-15",
+  "approval_authority_ref": "user://owner/residence/primary",
+  "policy_decision_ref": "policy-fabric://decision/pd-lock-high-risk-approved-003",
+  "policy_outcome": "allow",
+  "evidence_refs": [
+    "evidence://agentplane/device-actuation/high-risk-lock-approved-003"
+  ],
+  "hellgraph_evidence_refs": [
+    "evidence://hellgraph/device-actuation/high-risk-lock-approved-003"
+  ],
+  "upstream_anchors": [
+    "prophet-platform://strategy/sovereign-device-orchestration",
+    "agentplane#111"
+  ],
+  "non_claims": [
+    "This receipt does not certify physical lock state; it records the actuation boundary decision only.",
+    "Approval is from the authorized residence owner; no delegation to subagent is implied."
+  ],
+  "issued_at": "2024-01-15T14:10:00Z"
+}

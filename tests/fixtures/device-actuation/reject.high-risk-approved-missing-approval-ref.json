@@ -1,0 +1,16 @@
+{
+  "_reject_reason": "high_risk + proposal_status=approved requires approval_ref + approval_authority_ref (conditional)",
+  "kind": "DeviceActuationBoundaryReceipt",
+  "receipt_id": "actuation-receipt:reject-high-risk-no-approval",
+  "action_proposal_id": "proposal:reject-high-risk-no-approval",
+  "action_class": "payment",
+  "capability_class": "high_risk",
+  "actuation_target": {
+    "target_id": "payment://account/savings/transfer",
+    "target_type": "payment_transfer"
+  },
+  "proposal_status": "approved",
+  "policy_decision_ref": "policy-fabric://decision/pd-reject-high-risk-no-approval",
+  "non_claims": ["placeholder"],
+  "issued_at": "2024-01-15T14:00:00Z"
+}

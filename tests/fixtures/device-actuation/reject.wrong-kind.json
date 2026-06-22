@@ -1,0 +1,13 @@
+{
+  "_reject_reason": "kind must be DeviceActuationBoundaryReceipt (const violation)",
+  "kind": "DeviceActuationReceipt",
+  "receipt_id": "actuation-receipt:reject-wrong-kind",
+  "action_proposal_id": "proposal:reject-wrong-kind",
+  "action_class": "browser",
+  "capability_class": "low_risk",
+  "actuation_target": { "target_id": "browser://tab", "target_type": "browser_tab" },
+  "proposal_status": "proposed",
+  "policy_decision_ref": "policy-fabric://decision/pd-reject-wrong-kind",
+  "non_claims": ["placeholder"],
+  "issued_at": "2024-01-15T14:00:00Z"
+}
