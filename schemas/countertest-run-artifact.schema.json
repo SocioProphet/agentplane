@@ -1,0 +1,80 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://socioprophet.io/schemas/agentplane/countertest-run-artifact/v0.1",
+  "title": "CountertestRunArtifact",
+  "description": "AgentPlane run artifact for epistemic counter-test runs (CTEST.STEELMAN.CONFIRM.V2 and variants). Confirms or refutes hygiene findings by constructing the strongest plausible counter-claim.",
+  "type": "object",
+  "required": [
+    "kind",
+    "artifact_id",
+    "run_ref",
+    "countertest_id",
+    "hygiene_run_ref",
+    "input_hash",
+    "ruleset_hash",
+    "findings_addressed",
+    "countertest_outcomes",
+    "validation_artifact_ref",
+    "replay_artifact_ref",
+    "sociosphere_protocol_ref",
+    "issued_at"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "kind": { "type": "string", "const": "CountertestRunArtifact" },
+    "artifact_id": { "type": "string", "minLength": 1 },
+    "run_ref": { "type": "string", "minLength": 1 },
+    "countertest_id": {
+      "type": "string",
+      "description": "Counter-test identifier, e.g. CTEST.STEELMAN.CONFIRM.V2"
+    },
+    "hygiene_run_ref": {
+      "type": "string",
+      "description": "Reference to the HygieneRunArtifact this counter-test addresses"
+    },
+    "input_hash": {
+      "type": "string",
+      "pattern": "^sha256:[A-Fa-f0-9]{64}$"
+    },
+    "ruleset_hash": {
+      "type": "string",
+      "pattern": "^sha256:[A-Fa-f0-9]{64}$"
+    },
+    "findings_addressed": { "type": "integer", "minimum": 0 },
+    "countertest_outcomes": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/CountertestOutcome" }
+    },
+    "validation_artifact_ref": { "type": "string", "minLength": 1 },
+    "replay_artifact_ref": { "type": "string", "minLength": 1 },
+    "sociosphere_protocol_ref": {
+      "type": "string",
+      "const": "protocol/epistemic-governance/v1"
+    },
+    "replay_verified": { "type": "boolean" },
+    "issued_at": { "type": "string", "format": "date-time" }
+  },
+  "$defs": {
+    "CountertestOutcome": {
+      "type": "object",
+      "required": ["outcome_id", "finding_ref", "verdict", "steelman_claim"],
+      "additionalProperties": false,
+      "properties": {
+        "outcome_id": { "type": "string", "minLength": 1 },
+        "finding_ref": { "type": "string", "minLength": 1 },
+        "verdict": {
+          "type": "string",
+          "enum": ["confirmed_finding", "refuted_finding", "inconclusive", "escalate_review"]
+        },
+        "steelman_claim": {
+          "type": "string",
+          "description": "Strongest plausible counter-claim against the hygiene finding"
+        },
+        "counter_evidence_refs": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    }
+  }
+}

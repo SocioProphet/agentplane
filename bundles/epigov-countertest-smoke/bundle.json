@@ -1,0 +1,40 @@
+{
+  "apiVersion": "agentplane.socioprophet.org/v0.1",
+  "kind": "Bundle",
+  "metadata": {
+    "name": "epigov-countertest-smoke",
+    "version": "0.1.0",
+    "createdAt": "2026-06-11T00:00:00Z",
+    "licensePolicy": {
+      "allowAGPL": false,
+      "notes": "Epistemic governance counter-test bundle. Evidence-forward."
+    },
+    "source": { "git": { "dirty": false, "rev": "UNSET" } }
+  },
+  "spec": {
+    "upstreamAnchors": [
+      "SocioProphet/sociosphere#322:epistemic-governance-v0.2.1",
+      "protocol/epistemic-governance/v1"
+    ],
+    "nonClaims": [
+      "This bundle does not grant authority to accept or dismiss hygiene findings.",
+      "This bundle does not implement autonomous adversarial execution.",
+      "This bundle does not self-modify at runtime."
+    ],
+    "artifacts": { "outDir": "./artifacts/epigov-countertest-smoke" },
+    "policy": {
+      "lane": "smoke",
+      "humanGateRequired": false,
+      "failOnTimeout": true,
+      "maxRunSeconds": 60,
+      "policyPackRef": "policy://agentplane/epigov-smoke-v1",
+      "policyPackHash": "UNSET"
+    },
+    "determinism": {
+      "required": true,
+      "note": "Same input + same ruleset hash must produce same counter-test output"
+    },
+    "smoke": { "script": "bundles/epigov-countertest-smoke/smoke.sh" },
+    "secrets": { "required": [], "secretRefRoot": "secrets://tenant" }
+  }
+}
