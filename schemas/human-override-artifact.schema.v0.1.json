@@ -1,0 +1,67 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://socioprophet.io/schemas/agentplane/human-override-artifact/v0.1",
+  "title": "HumanOverrideArtifact",
+  "description": "AgentPlane evidence artifact for a human override of a stop gate, guardrail decision, or policy gate. Required for waiving CI requirements, allowing protected branch writes, or overriding critical deny decisions. Signed override is preserved as first-class evidence.",
+  "type": "object",
+  "required": [
+    "kind",
+    "override_id",
+    "override_type",
+    "overridden_artifact_ref",
+    "authority_ref",
+    "override_reason",
+    "policy_decision_ref",
+    "non_claims",
+    "issued_at"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "kind": { "type": "string", "const": "HumanOverrideArtifact" },
+    "override_id": { "type": "string", "minLength": 1 },
+    "override_type": {
+      "type": "string",
+      "enum": [
+        "ci_waiver",
+        "protected_branch_write",
+        "critical_deny_override",
+        "stop_gate_waiver",
+        "quarantine_release",
+        "replay_skip"
+      ]
+    },
+    "overridden_artifact_ref": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Ref to the stop gate, guardrail decision, or policy artifact being overridden"
+    },
+    "authority_ref": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Human authority ref (post, user, or senior authorization); required — no anonymous overrides"
+    },
+    "override_reason": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Explicit human-supplied reason; must not be empty"
+    },
+    "scope_constraints": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Scope constraints on this override (e.g., limited to specific paths, tasks, or time window)"
+    },
+    "policy_decision_ref": { "type": "string", "minLength": 1 },
+    "expires_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Override expiry; if absent, single-use assumed"
+    },
+    "audit_ref": { "type": "string" },
+    "non_claims": {
+      "type": "array",
+      "items": { "type": "string" },
+      "minItems": 1
+    },
+    "issued_at": { "type": "string", "format": "date-time" }
+  }
+}

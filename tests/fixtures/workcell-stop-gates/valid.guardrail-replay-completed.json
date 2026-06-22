@@ -1,0 +1,17 @@
+{
+  "kind": "GuardrailReplayArtifact",
+  "replay_id": "guardrail-replay:issue-106-policy-decision-001",
+  "policy_decision_artifact_ref": "guardrail-fabric://policy-decision/pd-issue-106-code-review",
+  "workcell_ref": "workcell://agentplane/workcell-issue-106-001",
+  "replay_class": "best-effort",
+  "replay_status": "completed",
+  "evidence_refs": [
+    "evidence://agentplane/guardrail-replay/issue-106-policy-decision-001"
+  ],
+  "policy_decision_ref": "policy-fabric://decision/pd-guardrail-replay-issue-106",
+  "non_claims": [
+    "best-effort replay class; replay may not reproduce exact guardrail evaluation context.",
+    "This artifact does not evaluate policy; it records the replay of the governed context."
+  ],
+  "issued_at": "2024-01-15T11:30:00Z"
+}

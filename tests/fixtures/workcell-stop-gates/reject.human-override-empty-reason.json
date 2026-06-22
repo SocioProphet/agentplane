@@ -1,0 +1,12 @@
+{
+  "_reject_reason": "override_reason must be non-empty (minLength: 1)",
+  "kind": "HumanOverrideArtifact",
+  "override_id": "override:reject-empty-reason",
+  "override_type": "ci_waiver",
+  "overridden_artifact_ref": "stop-gate://reject",
+  "authority_ref": "user://reject",
+  "override_reason": "",
+  "policy_decision_ref": "policy-fabric://decision/pd-reject",
+  "non_claims": ["placeholder"],
+  "issued_at": "2024-01-15T10:00:00Z"
+}
