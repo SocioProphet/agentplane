@@ -1,0 +1,26 @@
+{
+  "kind": "AgenticRuntimeState",
+  "state_record_id": "runtime-state:run-003-node-e-retry",
+  "node_id": "node://agentplane/run-003/agent-e",
+  "run_ref": "governed-run://agentplane/run-003",
+  "from_state": "failed",
+  "to_state": "retry_scheduled",
+  "transition_cause": "retry_policy_applied",
+  "retry_policy": {
+    "policy_id": "retry-policy://agentplane/tool-level-backoff",
+    "retry_scope": "tool",
+    "max_attempts": 3,
+    "attempt_number": 2,
+    "backoff_strategy": "exponential_backoff",
+    "delay_seconds": 30
+  },
+  "evidence_refs": [
+    "evidence://agentplane/run-003/agent-e/retry-scheduled-attempt-2"
+  ],
+  "policy_decision_ref": "policy-fabric://decision/pd-run-003-node-e-retry",
+  "non_claims": [
+    "Retry scheduling does not guarantee the subsequent attempt will succeed.",
+    "Retry scope is limited to the tool boundary; underlying failures may persist."
+  ],
+  "issued_at": "2024-01-15T10:08:00Z"
+}

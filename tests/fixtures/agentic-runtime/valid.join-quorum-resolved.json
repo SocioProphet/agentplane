@@ -1,0 +1,29 @@
+{
+  "kind": "AgenticRuntimeState",
+  "state_record_id": "runtime-state:run-002-join-quorum",
+  "node_id": "node://agentplane/run-002/orchestrator",
+  "run_ref": "governed-run://agentplane/run-002",
+  "from_state": "waiting_for_resource",
+  "to_state": "running",
+  "transition_cause": "join_resolved",
+  "join_record": {
+    "join_id": "join://agentplane/run-002/analysis-join",
+    "join_strategy": "quorum",
+    "participating_node_ids": [
+      "node://agentplane/run-002/agent-b",
+      "node://agentplane/run-002/agent-c",
+      "node://agentplane/run-002/agent-d"
+    ],
+    "quorum_threshold": 0.67,
+    "join_outcome": "resolved_partial"
+  },
+  "evidence_refs": [
+    "evidence://agentplane/run-002/join-quorum-resolved"
+  ],
+  "policy_decision_ref": "policy-fabric://decision/pd-run-002-join",
+  "non_claims": [
+    "Quorum join does not assert that all participating nodes produced equivalent outputs.",
+    "Partial resolution may require human review for divergent nodes."
+  ],
+  "issued_at": "2024-01-15T10:12:00Z"
+}

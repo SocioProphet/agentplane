@@ -1,0 +1,29 @@
+{
+  "kind": "AgenticRuntimeState",
+  "state_record_id": "runtime-state:run-002-fanout-parallel",
+  "node_id": "node://agentplane/run-002/orchestrator",
+  "run_ref": "governed-run://agentplane/run-002",
+  "from_state": "running",
+  "to_state": "running",
+  "transition_cause": "fanout_launched",
+  "fanout_record": {
+    "fanout_id": "fanout://agentplane/run-002/parallel-analysis",
+    "fanout_strategy": "parallel_bounded",
+    "spawned_node_ids": [
+      "node://agentplane/run-002/agent-b",
+      "node://agentplane/run-002/agent-c",
+      "node://agentplane/run-002/agent-d"
+    ],
+    "concurrency_limit": 2,
+    "join_point_ref": "join://agentplane/run-002/analysis-join"
+  },
+  "evidence_refs": [
+    "evidence://agentplane/run-002/fanout-launched"
+  ],
+  "policy_decision_ref": "policy-fabric://decision/pd-run-002-fanout",
+  "non_claims": [
+    "Fanout record does not assert that spawned nodes will succeed.",
+    "Join resolution is a separate evidence artifact."
+  ],
+  "issued_at": "2024-01-15T10:06:00Z"
+}

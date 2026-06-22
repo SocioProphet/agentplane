@@ -1,0 +1,13 @@
+{
+  "_reject_reason": "to_state=waiting_for_human requires control_signal to be present (conditional)",
+  "kind": "AgenticRuntimeState",
+  "state_record_id": "runtime-state:reject-waiting-human-no-signal",
+  "node_id": "node://agentplane/run-reject/agent-a",
+  "run_ref": "governed-run://agentplane/run-reject",
+  "from_state": "running",
+  "to_state": "waiting_for_human",
+  "transition_cause": "control_signal_received",
+  "policy_decision_ref": "policy-fabric://decision/pd-reject",
+  "non_claims": ["placeholder"],
+  "issued_at": "2024-01-15T10:00:00Z"
+}

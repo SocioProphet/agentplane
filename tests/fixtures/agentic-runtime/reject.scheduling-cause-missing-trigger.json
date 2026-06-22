@@ -1,0 +1,13 @@
+{
+  "_reject_reason": "transition_cause=scheduling_trigger_fired requires scheduling_trigger (conditional)",
+  "kind": "AgenticRuntimeState",
+  "state_record_id": "runtime-state:reject-scheduling-no-trigger",
+  "node_id": "node://agentplane/run-reject/scheduler",
+  "run_ref": "governed-run://agentplane/run-reject",
+  "from_state": "created",
+  "to_state": "queued",
+  "transition_cause": "scheduling_trigger_fired",
+  "policy_decision_ref": "policy-fabric://decision/pd-reject",
+  "non_claims": ["placeholder"],
+  "issued_at": "2024-01-15T10:00:00Z"
+}
