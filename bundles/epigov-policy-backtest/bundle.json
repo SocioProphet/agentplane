@@ -1,0 +1,37 @@
+{
+  "apiVersion": "agentplane.socioprophet.org/v0.1",
+  "kind": "Bundle",
+  "metadata": {
+    "name": "epigov-policy-backtest",
+    "version": "0.1.0",
+    "createdAt": "2026-06-11T00:00:00Z",
+    "licensePolicy": {
+      "allowAGPL": false,
+      "notes": "Epistemic governance policy backtest bundle. Evidence-forward. No live policy writes."
+    },
+    "source": { "git": { "dirty": false, "rev": "UNSET" } }
+  },
+  "spec": {
+    "upstreamAnchors": [
+      "SocioProphet/sociosphere#322:epistemic-governance-v0.2.1",
+      "protocol/epistemic-governance/v1"
+    ],
+    "nonClaims": [
+      "This bundle does not write or modify live policies.",
+      "This bundle does not implement autonomous adversarial execution.",
+      "This bundle does not self-modify at runtime.",
+      "Backtest results are observational evidence only; they do not constitute policy approval."
+    ],
+    "artifacts": { "outDir": "./artifacts/epigov-policy-backtest" },
+    "policy": {
+      "lane": "backtest",
+      "humanGateRequired": true,
+      "failOnTimeout": true,
+      "maxRunSeconds": 300,
+      "policyPackRef": "policy://agentplane/epigov-backtest-v1",
+      "policyPackHash": "UNSET"
+    },
+    "smoke": { "script": "bundles/epigov-policy-backtest/smoke.sh" },
+    "secrets": { "required": [], "secretRefRoot": "secrets://tenant" }
+  }
+}
