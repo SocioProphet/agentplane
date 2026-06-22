@@ -1,0 +1,19 @@
+{
+  "_reject_reason": "cross-wall subagent delegation: source and target on different walls; must be denied before payload exposure",
+  "schemaVersion": "agentplane.wallguard-collaboration-admission.v0.1",
+  "recordType": "WallGuardCollaborationAdmissionReceipt",
+  "receipt_id": "wallguard-collab-admission:cross-wall-delegation-reject-001",
+  "collaboration_request_id": "collab-request:client-a-to-client-b:delegation-001",
+  "source_agent_wall_context_ref": "agent-wall-context://orchestrator-agent/client-a/matter-x",
+  "target_agent_wall_context_ref": "agent-wall-context://subagent-b/client-b/matter-y",
+  "source_wall_ref": "wall://client-a/matter-x",
+  "target_wall_ref": "wall://client-b/matter-y",
+  "collaboration_action": "subagent_delegation",
+  "admitted": true,
+  "admission_decision": "admit",
+  "reason_code": "same_wall_allowed",
+  "wall_decision_ref": "wallguard-decision://cross-wall-delegation-reject-001",
+  "wall_decision_outcome": "allow",
+  "receipt_hash": "sha256:cccc3333cccc3333cccc3333cccc3333cccc3333cccc3333cccc3333cccc3333",
+  "issued_at": "2024-01-15T10:02:00Z"
+}

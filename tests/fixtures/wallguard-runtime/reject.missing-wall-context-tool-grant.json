@@ -1,0 +1,19 @@
+{
+  "_reject_reason": "missing wall context for tool grant: source_wall_ref=unknown must fail closed, not admit",
+  "schemaVersion": "agentplane.wallguard-collaboration-admission.v0.1",
+  "recordType": "WallGuardCollaborationAdmissionReceipt",
+  "receipt_id": "wallguard-collab-admission:missing-context-tool-grant-reject-001",
+  "collaboration_request_id": "collab-request:unknown-wall:tool-grant-001",
+  "source_agent_wall_context_ref": "agent-wall-context://agent-alpha/unknown",
+  "target_agent_wall_context_ref": "agent-wall-context://tool-provider-a/client-a/matter-x",
+  "source_wall_ref": "unknown",
+  "target_wall_ref": "wall://client-a/matter-x",
+  "collaboration_action": "tool_grant",
+  "admitted": true,
+  "admission_decision": "admit",
+  "reason_code": "same_wall_allowed",
+  "wall_decision_ref": "wallguard-decision://missing-context-tool-grant-reject-001",
+  "wall_decision_outcome": "allow",
+  "receipt_hash": "sha256:ffff6666ffff6666ffff6666ffff6666ffff6666ffff6666ffff6666ffff6666",
+  "issued_at": "2024-01-15T10:05:00Z"
+}
