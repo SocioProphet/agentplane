@@ -1,0 +1,19 @@
+{
+  "_reject_reason": "claim_status=confirmed but promotion_gate=none_required — validator must reject promotion without a gate for confirmed claims",
+  "kind": "BoundaryCalculusEvidenceEnvelope",
+  "envelope_id": "bcee_reject_no_gate_001",
+  "run_ref": "agentplane://run/boundary-calculus/run_reject_002",
+  "claim_id": "claim://boundary-calculus/reject-no-gate-001",
+  "claim_status": "confirmed",
+  "local_model": "claude-sonnet-4-6",
+  "boundary_or_interface": "API.Authorization.PolicyGate",
+  "non_claims": [
+    "This is a reject fixture."
+  ],
+  "evidence_refs": [
+    "evidence://agentplane/run/boundary-calculus/run_reject_002/trace"
+  ],
+  "promotion_gate": "none_required",
+  "policy_result": "allow",
+  "captured_at": "2026-06-11T10:45:00Z"
+}

@@ -1,0 +1,26 @@
+{
+  "kind": "CountertestRunArtifact",
+  "artifact_id": "epigov_countertest_run_strawman_001",
+  "run_ref": "agentplane://run/epigov-countertest-smoke/run_strawman_001",
+  "countertest_id": "CTEST.STEELMAN.CONFIRM.V2",
+  "hygiene_run_ref": "agentplane://run/epigov-hygiene-detector-smoke/run_strawman_001",
+  "input_hash": "sha256:b4e2f1c3d5a6b7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0d1e2",
+  "ruleset_hash": "sha256:c5f3e1d2b4a5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0d1",
+  "findings_addressed": 1,
+  "countertest_outcomes": [
+    {
+      "outcome_id": "ctest_outcome_001",
+      "finding_ref": "finding_strawman_001",
+      "verdict": "confirmed_finding",
+      "steelman_claim": "The strongest interpretation of the position is that it relies on the weakest formulation of the opposing argument; even under charitable reading this remains a strawman.",
+      "counter_evidence_refs": [
+        "evidence://epigov/primary-source/opposing-position-v2"
+      ]
+    }
+  ],
+  "validation_artifact_ref": "agentplane://validation/epigov-countertest-smoke/val_strawman_001",
+  "replay_artifact_ref": "agentplane://replay/epigov-countertest-smoke/replay_strawman_001",
+  "sociosphere_protocol_ref": "protocol/epistemic-governance/v1",
+  "replay_verified": true,
+  "issued_at": "2026-06-11T10:10:00Z"
+}
