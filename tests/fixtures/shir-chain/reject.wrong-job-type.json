@@ -1,0 +1,23 @@
+{
+  "_reject_reason": "job_type must be shir.governed_chain.v0.1 (const violation)",
+  "kind": "SHIRGovernedChainJob",
+  "job_id": "shir-job:reject-wrong-type",
+  "job_type": "shir.governed_chain.v0.2",
+  "input_ref": "artifact://fabric-mlops-ts-suite/rdf/test.ttl",
+  "schema_ref": "semantic-serdes://schema/shir-v1/test",
+  "ontology_profile_ref": "ontogenesis://profile/shir/test",
+  "out_ref": "artifact://agentplane/shir-jobs/reject-wrong-type/output",
+  "policy_mode": "advisory",
+  "relation_strategy": "relation_node",
+  "stages": {
+    "rdf_to_shir": { "stage_id": "s1", "stage_status": "pending" },
+    "shir_to_pyg": { "stage_id": "s2", "stage_status": "pending" },
+    "semantic_leakage": { "stage_id": "s3", "stage_status": "pending" },
+    "chain_receipt": { "stage_id": "s4", "stage_status": "pending" }
+  },
+  "artifacts": {},
+  "job_status": "running",
+  "policy_decision_ref": "policy-fabric://decision/pd-reject-wrong-type",
+  "non_claims": ["placeholder"],
+  "issued_at": "2024-01-15T16:00:00Z"
+}

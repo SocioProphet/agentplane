@@ -1,0 +1,86 @@
+{
+  "kind": "SHIRGovernedChainJob",
+  "job_id": "shir-job:toplvm-clean-run-001",
+  "job_type": "shir.governed_chain.v0.1",
+  "input_ref": "artifact://fabric-mlops-ts-suite/rdf/toplvm-ontology.v1.ttl",
+  "input_format": "turtle",
+  "schema_ref": "semantic-serdes://schema/shir-v1/checkout-2024-01-15",
+  "ontology_profile_ref": "ontogenesis://profile/shir/toplvm-v1",
+  "out_ref": "artifact://agentplane/shir-jobs/toplvm-clean-run-001/output",
+  "policy_mode": "advisory",
+  "relation_strategy": "relation_node",
+  "stages": {
+    "rdf_to_shir": {
+      "stage_id": "shir-job:toplvm-clean-run-001:rdf-to-shir",
+      "stage_status": "completed",
+      "stage_receipt_ref": "receipt://shir/toplvm-clean-run-001/rdf-to-shir",
+      "artifact_refs": [
+        "artifact://agentplane/shir-jobs/toplvm-clean-run-001/output/shir-candidate.json",
+        "artifact://agentplane/shir-jobs/toplvm-clean-run-001/output/shir-assertion.json"
+      ]
+    },
+    "shir_to_pyg": {
+      "stage_id": "shir-job:toplvm-clean-run-001:shir-to-pyg",
+      "stage_status": "completed",
+      "stage_receipt_ref": "receipt://shir/toplvm-clean-run-001/shir-to-pyg",
+      "artifact_refs": [
+        "artifact://agentplane/shir-jobs/toplvm-clean-run-001/output/pyg-manifest.json",
+        "artifact://agentplane/shir-jobs/toplvm-clean-run-001/output/projection-manifest.json",
+        "artifact://agentplane/shir-jobs/toplvm-clean-run-001/output/projection-loss-report.json"
+      ]
+    },
+    "semantic_leakage": {
+      "stage_id": "shir-job:toplvm-clean-run-001:semantic-leakage",
+      "stage_status": "completed",
+      "stage_receipt_ref": "receipt://shir/toplvm-clean-run-001/semantic-leakage",
+      "artifact_refs": [
+        "artifact://agentplane/shir-jobs/toplvm-clean-run-001/output/semantic-leakage-report.json",
+        "artifact://agentplane/shir-jobs/toplvm-clean-run-001/output/semantic-leakage-projection-loss-report.json"
+      ]
+    },
+    "chain_receipt": {
+      "stage_id": "shir-job:toplvm-clean-run-001:chain-receipt",
+      "stage_status": "completed",
+      "stage_receipt_ref": "receipt://shir/toplvm-clean-run-001/chain",
+      "artifact_refs": [
+        "artifact://agentplane/shir-jobs/toplvm-clean-run-001/output/chain-run-receipt.json"
+      ]
+    }
+  },
+  "artifacts": {
+    "shir_candidate_assertion_ref": "artifact://agentplane/shir-jobs/toplvm-clean-run-001/output/shir-candidate.json",
+    "shir_assertion_ref": "artifact://agentplane/shir-jobs/toplvm-clean-run-001/output/shir-assertion.json",
+    "rdf_to_shir_receipt_ref": "receipt://shir/toplvm-clean-run-001/rdf-to-shir",
+    "pyg_manifest_ref": "artifact://agentplane/shir-jobs/toplvm-clean-run-001/output/pyg-manifest.json",
+    "projection_manifest_ref": "artifact://agentplane/shir-jobs/toplvm-clean-run-001/output/projection-manifest.json",
+    "projection_loss_report_ref": "artifact://agentplane/shir-jobs/toplvm-clean-run-001/output/projection-loss-report.json",
+    "shir_to_pyg_receipt_ref": "receipt://shir/toplvm-clean-run-001/shir-to-pyg",
+    "semantic_leakage_report_ref": "artifact://agentplane/shir-jobs/toplvm-clean-run-001/output/semantic-leakage-report.json",
+    "semantic_leakage_projection_loss_report_ref": "artifact://agentplane/shir-jobs/toplvm-clean-run-001/output/semantic-leakage-projection-loss-report.json",
+    "semantic_leakage_receipt_ref": "receipt://shir/toplvm-clean-run-001/semantic-leakage",
+    "chain_run_receipt_ref": "receipt://shir/toplvm-clean-run-001/chain"
+  },
+  "failure_mode": "none",
+  "job_status": "completed",
+  "policy_outcome": "allowed",
+  "policy_decision_ref": "policy-fabric://decision/pd-shir-toplvm-clean-run-001",
+  "replay_artifact_ref": "replay://agentplane/shir-jobs/toplvm-clean-run-001",
+  "hellgraph_evidence_refs": [
+    "evidence://hellgraph/shir-chain/toplvm-clean-run-001"
+  ],
+  "upstream_anchors": [
+    "prophet-platform-fabric-mlops-ts-suite#36",
+    "prophet-platform-fabric-mlops-ts-suite#37",
+    "prophet-platform-fabric-mlops-ts-suite#38",
+    "prophet-platform-fabric-mlops-ts-suite#39",
+    "prophet-platform-fabric-mlops-ts-suite#45",
+    "prophet-platform-fabric-mlops-ts-suite#46",
+    "agentplane#112"
+  ],
+  "non_claims": [
+    "This job contract does not materialize tensors or run GNN training.",
+    "No ontology promotion occurs in v0.1.",
+    "PyTorch/PyG/DGL runtime is not required for this orchestration contract."
+  ],
+  "issued_at": "2024-01-15T16:00:00Z"
+}
