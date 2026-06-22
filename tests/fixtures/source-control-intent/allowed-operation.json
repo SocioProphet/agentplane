@@ -1,0 +1,20 @@
+{
+  "kind": "SourceControlIntentBridgeArtifact",
+  "artifact_id": "scib_pr_open_20260611_001",
+  "captured_at": "2026-06-11T10:00:00Z",
+  "scaffold_baseline": "5d85ab6a24502f60f15ef829235b6288a289d47e",
+  "service_id": "svc.substrate.source-control",
+  "operation": "pr_open",
+  "intent_status": "admitted",
+  "agentplane_admission_ref": "agentplane://admission/scib_admission_20260611_001",
+  "policy_decision": "allow_with_audit",
+  "policy_ref": "policy://platform/source-control-pr-open-v1",
+  "replay_eligible": true,
+  "evidence_refs": [
+    "ev://agentplane/run-receipt/scib_run_20260611_001",
+    "ev://sourceos/state-integrity/scib_20260611_001"
+  ],
+  "runtime_ready": false,
+  "pr_ref": "github://SocioProphet/gitea-sovereign/pull/2",
+  "actor_ref": "actor://agent/governed-runner-001"
+}
