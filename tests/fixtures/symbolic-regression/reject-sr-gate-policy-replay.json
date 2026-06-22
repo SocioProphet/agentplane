@@ -1,0 +1,15 @@
+{
+  "_reject_reason": "requireReplayVerified must be true; false is not permitted",
+  "policyId": "urn:agentplane:sr-gate-policy:reject-replay",
+  "schemaVersion": "0.1.0",
+  "applicationMode": "equation_discovery",
+  "methodFamilies": ["pysr"],
+  "minimumDatasetRows": 100,
+  "maximumCandidateComplexity": 30,
+  "maximumNmse": 0.05,
+  "requiredUnitsStatus": "consistent",
+  "requireReplayVerified": false,
+  "allowControlAuthority": false,
+  "forbiddenGovernanceFlags": [],
+  "promotionEligibility": "review_required"
+}

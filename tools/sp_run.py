@@ -170,6 +170,13 @@ def command_dossier(args: argparse.Namespace) -> int:
     return 0
 
 
+def command_validate_bundle(args: argparse.Namespace) -> int:
+    import subprocess
+    tool = Path(__file__).parent / "validate_sourceos_bundle.py"
+    result = subprocess.run([sys.executable, str(tool), "--bundle", args.bundle])
+    return result.returncode
+
+
 def command_validate_dossier(args: argparse.Namespace) -> int:
     try:
         validate_run_dossier.validate_schema(validate_run_dossier.load_json(validate_run_dossier.SCHEMA))
@@ -477,6 +484,10 @@ def build_parser() -> argparse.ArgumentParser:
     validate = subparsers.add_parser("validate-dossier", help="Validate a RunDossier JSON file.")
     validate.add_argument("dossier_json")
     validate.set_defaults(func=command_validate_dossier)
+
+    validate_bundle = subparsers.add_parser("validate-bundle", help="Validate a SourceOS image-production bundle against blocking conditions.")
+    validate_bundle.add_argument("--bundle", required=True, help="Path to bundle.json")
+    validate_bundle.set_defaults(func=command_validate_bundle)
 
     return parser
 

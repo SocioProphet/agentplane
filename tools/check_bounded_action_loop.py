@@ -13,7 +13,8 @@ except ImportError as exc:
 ROOT = Path(__file__).resolve().parents[1]
 SCHEMA = ROOT / "schemas" / "bounded-action-loop.v0.schema.json"
 FIXTURES = ROOT / "tests" / "fixtures" / "bounded-action-loop"
-VALID = FIXTURES / "valid.record-event-instance.json"
+
+INTERVENTION_STATUSES = {"blocked", "modified", "escalated"}
 
 
 def load_json(path: Path) -> dict[str, Any]:
@@ -41,6 +42,12 @@ def check_data(data: dict[str, Any]) -> None:
         raise ValueError("proposal evidence refs required")
     if proposal["risk_class"] != "low" and trace["trace_status"] == "recorded":
         raise ValueError("recorded trace requires low risk in v0")
+    # Runtime trace must always be present and consistent with outcome
+    if trace["trace_status"] != outcome["result"]:
+        raise ValueError("trace_status and outcome result must match")
+    # Intervention outcomes (blocked/modified/escalated) must have audit_ref
+    if outcome["result"] in INTERVENTION_STATUSES and not outcome.get("audit_ref"):
+        raise ValueError(f"intervention outcome result={outcome['result']} requires audit_ref")
 
 
 def validate_file(path: Path, schema: dict[str, Any]) -> None:
@@ -51,7 +58,11 @@ def validate_file(path: Path, schema: dict[str, Any]) -> None:
 
 def main() -> int:
     schema = load_json(SCHEMA)
-    validate_file(VALID, schema)
+    valids = sorted(FIXTURES.glob("valid.*.json"))
+    if not valids:
+        raise SystemExit("missing valid bounded-action-loop fixtures")
+    for path in valids:
+        validate_file(path, schema)
     invalids = sorted(FIXTURES.glob("invalid.*.json"))
     if not invalids:
         raise SystemExit("missing invalid bounded-action-loop fixtures")

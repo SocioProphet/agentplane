@@ -1,0 +1,14 @@
+{
+  "_reject_reason": "intent_status=admitted but agentplane_admission_ref is empty — conditional requires non-empty admission ref for admitted status",
+  "kind": "SourceControlIntentBridgeArtifact",
+  "artifact_id": "scib_reject_admitted_no_ref_001",
+  "captured_at": "2026-06-11T13:00:00Z",
+  "scaffold_baseline": "5d85ab6a24502f60f15ef829235b6288a289d47e",
+  "service_id": "svc.substrate.source-control",
+  "operation": "pr_open",
+  "intent_status": "admitted",
+  "agentplane_admission_ref": "",
+  "policy_decision": "allow",
+  "replay_eligible": true,
+  "runtime_ready": false
+}
