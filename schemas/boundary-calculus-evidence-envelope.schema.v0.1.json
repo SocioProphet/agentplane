@@ -1,0 +1,107 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://socioprophet.io/schemas/agentplane/boundary-calculus-evidence-envelope/v0.1",
+  "title": "BoundaryCalculusEvidenceEnvelope",
+  "description": "AgentPlane evidence envelope emitted when agents use the Boundary Calculus claim discipline. AgentPlane emits evidence; SocioSphere owns the standard and promotion/demotion controller.",
+  "type": "object",
+  "required": [
+    "kind",
+    "envelope_id",
+    "run_ref",
+    "claim_id",
+    "claim_status",
+    "local_model",
+    "boundary_or_interface",
+    "non_claims",
+    "evidence_refs",
+    "promotion_gate",
+    "policy_result",
+    "captured_at"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "kind": { "type": "string", "const": "BoundaryCalculusEvidenceEnvelope" },
+    "envelope_id": { "type": "string", "minLength": 1 },
+    "run_ref": {
+      "type": "string",
+      "description": "AgentPlane run artifact reference that emitted this envelope"
+    },
+    "claim_id": { "type": "string", "minLength": 1 },
+    "claim_status": {
+      "type": "string",
+      "enum": [
+        "observation",
+        "hypothesis",
+        "supported",
+        "confirmed",
+        "falsified",
+        "metaphor",
+        "load_bearing_assertion"
+      ]
+    },
+    "local_model": {
+      "type": "string",
+      "description": "The model or agent producing the claim"
+    },
+    "boundary_or_interface": {
+      "type": "string",
+      "description": "The boundary or interface at which the claim is being evaluated"
+    },
+    "load_bearing": {
+      "type": "boolean",
+      "description": "Whether the claim is load-bearing in a downstream decision or security gate"
+    },
+    "non_claims": {
+      "type": "array",
+      "items": { "type": "string" },
+      "minItems": 1,
+      "description": "Explicit list of what this envelope does NOT assert"
+    },
+    "evidence_refs": {
+      "type": "array",
+      "items": { "type": "string" },
+      "minItems": 1,
+      "description": "References to supporting evidence for this claim"
+    },
+    "promotion_gate": {
+      "type": "string",
+      "description": "Reference to the gate that must approve promotion to a stronger claim status",
+      "enum": [
+        "none_required",
+        "peer_review",
+        "sociosphere_controller",
+        "policy_fabric_evaluation",
+        "agentplane_replay_verification"
+      ]
+    },
+    "policy_result": {
+      "type": "string",
+      "enum": ["allow", "allow_with_warning", "block", "escalate", "pending_review"]
+    },
+    "security_escalation_ref": {
+      "type": "string",
+      "description": "Reference to security escalation record, required when policy_result=escalate"
+    },
+    "attribution_source": {
+      "type": "string",
+      "description": "Source of attribution claim, if any"
+    },
+    "attribution_discriminating_evidence_refs": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Evidence refs that discriminate this attribution from alternatives"
+    },
+    "captured_at": { "type": "string", "format": "date-time" }
+  },
+  "if": {
+    "properties": {
+      "claim_status": { "const": "metaphor" }
+    }
+  },
+  "then": {
+    "properties": {
+      "load_bearing": { "const": false }
+    },
+    "required": ["load_bearing"]
+  }
+}
