@@ -1,0 +1,36 @@
+{
+  "kind": "ConversationalActionEvidence",
+  "evidence_id": "conv-evidence:a1b2c3-trigger-exec",
+  "conversation_session_id": "conv-session:case-review-2024-01-15-sess-001",
+  "turn_id": "conv-turn:sess-001-turn-07",
+  "action_type": "trigger_execution",
+  "actor_ref": "agent://agentplane/conversational-gateway/v1",
+  "service_ref": "service://conversational-mesh/case-review-service/v2",
+  "policy_decision_ref": "policy-fabric://decision/pd-conv-trigger-exec-a1b2",
+  "policy_outcome": "allow",
+  "execution_artifact_ref": "governed-run://agentplane/runs/run-a1b2c3d4-case-analysis",
+  "execution_artifact_kind": "GovernedRunContract",
+  "replay_linkage": {
+    "replay_eligible": true,
+    "replay_artifact_ref": "replay://agentplane/conversational/replay-a1b2c3",
+    "replay_verified": true,
+    "replay_divergence_detected": false,
+    "replay_scope": "execution_artifact"
+  },
+  "annotation_refs": [
+    "annotation://case-review/turn-06-analyst-note"
+  ],
+  "non_claims": [
+    "This artifact does not claim to represent the full conversation transcript.",
+    "This artifact does not certify outcome quality; it records the execution trigger only."
+  ],
+  "hellgraph_evidence_refs": [
+    "evidence://hellgraph/conversational/conv-evidence-a1b2c3",
+    "evidence://prophet-core/conversational/turn-07-exec-trigger"
+  ],
+  "upstream_anchors": [
+    "standards-storage#conversational-standards",
+    "agentplane#149"
+  ],
+  "issued_at": "2024-01-15T14:07:55Z"
+}

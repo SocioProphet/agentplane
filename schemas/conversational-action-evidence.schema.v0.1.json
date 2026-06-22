@@ -1,0 +1,109 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://socioprophet.io/schemas/agentplane/conversational-action-evidence/v0.1",
+  "title": "ConversationalActionEvidence",
+  "description": "Evidence artifact for a conversational action that enters the AgentPlane execution and evidence plane. Binds a conversational turn or multi-turn session to governed execution work — replay linkage, policy decision refs, and HellGraph evidence emission. AgentPlane owns the execution boundary; conversational services own the turn record; this artifact is the seam.",
+  "type": "object",
+  "required": [
+    "kind",
+    "evidence_id",
+    "conversation_session_id",
+    "turn_id",
+    "action_type",
+    "actor_ref",
+    "policy_decision_ref",
+    "execution_artifact_ref",
+    "replay_linkage",
+    "hellgraph_evidence_refs",
+    "issued_at"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "kind": { "type": "string", "const": "ConversationalActionEvidence" },
+    "evidence_id": { "type": "string", "minLength": 1 },
+    "conversation_session_id": { "type": "string", "minLength": 1 },
+    "turn_id": { "type": "string", "minLength": 1 },
+    "action_type": {
+      "type": "string",
+      "enum": [
+        "trigger_execution",
+        "query",
+        "annotation",
+        "approval_grant",
+        "approval_denial",
+        "escalation",
+        "cancellation",
+        "replay_request"
+      ]
+    },
+    "actor_ref": { "type": "string", "minLength": 1 },
+    "service_ref": { "type": "string" },
+    "policy_decision_ref": { "type": "string", "minLength": 1 },
+    "policy_outcome": {
+      "type": "string",
+      "enum": ["allow", "allow_with_constraints", "deny", "escalate"]
+    },
+    "execution_artifact_ref": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Ref to the AgentPlane execution artifact (run, admission, governed run, etc.) triggered or referenced by this conversational action"
+    },
+    "execution_artifact_kind": {
+      "type": "string",
+      "description": "Kind discriminator of the bound execution artifact"
+    },
+    "replay_linkage": { "$ref": "#/$defs/ReplayLinkage" },
+    "annotation_refs": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Optional annotation or comment refs that informed this action"
+    },
+    "non_claims": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Explicit non-claim declarations scoping this evidence artifact"
+    },
+    "hellgraph_evidence_refs": {
+      "type": "array",
+      "items": { "type": "string" },
+      "minItems": 1
+    },
+    "upstream_anchors": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "issued_at": { "type": "string", "format": "date-time" }
+  },
+  "$defs": {
+    "ReplayLinkage": {
+      "type": "object",
+      "required": ["replay_eligible", "replay_artifact_ref"],
+      "additionalProperties": false,
+      "properties": {
+        "replay_eligible": { "type": "boolean" },
+        "replay_artifact_ref": { "type": "string", "minLength": 1 },
+        "replay_verified": { "type": "boolean" },
+        "replay_divergence_detected": { "type": "boolean" },
+        "replay_divergence_ref": {
+          "type": "string",
+          "description": "Ref to divergence record when replay_divergence_detected is true"
+        },
+        "replay_scope": {
+          "type": "string",
+          "enum": ["turn", "session", "execution_artifact"],
+          "description": "What scope the replay covers"
+        }
+      }
+    }
+  },
+  "if": {
+    "properties": { "action_type": { "const": "approval_denial" } }
+  },
+  "then": {
+    "properties": {
+      "policy_outcome": {
+        "enum": ["deny", "escalate"]
+      }
+    }
+  }
+}

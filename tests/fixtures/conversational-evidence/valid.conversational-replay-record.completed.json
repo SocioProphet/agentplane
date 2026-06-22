@@ -1,0 +1,20 @@
+{
+  "kind": "ConversationalReplayRecord",
+  "replay_record_id": "conv-replay:a1b2c3-completed",
+  "conversation_session_id": "conv-session:case-review-2024-01-15-sess-001",
+  "turn_id": "conv-turn:sess-001-turn-07",
+  "replay_trigger_ref": "conv-evidence:a1b2c3-trigger-exec",
+  "replay_execution_ref": "governed-run://agentplane/runs/replay-run-a1b2c3d4",
+  "replay_status": "completed",
+  "replay_scope": "execution_artifact",
+  "policy_decision_ref": "policy-fabric://decision/pd-conv-replay-a1b2c3",
+  "non_claims": [
+    "This replay record does not certify semantic equivalence of replay output to original.",
+    "This record does not represent live execution state."
+  ],
+  "upstream_anchors": [
+    "standards-storage#conversational-standards",
+    "agentplane#149"
+  ],
+  "issued_at": "2024-01-15T15:30:00Z"
+}

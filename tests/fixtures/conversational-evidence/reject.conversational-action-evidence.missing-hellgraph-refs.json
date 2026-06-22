@@ -1,0 +1,16 @@
+{
+  "_reject_reason": "hellgraph_evidence_refs is required but absent",
+  "kind": "ConversationalActionEvidence",
+  "evidence_id": "conv-evidence:reject-no-hellgraph",
+  "conversation_session_id": "conv-session:reject-sess-001",
+  "turn_id": "conv-turn:reject-turn-01",
+  "action_type": "query",
+  "actor_ref": "agent://agentplane/conversational-gateway/v1",
+  "policy_decision_ref": "policy-fabric://decision/pd-reject-no-hellgraph",
+  "execution_artifact_ref": "governed-run://agentplane/runs/reject-no-hellgraph",
+  "replay_linkage": {
+    "replay_eligible": false,
+    "replay_artifact_ref": "replay://agentplane/conversational/replay-reject"
+  },
+  "issued_at": "2024-01-15T14:00:00Z"
+}

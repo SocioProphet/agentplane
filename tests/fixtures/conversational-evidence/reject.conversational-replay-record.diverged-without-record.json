@@ -1,0 +1,13 @@
+{
+  "_reject_reason": "replay_status=diverged requires divergence_record (conditional allOf)",
+  "kind": "ConversationalReplayRecord",
+  "replay_record_id": "conv-replay:reject-diverged-no-record",
+  "conversation_session_id": "conv-session:reject-sess-002",
+  "replay_trigger_ref": "conv-evidence:reject-trigger",
+  "replay_execution_ref": "governed-run://agentplane/runs/reject-diverged",
+  "replay_status": "diverged",
+  "replay_scope": "turn",
+  "policy_decision_ref": "policy-fabric://decision/pd-reject-diverged",
+  "non_claims": ["placeholder"],
+  "issued_at": "2024-01-15T16:00:00Z"
+}
