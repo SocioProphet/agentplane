@@ -1,0 +1,29 @@
+{
+  "kind": "ModelRoutingLaneDecisionReceipt",
+  "receipt_id": "route-receipt:standard-planning-run-a1b2",
+  "run_ref": "governed-run://agentplane/runs/run-a1b2c3-code-review",
+  "chain_stage": "planning",
+  "task_class": "reasoning",
+  "requested_lane": "standard",
+  "selected_lane": "standard",
+  "lane_decision_outcome": "lane_selected",
+  "cost_class": "standard",
+  "prompt_evidence_policy": "hash_only",
+  "prompt_hash_ref": "sha256:a3b1c2d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2",
+  "context_tool_posture": "tools_governed",
+  "policy_decision_ref": "policy-fabric://decision/pd-model-routing-standard-a1b2",
+  "model_router_policy_ref": "model-router://policy/agent-execution-model-routing/default.v1",
+  "guardrail_fabric_ref": "guardrail-fabric://gate/model-routing-lane-a1b2",
+  "hellgraph_evidence_refs": [
+    "evidence://hellgraph/model-routing/route-receipt-standard-a1b2"
+  ],
+  "upstream_anchors": [
+    "model-router://schemas/agent-execution-model-routing-policy",
+    "agentplane#119"
+  ],
+  "non_claims": [
+    "This receipt does not store raw prompts; only hash_only evidence is retained.",
+    "This receipt does not claim to represent model provider selection; lane selection is abstracted from providers."
+  ],
+  "issued_at": "2024-01-15T10:00:01Z"
+}

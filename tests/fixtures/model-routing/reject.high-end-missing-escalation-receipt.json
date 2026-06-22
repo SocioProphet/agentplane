@@ -1,0 +1,19 @@
+{
+  "_reject_reason": "selected_lane=high_end requires escalation_receipt_ref and de_escalation_required_after_stage (conditional allOf)",
+  "kind": "ModelRoutingLaneDecisionReceipt",
+  "receipt_id": "route-receipt:reject-highend-no-escalation",
+  "run_ref": "governed-run://agentplane/runs/reject-highend",
+  "chain_stage": "planning",
+  "task_class": "reasoning",
+  "requested_lane": "high_end",
+  "selected_lane": "high_end",
+  "lane_decision_outcome": "escalated",
+  "escalation_reason": "some reason",
+  "cost_class": "high",
+  "prompt_evidence_policy": "hash_only",
+  "context_tool_posture": "tools_governed",
+  "policy_decision_ref": "policy-fabric://decision/pd-reject-highend",
+  "model_router_policy_ref": "model-router://policy/default",
+  "non_claims": ["placeholder"],
+  "issued_at": "2024-01-15T10:00:00Z"
+}
