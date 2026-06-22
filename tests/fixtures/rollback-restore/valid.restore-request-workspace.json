@@ -1,0 +1,26 @@
+{
+  "kind": "RollbackRestoreRequest",
+  "request_id": "rollback-restore-req:workspace-001",
+  "rollback_boundary_ref": "rollback-boundary://agentplane/tmp-workspace-boundary-001",
+  "admission_ref": "restore-admission://agentplane/admission-workspace-001",
+  "authority_ref": "authority://agentplane/governed-runner-authority-001",
+  "authority_state": "active",
+  "safe_root": "/tmp/agentplane-workspace/run-001",
+  "restore_target_paths": [
+    "/tmp/agentplane-workspace/run-001/output/result.json",
+    "/tmp/agentplane-workspace/run-001/output/evidence.json"
+  ],
+  "path_allowlist": [
+    "/tmp/agentplane-workspace/run-001/output/result.json",
+    "/tmp/agentplane-workspace/run-001/output/evidence.json"
+  ],
+  "before_digest": "sha256:a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2",
+  "expected_after_digest": "sha256:b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3",
+  "requestor_ref": "agent://agentplane/governed-runner-agent-001",
+  "policy_decision_ref": "policy-fabric://decision/pd-rollback-restore-workspace-001",
+  "non_claims": [
+    "This request does not grant authority to restore paths outside safe_root.",
+    "Restore is scoped to the declared rollback boundary only; no cross-repo restore."
+  ],
+  "issued_at": "2024-01-15T10:00:00Z"
+}

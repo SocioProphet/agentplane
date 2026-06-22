@@ -1,0 +1,80 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12",
+  "$id": "https://schemas.socioprophet.io/agentplane/rollback-restore-request.v0.1.json",
+  "title": "RollbackRestoreRequest",
+  "description": "A governed request to restore state within a declared RollbackBoundary. Requires an admitted restore admission, active authority, and before-digest evidence. Paths must remain inside safe_root.",
+  "type": "object",
+  "required": [
+    "kind",
+    "request_id",
+    "rollback_boundary_ref",
+    "admission_ref",
+    "authority_ref",
+    "authority_state",
+    "safe_root",
+    "restore_target_paths",
+    "before_digest",
+    "policy_decision_ref",
+    "non_claims",
+    "issued_at"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "kind": { "type": "string", "const": "RollbackRestoreRequest" },
+    "request_id": { "type": "string", "minLength": 1 },
+    "rollback_boundary_ref": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Ref to an existing RollbackBoundary that scopes this restore."
+    },
+    "admission_ref": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Ref to the RestoreAdmission artifact that admitted this request."
+    },
+    "authority_ref": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Ref to the authority entity permitting restore."
+    },
+    "authority_state": {
+      "type": "string",
+      "enum": ["active", "suspended", "revoked"],
+      "description": "Current state of the restore authority. Must be active for restore to proceed."
+    },
+    "safe_root": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Absolute path prefix. All restore_target_paths must be children of this root."
+    },
+    "restore_target_paths": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "minItems": 1,
+      "description": "File/directory paths to restore. All must be descendants of safe_root."
+    },
+    "path_allowlist": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "description": "Optional explicit allowlist further restricting restore_target_paths."
+    },
+    "before_digest": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$",
+      "description": "SHA-256 digest of the target state before restore."
+    },
+    "expected_after_digest": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$",
+      "description": "Expected SHA-256 digest of the restored state post-restore."
+    },
+    "requestor_ref": { "type": "string", "minLength": 1 },
+    "policy_decision_ref": { "type": "string", "minLength": 1 },
+    "non_claims": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "minItems": 1
+    },
+    "issued_at": { "type": "string", "format": "date-time" }
+  }
+}

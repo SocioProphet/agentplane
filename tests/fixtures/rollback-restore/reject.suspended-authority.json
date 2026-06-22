@@ -1,0 +1,15 @@
+{
+  "_reject_reason": "authority_state=suspended; restore must not proceed with a suspended or revoked authority",
+  "kind": "RollbackRestoreRequest",
+  "request_id": "rollback-restore-req:reject-suspended-authority",
+  "rollback_boundary_ref": "rollback-boundary://agentplane/boundary-reject",
+  "admission_ref": "restore-admission://agentplane/admission-reject-004",
+  "authority_ref": "authority://agentplane/governed-runner-authority-suspended",
+  "authority_state": "suspended",
+  "safe_root": "/tmp/agentplane-workspace/run-reject",
+  "restore_target_paths": ["/tmp/agentplane-workspace/run-reject/output/result.json"],
+  "before_digest": "sha256:a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2",
+  "policy_decision_ref": "policy-fabric://decision/pd-reject",
+  "non_claims": ["placeholder"],
+  "issued_at": "2024-01-15T10:00:00Z"
+}
