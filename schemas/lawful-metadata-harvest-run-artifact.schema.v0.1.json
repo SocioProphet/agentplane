@@ -1,0 +1,102 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://socioprophet.io/schemas/agentplane/lawful-metadata-harvest-run-artifact/v0.1",
+  "title": "LawfulMetadataHarvestRunArtifact",
+  "description": "AgentPlane run artifact for a lawful metadata harvest bundle. Compatible with ProCybernetica lawful-metadata-harvest-envelope contract. No live network harvesting is performed; all harvest state is synthetic.",
+  "type": "object",
+  "required": [
+    "kind",
+    "artifact_id",
+    "run_ref",
+    "harvest_batches",
+    "envelope_ref",
+    "replay_ref",
+    "promotion_decision",
+    "no_live_network_harvest",
+    "policy_ref",
+    "issued_at"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "kind": { "type": "string", "const": "LawfulMetadataHarvestRunArtifact" },
+    "artifact_id": { "type": "string", "minLength": 1 },
+    "run_ref": { "type": "string", "minLength": 1 },
+    "harvest_batches": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/HarvestBatch" }
+    },
+    "envelope_ref": {
+      "type": "string",
+      "description": "Reference to the lawful-metadata-harvest-envelope compatible with ProCybernetica contract"
+    },
+    "replay_ref": {
+      "type": "string",
+      "description": "Reference to non-mutating replay artifact"
+    },
+    "promotion_decision": { "$ref": "#/$defs/PromotionDecision" },
+    "token_loop_anomaly": { "$ref": "#/$defs/TokenLoopAnomaly" },
+    "no_live_network_harvest": {
+      "type": "boolean",
+      "const": true
+    },
+    "policy_ref": { "type": "string", "minLength": 1 },
+    "procybernetica_protocol_ref": {
+      "type": "string",
+      "description": "Reference to ProCybernetica lawful-metadata-harvest-envelope contract"
+    },
+    "issued_at": { "type": "string", "format": "date-time" }
+  },
+  "$defs": {
+    "HarvestBatch": {
+      "type": "object",
+      "required": ["batch_id", "verb", "records_harvested", "records_valid", "batch_status"],
+      "additionalProperties": false,
+      "properties": {
+        "batch_id": { "type": "string", "minLength": 1 },
+        "verb": {
+          "type": "string",
+          "enum": ["Identify", "ListIdentifiers", "ListRecords", "GetRecord", "ListMetadataFormats", "ListSets"]
+        },
+        "records_harvested": { "type": "integer", "minimum": 0 },
+        "records_valid": { "type": "integer", "minimum": 0 },
+        "batch_status": {
+          "type": "string",
+          "enum": ["complete", "partial", "error", "empty"]
+        },
+        "resumption_token": { "type": ["string", "null"] },
+        "evidence_ref": { "type": "string" }
+      }
+    },
+    "PromotionDecision": {
+      "type": "object",
+      "required": ["decision", "decided_by", "promotion_is_explicit"],
+      "additionalProperties": false,
+      "properties": {
+        "decision": {
+          "type": "string",
+          "enum": ["promote", "defer", "reject"]
+        },
+        "decided_by": { "type": "string", "minLength": 1 },
+        "promotion_is_explicit": { "type": "boolean", "const": true },
+        "reason": { "type": "string" }
+      }
+    },
+    "TokenLoopAnomaly": {
+      "type": "object",
+      "required": ["detected", "anomaly_type"],
+      "additionalProperties": false,
+      "properties": {
+        "detected": { "type": "boolean" },
+        "anomaly_type": {
+          "type": "string",
+          "enum": ["none", "resumption_loop", "duplicate_token", "stale_token", "unexpected_terminal"]
+        },
+        "affected_batch_ids": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    }
+  }
+}
