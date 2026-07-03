@@ -10,6 +10,7 @@ AgentPlane's rule is strict: events can propose work, but admission must prove
 idempotency, policy outcome, evidence references, and high-risk approval posture
 before an executor can run anything.
 """
+"""Validate event-capability admission before AgentPlane execution."""
 
 from __future__ import annotations
 
