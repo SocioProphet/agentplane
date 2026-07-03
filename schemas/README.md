@@ -30,6 +30,7 @@ All schemas use [JSON Schema Draft 2020-12](https://json-schema.org/specificatio
 | [`external-model-provider-route-evidence.schema.v0.1.json`](external-model-provider-route-evidence.schema.v0.1.json) | `ExternalModelProviderRouteEvidence` | v0.1 | Evidence record for BYOM or enterprise external model provider route planning under policy. |
 | [`native-assistant-bridge-evidence.schema.v0.1.json`](native-assistant-bridge-evidence.schema.v0.1.json) | `NativeAssistantBridgeEvidence` | v0.1 | Evidence record for native assistant bridge planning across Apple App Intents/Siri/Shortcuts, Android, Windows, browser, MCP, or other host/device bridges. |
 | [`policy-fabric-verdict-envelope.schema.v0.1.json`](policy-fabric-verdict-envelope.schema.v0.1.json) | `PolicyFabricVerdictEnvelope` | v0.1 | Execution-side envelope for consuming governed Policy Fabric promotion verdicts. |
+| [`office-artifact-evidence.schema.v0.1.json`](office-artifact-evidence.schema.v0.1.json) | `OfficeArtifactEvidence` | v0.1 | Evidence record for Prophet Workspace OfficeArtifact generation, inspection, conversion, review, or publishing actions. |
 
 ---
 
