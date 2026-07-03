@@ -16,5 +16,8 @@
     "sandboxProfileRef": "urn:sandbox-profile:office-review:v1"
   },
   "status": "admitted",
+  "conditions": [
+    "no external publish side effects without explicit follow-up approval"
+  ],
   "recordedAt": "2026-05-09T09:10:05Z"
 }
