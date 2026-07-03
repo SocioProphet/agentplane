@@ -411,3 +411,7 @@ validate-prometheus-sr:
 
 validate-reasoning-failure-traces:
 	python3 tools/validate_reasoning_failure_traces.py
+.PHONY: validate-health-ai-control-receipt
+validate-health-ai-control-receipt:
+	python3 tools/validate_health_ai_control_receipt.py
+
