@@ -64,6 +64,9 @@ validate: validate-governance-context validate-lattice-data-governai-execution-r
 .PHONY: validate test validate-lattice-data-governai-execution-refs validate-lattice-runtime-profile-refs validate-network-native-assistant-evidence validate-evidence-receipt-binding
 
 validate: validate-lattice-data-governai-execution-refs validate-lattice-runtime-profile-refs validate-network-native-assistant-evidence validate-evidence-receipt-binding
+.PHONY: validate test validate-lattice-data-governai-execution-refs validate-lattice-runtime-profile-refs validate-network-native-assistant-evidence
+
+validate: validate-lattice-data-governai-execution-refs validate-lattice-runtime-profile-refs validate-network-native-assistant-evidence
 	python3 tools/validate_execution_timing.py
 
 validate-governance-context:

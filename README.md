@@ -23,6 +23,27 @@ Evidence artifacts are written to `spec.artifacts.outDir` inside the bundle.
 
 ---
 
+## Evidence surface
+
+Agentplane treats execution as evidence-producing work. The current public evidence types include:
+
+- `ValidationArtifact`
+- `PlacementDecision`
+- `RunArtifact`
+- `ReplayArtifact`
+- `PromotionArtifact`
+- `ReversalArtifact`
+- `SessionArtifact`
+- `AgentMachineMountEvidence`
+- `OfficeArtifactEvidence`
+- `NetworkDoorPlanEvidence`
+- `ExternalModelProviderRouteEvidence`
+- `NativeAssistantBridgeEvidence`
+
+The Network Door / BYOM / Native Assistant evidence types are non-mutating by default. They record policy posture, references, route decisions, hash-only prompt/destination evidence, and side-effect flags without directly mutating firewall state, installing mesh components, contacting model providers, invoking native assistant APIs, or storing credentials.
+
+---
+
 ## Prerequisites
 
 | Tool | Purpose |
@@ -109,6 +130,7 @@ agentplane/
 | System space / deployment topology | [docs/system-space.md](docs/system-space.md) |
 | Receipt lifecycle | [docs/receipt-lifecycle.md](docs/receipt-lifecycle.md) |
 | Sociosphere integration | [docs/integration/sociosphere.md](docs/integration/sociosphere.md) |
+| Network/BYOM/native assistant evidence | [docs/integration/network-native-assistant-evidence.md](docs/integration/network-native-assistant-evidence.md) |
 | State pointer model | [docs/state-pointers.md](docs/state-pointers.md) |
 | Control matrix import | [policy/imports/control-matrix/README.md](policy/imports/control-matrix/README.md) |
 | Architecture Decision Records | [docs/adr/README.md](docs/adr/README.md) |
@@ -133,6 +155,7 @@ sociosphere   →  agentplane  →  RunArtifact / ReplayArtifact / Receipt
 slash-topics  →  agentplane  (context pack event stream)
 human-digital-twin → agentplane  (policy/approval event stream)
 TriTRPC       →  agentplane  (deterministic transport metadata)
+sourceosctl   →  agentplane  (Agent Machine, Office, Network, BYOM, Native Assistant evidence imports)
 ```
 
 See [docs/integration/sociosphere.md](docs/integration/sociosphere.md) and
