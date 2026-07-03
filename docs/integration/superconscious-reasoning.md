@@ -72,6 +72,9 @@ The script is read-only and emits an AgentPlane-side import report. It does not 
 The first AgentPlane fixture validates a Superconscious deterministic run directory with no network, no model call, no host mutation, and memory proposal-only posture.
 
 Validation proves:
+The first AgentPlane fixture should validate a Superconscious deterministic run directory with no network, no model call, no host mutation, and memory proposal-only posture.
+
+Validation should prove:
 
 ```text
 ReasoningRun -> ReasoningReceipt -> ReasoningReplayPlan -> ReasoningBenchmark
@@ -97,3 +100,12 @@ The script is read-only and emits an AgentPlane-side import report. It does not 
 ## Next implementation step
 
 Once this import report is stable, wire it into AgentPlane evidence sealing and replay lifecycle as a promoted `ReasoningReceipt` import path.
+Add a small validator/import script that accepts a Superconscious run directory and emits an AgentPlane-side reasoning evidence import report.
+
+Suggested command:
+
+```text
+python3 scripts/import_superconscious_reasoning.py <run-dir>
+```
+
+The script should initially be read-only and produce a JSON report. Evidence sealing can follow after the import shape is stable.
