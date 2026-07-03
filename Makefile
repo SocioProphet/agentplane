@@ -517,8 +517,9 @@ validate-health-ai-control-receipt:
 
 .PHONY: validate test
 .PHONY: validate test validate-lattice-data-governai-execution-refs
+.PHONY: validate test validate-lattice-data-governai-execution-refs validate-lattice-runtime-profile-refs
 
-validate: validate-lattice-data-governai-execution-refs
+validate: validate-lattice-data-governai-execution-refs validate-lattice-runtime-profile-refs
 	python3 tools/validate_execution_timing.py
 
 # Validate the AgenticPRWorkOrder contract and example used by agentic PR control.
@@ -529,6 +530,9 @@ validate-guarded-workcell-artifact:
 	python3 tools/validate_guarded_workcell_artifact.py
 validate-lattice-data-governai-execution-refs:
 	python3 tools/validate_lattice_data_governai_execution_refs.py
+
+validate-lattice-runtime-profile-refs:
+	python3 tools/validate_lattice_runtime_profile_refs.py
 
 test:
 	python3 -m pytest -q tools/tests
