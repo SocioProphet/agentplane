@@ -1,0 +1,71 @@
+{
+  "kind": "ReasoningFailureTrace",
+  "version": "0.1",
+  "traceId": "trace:reasoning-failure:exact-string.synthetic.v0",
+  "sessionRef": "urn:srcos:session:reasoning-failure-exactness",
+  "taskRef": "urn:srcos:task:exact-string-preservation",
+  "caseId": "reasoning-failure.exact-string.synthetic.v0",
+  "receiptRef": "receipt:reasoning-failure:synthetic-exactness-byte-compare.v0",
+  "failureModeRefs": [
+    "https://socioprophet.github.io/ontogenesis/platform/reasoning-failure#ExactStringFailure"
+  ],
+  "reasoningTask": {
+    "taskClass": "exactness",
+    "domain": "configuration",
+    "invariantRef": "exactness.byte-identical.identifier"
+  },
+  "agentRun": {
+    "agentRef": "agent://prophet-platform/reasoning-failure-runner",
+    "role": "deterministic-verifier",
+    "capabilityEnvelopeRef": "capability://agentplane/reasoning-failure/exactness-runner@0.1",
+    "governanceContextRef": "governance-context://agentplane/reasoning-failure/exactness.synthetic.v0"
+  },
+  "verifier": {
+    "verifierRef": "deterministic.string.byte-compare.v0",
+    "verifierFamily": "deterministic",
+    "required": true,
+    "result": "failed"
+  },
+  "traceSteps": [
+    {
+      "stepId": "step:load-case",
+      "actorRef": "agent://prophet-platform/reasoning-failure-runner",
+      "action": "Loaded exact-string failure case fixture.",
+      "evidenceRefs": ["examples/reasoning-failure/exact-string-case.json"]
+    },
+    {
+      "stepId": "step:byte-compare",
+      "actorRef": "agent://prophet-platform/reasoning-failure-runner",
+      "action": "Compared protectedString and observedString byte-for-byte.",
+      "evidenceRefs": ["evidence:byte-compare:synthetic-exactness"]
+    }
+  ],
+  "invariantChecks": [
+    {
+      "invariantRef": "exactness.byte-identical.identifier",
+      "passed": false,
+      "expected": "sourceos-syncd.release-set.v0.1",
+      "observed": "sourceos_syncd.release_set.v0.1",
+      "evidenceRef": "evidence:byte-compare:synthetic-exactness"
+    }
+  ],
+  "termination": {
+    "terminationAuthorityRef": "authority://agentplane/verifier-required-before-close",
+    "candidateStatus": "premature-candidate",
+    "finalStatus": "needs-review",
+    "reason": "The verifier failed; task completion must not be claimed until exactness is corrected or waived by policy."
+  },
+  "annotations": [
+    {
+      "annotationId": "annotation:exact-string-failure",
+      "cluster": "task-verification-termination",
+      "failureModeRef": "https://socioprophet.github.io/ontogenesis/platform/reasoning-failure#ExactStringFailure",
+      "severity": "high"
+    }
+  ],
+  "evidenceRefs": [
+    "receipt:reasoning-failure:synthetic-exactness-byte-compare.v0",
+    "evidence:byte-compare:synthetic-exactness"
+  ],
+  "riskAction": "require-tool-verification"
+}
