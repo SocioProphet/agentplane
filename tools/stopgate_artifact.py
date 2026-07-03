@@ -34,11 +34,9 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-from cryptography.exceptions import InvalidSignature
-from cryptography.hazmat.primitives.asymmetric.ed25519 import (
-    Ed25519PrivateKey,
-    Ed25519PublicKey,
-)
+# `cryptography` (ed25519) is imported lazily inside the signing paths so that the
+# canonicalization / schema surface of this module stays importable in environments
+# without it. Only sign / verify actually require the dependency.
 
 SPEC_VERSION = "0.1"
 ARTIFACT_TYPE = "StopGateArtifact"
@@ -112,16 +110,20 @@ def parse_iso(value: str) -> datetime:
 @dataclass(frozen=True)
 class Signer:
     key_id: str
-    _private: Ed25519PrivateKey
+    _private: Any  # cryptography Ed25519PrivateKey
 
     @classmethod
     def from_seed(cls, seed: bytes, key_id: str) -> "Signer":
+        from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
+
         if len(seed) != 32:
             raise ValueError("ed25519 seed must be exactly 32 bytes")
         return cls(key_id=key_id, _private=Ed25519PrivateKey.from_private_bytes(seed))
 
     @classmethod
     def generate(cls, key_id: str) -> "Signer":
+        from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
+
         return cls(key_id=key_id, _private=Ed25519PrivateKey.generate())
 
     def public_bytes(self) -> bytes:
@@ -161,6 +163,9 @@ class Keyring:
         return self.add(signer.key_id, signer.public_bytes())
 
     def verify(self, key_id: str, data: bytes, signature_b64: str) -> bool:
+        from cryptography.exceptions import InvalidSignature
+        from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PublicKey
+
         pub = self._keys.get(key_id)
         if pub is None:
             return False
