@@ -26,10 +26,10 @@ Modes:
 
 Modes:
 - record-only: render and emit evidence only. No external mutation.
-- tekton-observe: record an existing Tekton PipelineRun/TaskRun surface. No external mutation.
-- tekton-submit: record a guarded submit intent. Requires explicit side-effect permission
-  and credential refs. The current implementation still does not call Tekton directly;
-  it prepares the evidence path for a future live submit backend.
+- tekton-observe: record or observe an existing Tekton PipelineRun/TaskRun surface.
+- tekton-submit: guarded submit intent. Requires explicit side-effect permission
+  and credential refs. Live submission additionally requires --execute-live,
+  a manifest, and a kubeconfig environment binding.
 """
 
 from __future__ import annotations
@@ -184,6 +184,7 @@ def validate_mode(args: argparse.Namespace, bundle: dict[str, Any]) -> dict[str,
         validate_live_adapter(args)
         require_non_empty(args.pipeline_run_ref, "--pipeline-run-ref is required for tekton-observe mode")
         mode_gate["requirement"] = "observe_existing_pipeline_run"
+        validate_live_adapter(args)
         return mode_gate
 
     if args.mode == "tekton-submit":
@@ -208,6 +209,7 @@ def validate_mode(args: argparse.Namespace, bundle: dict[str, Any]) -> dict[str,
         mode_gate["submitImplementation"] = "not_yet_live_recorded_intent_only"
         return mode_gate
 
+    validate_live_adapter(args)
     mode_gate["requirement"] = "record_only"
     return mode_gate
 
@@ -336,9 +338,16 @@ def render_execution_request(
 
     if args.mode == "tekton-submit":
         non_goals.extend([
-            "does not invoke Tekton directly in this implementation tranche",
+            "does not invoke Tekton directly",
+            "does not mutate host state",
+        ])
+    if args.mode == "tekton-submit" and not args.execute_live:
+        non_goals.extend([
+            "does not invoke Tekton directly in this invocation",
             "records guarded submit intent only",
         ])
+
+    delegated_pipeline_ref = args.pipeline_run_ref or live_result.get("pipelineRunRef")
 
     return {
         "kind": "SourceOSDelegatedExecutionRequest",
@@ -415,11 +424,16 @@ def main() -> int:
     parser.add_argument("--live-timeout-seconds", type=int, default=int(os.getenv("AGENTPLANE_SOURCEOS_LIVE_TIMEOUT_SECONDS", "120")))
     parser.add_argument("--executor", default="sourceos-delegated-record", help="Executor name to record in artifacts")
     parser.add_argument("--pipeline-run-ref", default=os.getenv("AGENTPLANE_SOURCEOS_TEKTON_PIPELINE_RUN_REF"))
+    parser.add_argument("--pipeline-run-name", default=os.getenv("AGENTPLANE_SOURCEOS_TEKTON_PIPELINE_RUN_NAME"))
+    parser.add_argument("--pipeline-run-manifest", default=os.getenv("AGENTPLANE_SOURCEOS_TEKTON_PIPELINE_RUN_MANIFEST"))
     parser.add_argument("--task-run-ref", action="append", default=[])
     parser.add_argument("--tekton-namespace", default=os.getenv("AGENTPLANE_SOURCEOS_TEKTON_NAMESPACE"))
     parser.add_argument("--tekton-pipeline-name", default=os.getenv("AGENTPLANE_SOURCEOS_TEKTON_PIPELINE_NAME"))
     parser.add_argument("--tekton-service-account-ref", default=os.getenv("AGENTPLANE_SOURCEOS_TEKTON_SERVICE_ACCOUNT_REF"))
     parser.add_argument("--kubeconfig-ref", default=os.getenv("AGENTPLANE_SOURCEOS_KUBECONFIG_REF"))
+    parser.add_argument("--kubeconfig-env", default=os.getenv("AGENTPLANE_SOURCEOS_KUBECONFIG_ENV", "KUBECONFIG"))
+    parser.add_argument("--kubectl-bin", default=os.getenv("AGENTPLANE_SOURCEOS_KUBECTL_BIN", "kubectl"))
+    parser.add_argument("--live-timeout-seconds", type=int, default=int(os.getenv("AGENTPLANE_SOURCEOS_LIVE_TIMEOUT_SECONDS", "120")))
     parser.add_argument("--katello-content-ref", default=os.getenv("AGENTPLANE_SOURCEOS_KATELLO_CONTENT_REF"))
     parser.add_argument("--katello-content-view-ref", default=os.getenv("AGENTPLANE_SOURCEOS_KATELLO_CONTENT_VIEW_REF"))
     parser.add_argument("--katello-lifecycle-environment-ref", default=os.getenv("AGENTPLANE_SOURCEOS_KATELLO_LIFECYCLE_ENVIRONMENT_REF"))
