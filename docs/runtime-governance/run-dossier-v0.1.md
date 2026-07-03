@@ -21,6 +21,7 @@ The dossier gives operators one compact object that answers:
 ## Boundary
 
 AgentPlane owns this artifact because AgentPlane owns governed execution evidence, attempt admission, rollback evidence, restore-admission evidence, and run-level receipts.
+AgentPlane owns this artifact because AgentPlane owns governed execution evidence, attempt admission, rollback evidence, and run-level receipts.
 
 Related planes:
 
@@ -150,11 +151,13 @@ python3 tools/build_run_dossier.py tests/fixtures/runs/run-dossier/run --generat
 This tranche does not define runtime execution.
 
 It does not define an MCP surface.
+It does not define a CLI or MCP surface.
 
 It does not settle runtime costs.
 
 It does not mutate authority state.
 
 It does not perform rollback or restore.
+It does not perform rollback.
 
 It converts existing evidence into an operator-consumable summary.

@@ -46,6 +46,8 @@ RESTORE_PANEL_REQUIRED = {
 STATUS = {"ready", "blocked", "requires_review", "failed_closed", "incomplete"}
 RESTORE_DECISIONS = {"admit", "require-review", "deny", "fail-closed"}
 
+STATUS = {"ready", "blocked", "requires_review", "failed_closed", "incomplete"}
+
 
 class ValidationError(Exception):
     pass
