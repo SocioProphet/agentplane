@@ -22,6 +22,10 @@ files, restore rollback state, settle budget, or change authority.
 admission receipt construction, and smoke evidence generation. It does not run
 agents, execute verifier commands, mutate governed files, restore rollback
 state, settle budget, or change authority.
+admission receipt construction, smoke evidence generation, run-store inspection,
+and the local JSON tool adapter. It does not run agents, execute verifier
+commands, mutate governed files, restore rollback state, settle budget, or
+change authority.
 """
 
 from __future__ import annotations
