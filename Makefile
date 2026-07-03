@@ -571,3 +571,7 @@ validate-health-ai-control-receipt:
 validate-prophet-mesh-agentplane-adapter:
 	python3 -m json.tool contracts/prophet-mesh/prophet-mesh-agentplane-adapter.v0.1.json >/dev/null
 	python3 tools/validate_prophet_mesh_agentplane_adapter.py
+.PHONY: validate-workspace-prophet-control-receipt
+validate-workspace-prophet-control-receipt:
+	python3 tools/validate_workspace_prophet_control_receipt.py
+
