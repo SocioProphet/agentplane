@@ -59,6 +59,7 @@ def now_iso() -> str:
 
 
 def load_bundle(path: Path) -> dict[str, Any]:
+def load_bundle(path: Path) -> dict:
     try:
         return json.loads(path.read_text(encoding="utf-8"))
     except Exception as e:
@@ -236,6 +237,15 @@ def main() -> int:
         "executor": args.executor,
         "backendIntent": backend,
         "inputs": inputs,
+        "inputs": {
+            "bundlePath": args.bundle_path or str(bundle_path),
+            "bundleRev": args.bundle_rev,
+            "artifactDir": str(Path(out_dir).resolve()),
+            "policyPackRef": pol.get("policyPackRef"),
+            "policyPackHash": pol.get("policyPackHash"),
+            "secretsRequired": secrets.get("required") or [],
+            "upstreamArtifacts": upstream,
+        },
     }
 
     out = Path(out_dir)

@@ -60,6 +60,7 @@ def now_iso() -> str:
 
 
 def load_bundle(path: Path) -> dict[str, Any]:
+def load_bundle(path: Path) -> dict:
     try:
         return json.loads(path.read_text(encoding="utf-8"))
     except Exception as e:
@@ -245,6 +246,8 @@ def main() -> int:
 
     if governance_context is not None:
         artifact["governanceContext"] = governance_context
+
+    }
 
     out = Path(out_dir)
     out.mkdir(parents=True, exist_ok=True)
