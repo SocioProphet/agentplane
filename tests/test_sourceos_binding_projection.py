@@ -13,6 +13,7 @@ import emit_replay_artifact  # noqa: E402
 import emit_run_artifact  # noqa: E402
 import validate_bundle  # noqa: E402
 
+
 EXPECTED = {
     "contentSpecRef": "urn:srcos:content-spec:sourceos-workstation",
     "overlayRefs": [

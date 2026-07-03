@@ -49,6 +49,17 @@ SOURCEOS_ENV_KEYS = {
     "smokeReceiptRef": "AGENTPLANE_SOURCEOS_SMOKE_RECEIPT_REF",
 }
 
+SOURCEOS_BINDING_KEYS = {
+    "contentSpecRef",
+    "overlayRefs",
+    "buildRequestRef",
+    "releaseManifestRef",
+    "enrollmentProfileRef",
+    "evidenceBundleRef",
+    "localExecutionProtocolRef",
+    "remoteExecutionProtocolRef",
+}
+
 
 def die(msg: str, code: int = 2) -> None:
     print(f"[run-artifact] ERROR: {msg}", file=sys.stderr)
@@ -92,6 +103,7 @@ def _copy_non_empty(source: dict[str, Any], keys: list[str] | tuple[str, ...]) -
 
 
 def extract_sourceos_bindings(spec: dict[str, Any]) -> dict[str, Any]:
+def extract_sourceos_bindings(spec: dict) -> dict:
     integration_refs = spec.get("integrationRefs") or {}
     sourceos = integration_refs.get("sourceos") or spec.get("sourceosBuildRelease") or {}
     if not isinstance(sourceos, dict):
@@ -101,6 +113,10 @@ def extract_sourceos_bindings(spec: dict[str, Any]) -> dict[str, Any]:
     for key in SOURCEOS_BINDING_KEYS:
         value = sourceos.get(key)
         if _non_empty(value):
+    out = {}
+    for key in SOURCEOS_BINDING_KEYS:
+        value = sourceos.get(key)
+        if value not in (None, "", []):
             out[key] = value
     return out
 
