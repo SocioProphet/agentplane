@@ -11,6 +11,9 @@ This wrapper is intentionally narrow and evidence-first:
 - it sets guardrail and stop-gate environment variables for the command;
 - it captures stdout/stderr to files;
 - it runs the (legacy, completion-oriented) stop-gate evaluator after the command;
+- it sets guardrail and stop-gate environment variables for the command;
+- it captures stdout/stderr to files;
+- it runs the stop-gate evaluator after the command;
 - it only returns success when the command exits 0 and the stop gate passes or is waived.
 
 It does not contact model providers, push branches, open PRs, mutate GitHub, or
@@ -23,6 +26,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import shlex
 import subprocess
 import sys
 from dataclasses import dataclass
@@ -76,6 +80,7 @@ def artifact_root(workspace: Path, session_ref: str) -> Path:
 
 
 def command_env(workcell: dict[str, Any], invocation_dir: Path, stop_gate_ref: str, break_glass_ref: str | None = None) -> dict[str, str]:
+def command_env(workcell: dict[str, Any], invocation_dir: Path, stop_gate_ref: str) -> dict[str, str]:
     guardrail = workcell.get("guardrail") or {}
     stop_gate = workcell.get("stopGate") or {}
     env = os.environ.copy()
@@ -242,6 +247,7 @@ def build_artifact(
     stop_gate_attestation: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     break_glass_ref = str(Path(args.break_glass_override).resolve()) if args.break_glass_override else None
+) -> dict[str, Any]:
     return {
         "kind": "GuardedInvocationArtifact",
         "bundle": str(workcell.get("bundle") or args.bundle or "guarded-command@0.1.0"),
@@ -285,6 +291,8 @@ def build_artifact(
         },
         "stopGateAttestation": stop_gate_attestation
         or {"required": bool(args.require_stopgate), "permitted": None},
+            "result": stop_gate_result,
+        },
         "result": result,
         "sideEffects": {
             "localCommandExecuted": started_at is not None,
@@ -409,6 +417,9 @@ def execute(args: argparse.Namespace) -> tuple[int, dict[str, Any]]:
     stderr_ref = invocation_dir / "stderr.txt"
     break_glass_ref = str(Path(args.break_glass_override).resolve()) if args.break_glass_override else None
     env = command_env(workcell, invocation_dir, str(stop_gate_ref), break_glass_ref)
+    stdout_ref = invocation_dir / "stdout.txt"
+    stderr_ref = invocation_dir / "stderr.txt"
+    env = command_env(workcell, invocation_dir, str(stop_gate_ref))
     started_at = utc_now()
     completed = run_command(args.command, workspace, env)
     completed_at = utc_now()
