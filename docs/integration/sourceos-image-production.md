@@ -73,6 +73,7 @@ spec:
 ```
 
 The bundle schema now exposes optional `spec.sourceos`, `spec.sociosAutomation`, and `spec.outputs` objects. Existing bundles do not need these fields; when a bundle declares SourceOS image-production intent, validation fails closed unless required authority references are present.
+The current `schemas/bundle.schema.v0.1.json` does not yet make `spec.sourceos` and `spec.sociosAutomation` first-class. Until that schema is extended, bundle authors should place these fields under a governed extension block or a typed sidecar file and reference it from `spec.policy.policyPackRef` or bundle metadata.
 
 ## Execution model
 
@@ -150,3 +151,6 @@ Agentplane must fail closed when:
 ## Current smoke path
 
 `bundles/sourceos-image-production-smoke/` verifies the declarative wiring only. It does not mutate a host, invoke Tekton, or publish to Katello. Real delegated execution belongs in the next implementation tranche.
+## Near-term schema gap
+
+The next schema patch should add an optional `spec.sourceos` object and `spec.sociosAutomation` object to `schemas/bundle.schema.v0.1.json` or introduce an additive patch schema. Until then, this document defines the integration lane and the evidence requirements.

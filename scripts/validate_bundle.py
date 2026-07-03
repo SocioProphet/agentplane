@@ -59,6 +59,8 @@ def validate_sourceos_image_production(spec: dict) -> dict:
     The lane is intentionally optional so existing bundles continue to pass. When a
     bundle declares any SourceOS image-production or socios automation intent, we
     fail closed unless the authority refs needed for governed execution are present.
+    bundle declares any SourceOS or socios automation intent, however, we fail
+    closed unless the authority refs needed for governed execution are present.
     """
     sourceos_present = "sourceos" in spec
     automation_present = "sociosAutomation" in spec
@@ -181,6 +183,7 @@ def main() -> int:
 
     sourceos_bindings = extract_sourceos_bindings(spec)
     sourceos_image_production_gate = validate_sourceos_image_production(spec)
+    sourceos_gate = validate_sourceos_image_production(spec)
 
     pol = spec.get("policy") or {}
     mrs = pol.get("maxRunSeconds")
@@ -262,6 +265,7 @@ def main() -> int:
             "artifactPath": str(gate_artifact_path),
             "matchedRowIds": gate_artifact["matchedRowIds"],
         },
+        "sourceosImageProductionGate": sourceos_gate,
         "abstractGate": {
             "reasoningClass": gate_artifact["gateContext"].get("reasoning_class"),
             "verificationMode": gate_artifact["gateContext"].get("verification_mode"),
