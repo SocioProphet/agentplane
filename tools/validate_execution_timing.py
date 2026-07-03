@@ -10,6 +10,21 @@ ROOT = Path(__file__).resolve().parents[1]
 EXAMPLE = ROOT / "examples" / "suite-execution-timing.example.json"
 REQUIRED_META = {"taskId", "agentId", "agentKind", "workstream", "repo"}
 REQUIRED_SPEC = {"command", "queueStartedAt", "runStartedAt", "runCompletedAt", "wallClockMs", "status", "exitCode", "retryCount", "stdoutRef", "stderrRef", "artifactRefs", "evidenceRef", "replayRef"}
+REQUIRED_SPEC = {
+    "command",
+    "queueStartedAt",
+    "runStartedAt",
+    "runCompletedAt",
+    "wallClockMs",
+    "status",
+    "exitCode",
+    "retryCount",
+    "stdoutRef",
+    "stderrRef",
+    "artifactRefs",
+    "evidenceRef",
+    "replayRef",
+}
 ALLOWED_AGENT_KINDS = {"codex", "copilot", "human", "local-cli", "system"}
 ALLOWED_STATUS = {"queued", "running", "succeeded", "failed", "cancelled", "blocked"}
 
@@ -31,6 +46,7 @@ def main() -> int:
         return fail("apiVersion must be agentplane.socioprophet.dev/v1")
     if data.get("kind") != "AgentExecutionRecord":
         return fail("kind must be AgentExecutionRecord")
+
     meta = data.get("metadata", {})
     spec = data.get("spec", {})
     missing_meta = sorted(REQUIRED_META - set(meta))
@@ -47,6 +63,7 @@ def main() -> int:
         return fail("spec.artifactRefs must be a list")
     if int(spec.get("retryCount")) < 0:
         return fail("spec.retryCount must be non-negative")
+
     queue_started = parse_ts(spec["queueStartedAt"])
     run_started = parse_ts(spec["runStartedAt"])
     run_completed = parse_ts(spec["runCompletedAt"])

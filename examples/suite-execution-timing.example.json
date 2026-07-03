@@ -21,6 +21,9 @@
     "stdoutRef": "artifact://agentplane/demo/sourceos-carry-validate/stdout.txt",
     "stderrRef": "artifact://agentplane/demo/sourceos-carry-validate/stderr.txt",
     "artifactRefs": ["artifact://agentplane/demo/sourceos-carry-validate/validation.json"],
+    "artifactRefs": [
+      "artifact://agentplane/demo/sourceos-carry-validate/validation.json"
+    ],
     "evidenceRef": "evidence://agentplane/demo/sourceos-carry-validate",
     "replayRef": "replay://agentplane/demo/sourceos-carry-validate"
   }

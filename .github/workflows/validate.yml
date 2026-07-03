@@ -29,3 +29,5 @@ jobs:
         run: |
           . .venv-ci/bin/activate
           make validate
+      - name: Validate timing telemetry
+        run: make validate
