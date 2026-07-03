@@ -22,6 +22,13 @@ jobs:
     permissions:
       contents: read
       statuses: write
+      - '.github/workflows/lint.yml'
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
