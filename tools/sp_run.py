@@ -13,6 +13,9 @@ authority.
 This CLI exposes operator-facing receipt inspection and preflight projection.
 It does not run agents, execute verifier commands, mutate files, restore rollback
 state, settle budget, or change authority.
+This v0 CLI exposes operator-facing receipt inspection only. It does not run
+agents, execute verifier commands, mutate files, restore rollback state, or
+change authority.
 """
 
 from __future__ import annotations
@@ -23,6 +26,8 @@ import json
 import re
 import sys
 from datetime import datetime, timezone
+import json
+import sys
 from pathlib import Path
 from typing import Any
 
@@ -73,6 +78,12 @@ BLOCK_PATTERNS = (
     _rx((40, 94, 124, 92, 115, 41, 115, 117, 100, 111, 40, 92, 115, 124, 36, 41)),
 )
 NETWORK_TARGET = re.compile(r"https?://([^/\s\"'`]+)", re.I)
+
+    "schemas/receipts/rollback-boundary.v0.1.schema.json",
+    "schemas/receipts/rollback-result.v0.1.schema.json",
+    "tools/build_run_dossier.py",
+    "tools/validate_run_dossier.py",
+)
 
 
 def emit(payload: dict[str, Any]) -> None:
@@ -135,6 +146,8 @@ def command_doctor(_args: argparse.Namespace) -> int:
             "capabilities": ["doctor", "dossier", "validate-dossier", "preflight", "admit"],
             "capabilities": ["doctor", "dossier", "validate-dossier", "preflight"],
             "non_goals": ["execute", "mutate", "restore", "authority_update", "budget_settlement"],
+            "capabilities": ["doctor", "dossier", "validate-dossier"],
+            "non_goals": ["execute", "mutate", "restore", "authority_update"],
             "files": files,
         }
     )
@@ -200,6 +213,7 @@ def command_validate_dossier(args: argparse.Namespace) -> int:
         validate_run_dossier.validate_schema(validate_run_dossier.load_json(validate_run_dossier.SCHEMA))
         validate_run_dossier.validate_dossier(validate_run_dossier.load_json(Path(args.dossier_json)))
     except Exception as exc:  # noqa: BLE001
+    except Exception as exc:  # noqa: BLE001 - command boundary should report any validation failure.
         emit({"ok": False, "dossier": args.dossier_json, "error": str(exc)})
         return 1
     emit({"ok": True, "dossier": args.dossier_json})
