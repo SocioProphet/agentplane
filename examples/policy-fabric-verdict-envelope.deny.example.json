@@ -12,6 +12,12 @@
   "fit": "surjection",
   "failedPredicates": ["governed_domain_requires_stronger_fit"],
   "reasons": ["domain is not promotable under the current governed fit state"],
+  "failedPredicates": [
+    "governed_domain_requires_stronger_fit"
+  ],
+  "reasons": [
+    "domain is not promotable under the current governed fit state"
+  ],
   "summary": "Blocked under current Policy Fabric verdict semantics.",
   "thresholds": {
     "minBijectiveStability": 0.6,
