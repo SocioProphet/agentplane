@@ -49,6 +49,8 @@ The bundle schema defines the contract for `bundle.json` files. Validated by
 | `metadata.createdAt` | string | ISO 8601 datetime |
 | `spec.vm.modulePath` | string | Path to NixOS module entry or adapter module path |
 | `spec.vm.backendIntent` | enum | One of: `qemu`, `microvm`, `lima-process`, `fleet`, `agent-machine` |
+| `spec.vm.modulePath` | string | Path to NixOS module entry (e.g., `vm.nix`) |
+| `spec.vm.backendIntent` | enum | One of: `qemu`, `microvm`, `lima-process`, `fleet` |
 | `spec.policy.maxRunSeconds` | integer | 5–3600 |
 | `spec.secrets` | object | Secret refs only — never inline values |
 | `spec.artifacts.outDir` | string | Directory where evidence artifacts are written |
@@ -303,6 +305,7 @@ Written by `scripts/emit_replay_artifact.py`.
 | `backendIntent` | enum | `qemu`, `microvm`, `lima-process`, `fleet` |
 | `inputs.bundlePath` | string | Path to the bundle directory |
 | `inputs.bundleRev` | string|null | Git commit SHA of the bundle |
+| `inputs.bundleRev` | string\|null | Git commit SHA of the bundle |
 | `inputs.artifactDir` | string | Absolute path to the artifact output directory |
 
 Optional inputs: `policyPackRef`, `policyPackHash`, `secretsRequired`, `upstreamArtifacts.*`.
@@ -334,4 +337,5 @@ Records a rollback/reversal event. `sourcePromotionReceiptRef` must match
 - The validator (`scripts/validate_bundle.py`) must be updated when a new bundle schema version
   is introduced.
 - Patch fragments (`.patch.json`) are staging areas; they are not enforced until promoted to a
+  versioned schema.
   versioned schema.

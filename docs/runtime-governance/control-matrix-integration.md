@@ -4,6 +4,12 @@
 > The first runtime enforcement surface is now live: `scripts/validate_bundle.py` evaluates the imported `compiled_policy_bundle_v3.json` through `scripts/evaluate_control_matrix_gate.py` and emits a `ControlGateArtifact` before execution proceeds. The imported file is currently a policy-engine execution slice of the broader control matrix.  
 > Monitor and generated-test lanes remain planned follow-on surfaces.  
 > See [policy/imports/control-matrix/README.md](../../policy/imports/control-matrix/README.md) for the current import state.
+> **Status: Plan document — not yet implemented.**  
+> The control matrix import lane has been seeded (`policy/imports/control-matrix/`), but the
+> compiled policy, monitor, and test bundles have not yet been generated or bound. The three
+> enforcement surfaces described below are design targets, not current behavior.  
+> See [policy/imports/control-matrix/README.md](../../policy/imports/control-matrix/README.md)
+> for the current import manifest status.
 
 This document defines the first expected binding points for the imported control bundle.
 

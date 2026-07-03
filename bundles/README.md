@@ -9,6 +9,7 @@ A bundle directory contains:
 | `bundle.json` | Manifest: metadata, policy, executor hint, artifact dir, smoke script ref, VM spec |
 | `vm.nix` | NixOS module defining the guest environment |
 | `smoke.sh` | Smoke test script, run on host or inside the guest VM |
+| `smoke.sh` | Smoke test script (runs on host or inside the guest VM) |
 
 The bundle schema is defined in [`schemas/bundle.schema.v0.1.json`](../schemas/bundle.schema.v0.1.json).
 Validate a bundle with:
@@ -18,6 +19,10 @@ python3 scripts/validate_bundle.py bundles/<name>/bundle.json
 ```
 
 Runners execute bundles. See [`runners/runner.md`](../runners/runner.md) for the backend-neutral runner contract.
+Runners execute bundles (`qemu-local` today; `microvm`/`fleet` later). See
+[`runners/runner.md`](../runners/runner.md) for the backend-agnostic runner contract.
+
+---
 
 ## example-agent
 
@@ -39,11 +44,19 @@ Two fields in the example `bundle.json` are intentionally set to `"UNSET"`:
 
 - `metadata.source.git.rev` should be set to the actual commit SHA before merging to main.
 - `spec.policy.policyPackHash` should be set to the SHA-256 hash of the referenced policy pack. Leave as `"UNSET"` during development when no real policy pack is pinned.
+- `metadata.source.git.rev` — Should be set to the actual commit SHA before merging to main.
+  When running `scripts/pr.sh`, consider setting this via a pre-commit step.
+- `spec.policy.policyPackHash` — Should be set to the SHA-256 hash of the referenced policy
+  pack. Leave as `"UNSET"` during development when no real policy pack is pinned.
 
 ### Run the example
 
 ```bash
 scripts/demo.sh
+# Full demo: hygiene → doctor → validate → run → emit artifacts
+scripts/demo.sh
+
+# Or run the bundle directly
 runners/qemu-local.sh run bundles/example-agent --profile staging --watch
 ```
 
