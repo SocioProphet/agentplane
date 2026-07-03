@@ -60,6 +60,20 @@ SOURCEOS_BINDING_KEYS = {
     "remoteExecutionProtocolRef",
 }
 
+SOURCEOS_ENV_KEYS = {
+    "tektonPipelineRunRef": "AGENTPLANE_SOURCEOS_TEKTON_PIPELINE_RUN_REF",
+    "tektonTaskRunRefs": "AGENTPLANE_SOURCEOS_TEKTON_TASK_RUN_REFS",
+    "katelloContentRef": "AGENTPLANE_SOURCEOS_KATELLO_CONTENT_REF",
+    "katelloContentViewRef": "AGENTPLANE_SOURCEOS_KATELLO_CONTENT_VIEW_REF",
+    "katelloLifecycleEnvironmentRef": "AGENTPLANE_SOURCEOS_KATELLO_LIFECYCLE_ENVIRONMENT_REF",
+    "outputArtifactRef": "AGENTPLANE_SOURCEOS_OUTPUT_ARTIFACT_REF",
+    "outputDigest": "AGENTPLANE_SOURCEOS_OUTPUT_DIGEST",
+    "ostreeRef": "AGENTPLANE_SOURCEOS_OSTREE_REF",
+    "releaseSetRef": "AGENTPLANE_SOURCEOS_RELEASE_SET_REF",
+    "bootReleaseSetRef": "AGENTPLANE_SOURCEOS_BOOT_RELEASE_SET_REF",
+    "smokeReceiptRef": "AGENTPLANE_SOURCEOS_SMOKE_RECEIPT_REF",
+}
+
 
 def die(msg: str, code: int = 2) -> None:
     print(f"[run-artifact] ERROR: {msg}", file=sys.stderr)
@@ -116,7 +130,7 @@ def extract_sourceos_bindings(spec: dict) -> dict:
     out = {}
     for key in SOURCEOS_BINDING_KEYS:
         value = sourceos.get(key)
-        if value not in (None, "", []):
+        if _non_empty(value):
             out[key] = value
     return out
 
