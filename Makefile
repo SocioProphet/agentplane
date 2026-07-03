@@ -74,6 +74,9 @@ validate: validate-agent-cycle-health validate-authority-dependency-evidence val
 .PHONY: validate test validate-governance-context validate-lattice-data-governai-execution-refs validate-lattice-runtime-profile-refs validate-network-native-assistant-evidence
 
 validate: validate-governance-context validate-lattice-data-governai-execution-refs validate-lattice-runtime-profile-refs validate-network-native-assistant-evidence
+.PHONY: validate test validate-governance-context validate-lattice-data-governai-execution-refs validate-lattice-runtime-profile-refs validate-network-native-assistant-evidence validate-guardrail-evidence-artifacts validate-stop-gate-evaluator validate-guarded-workcell-artifact validate-guarded-workcell-executor validate-guarded-invocation-artifact validate-guarded-invocation validate-agentic-pr-work-order validate-semantic-enterprise-agent-boundary validate-ops-history-contracts agentplane-evidence-receipt-composition-tier2-binding-ci lawful-learning-phase9-contract-ci
+
+validate: validate-governance-context validate-lattice-data-governai-execution-refs validate-lattice-runtime-profile-refs validate-network-native-assistant-evidence validate-guardrail-evidence-artifacts validate-stop-gate-evaluator validate-guarded-workcell-artifact validate-guarded-workcell-executor validate-guarded-invocation-artifact validate-guarded-invocation validate-agentic-pr-work-order validate-semantic-enterprise-agent-boundary validate-ops-history-contracts agentplane-evidence-receipt-composition-tier2-binding-ci lawful-learning-phase9-contract-ci
 	python3 tools/validate_execution_timing.py
 
 validate-governance-context:
