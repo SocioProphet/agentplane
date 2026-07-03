@@ -62,6 +62,7 @@ python tools/shir_governed_chain_job.py \
 **What it does:**
 
 1. Invokes the fabric-suite governed SHIR chain unless `--from-chain-receipt` is supplied.
+1. Invokes the fabric suite governed SHIR chain unless `--from-chain-receipt` is supplied.
 2. Retains the chain stage artifacts under `--out-ref`.
 3. Parses `chain_run_receipt.json`.
 4. Projects the chain receipt into `agentplane_run_record.json`.
