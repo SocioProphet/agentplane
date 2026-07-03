@@ -151,6 +151,9 @@ validate: validate-governance-context validate-lattice-data-governai-execution-r
 .PHONY: validate test validate-governance-context validate-lattice-data-governai-execution-refs validate-lattice-runtime-profile-refs validate-network-native-assistant-evidence validate-guardrail-evidence-artifacts validate-stop-gate-evaluator validate-guarded-workcell-artifact validate-guarded-workcell-executor
 
 validate: validate-governance-context validate-lattice-data-governai-execution-refs validate-lattice-runtime-profile-refs validate-network-native-assistant-evidence validate-guardrail-evidence-artifacts validate-stop-gate-evaluator validate-guarded-workcell-artifact validate-guarded-workcell-executor
+.PHONY: validate test validate-governance-context validate-lattice-data-governai-execution-refs validate-lattice-runtime-profile-refs validate-network-native-assistant-evidence validate-guardrail-evidence-artifacts validate-stop-gate-evaluator validate-guarded-workcell-artifact
+
+validate: validate-governance-context validate-lattice-data-governai-execution-refs validate-lattice-runtime-profile-refs validate-network-native-assistant-evidence validate-guardrail-evidence-artifacts validate-stop-gate-evaluator validate-guarded-workcell-artifact
 	python3 tools/validate_execution_timing.py
 
 validate-governance-context:
@@ -512,6 +515,9 @@ validate:
 # Validate the AgenticPRWorkOrder contract and example used by agentic PR control.
 validate-agentic-pr-work-order:
 	python3 tools/validate_agentic_pr_work_order.py
+
+validate-guarded-workcell-artifact:
+	python3 tools/validate_guarded_workcell_artifact.py
 
 test:
 	python3 -m pytest -q tools/tests
