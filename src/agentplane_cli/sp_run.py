@@ -6,6 +6,7 @@ is promoted into importable package modules. If the entry point is invoked from 
 non-source install where `tools/sp_run.py` is unavailable, it fails closed with a
 clear diagnostic instead of raising an opaque import error.
 """
+"""Installed entry point for the AgentPlane sp-run CLI."""
 
 from __future__ import annotations
 
@@ -42,6 +43,8 @@ class SpRunInstallError(RuntimeError):
                 "budget_settlement",
             ],
         }
+import sys
+from pathlib import Path
 
 
 def _repo_root() -> Path:
@@ -59,6 +62,11 @@ def _load_tool_module():
     spec = importlib.util.spec_from_file_location("agentplane_tools_sp_run", tool_path)
     if spec is None or spec.loader is None:
         raise SpRunInstallError(_repo_root(), tool_path)
+def _load_tool_module():
+    tool_path = _repo_root() / "tools" / "sp_run.py"
+    spec = importlib.util.spec_from_file_location("agentplane_tools_sp_run", tool_path)
+    if spec is None or spec.loader is None:
+        raise RuntimeError(f"unable to load sp-run implementation from {tool_path}")
     module = importlib.util.module_from_spec(spec)
     tools_dir = str(tool_path.parent)
     if tools_dir not in sys.path:
@@ -73,6 +81,7 @@ def main() -> int:
     except SpRunInstallError as exc:
         print(json.dumps(exc.as_payload(), indent=2, sort_keys=True), file=sys.stderr)
         return 127
+    module = _load_tool_module()
     return int(module.main(sys.argv[1:]))
 
 
