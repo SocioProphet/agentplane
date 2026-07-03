@@ -16,6 +16,9 @@ state, settle budget, or change authority.
 This v0 CLI exposes operator-facing receipt inspection only. It does not run
 agents, execute verifier commands, mutate files, restore rollback state, or
 change authority.
+admission receipt construction, smoke evidence generation, and run-store
+inspection. It does not run agents, execute verifier commands, mutate governed
+files, restore rollback state, settle budget, or change authority.
 """
 
 from __future__ import annotations
@@ -145,6 +148,7 @@ def command_doctor(_args: argparse.Namespace) -> int:
             ],
             "capabilities": ["doctor", "dossier", "validate-dossier", "preflight", "admit"],
             "capabilities": ["doctor", "dossier", "validate-dossier", "preflight"],
+            ],
             "non_goals": ["execute", "mutate", "restore", "authority_update", "budget_settlement"],
             "capabilities": ["doctor", "dossier", "validate-dossier"],
             "non_goals": ["execute", "mutate", "restore", "authority_update"],
