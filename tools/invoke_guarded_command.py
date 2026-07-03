@@ -26,7 +26,6 @@ from __future__ import annotations
 import argparse
 import json
 import os
-import shlex
 import subprocess
 import sys
 from dataclasses import dataclass
@@ -248,6 +247,7 @@ def build_artifact(
 ) -> dict[str, Any]:
     break_glass_ref = str(Path(args.break_glass_override).resolve()) if args.break_glass_override else None
 ) -> dict[str, Any]:
+    break_glass_ref = str(Path(args.break_glass_override).resolve()) if args.break_glass_override else None
     return {
         "kind": "GuardedInvocationArtifact",
         "bundle": str(workcell.get("bundle") or args.bundle or "guarded-command@0.1.0"),
@@ -419,7 +419,8 @@ def execute(args: argparse.Namespace) -> tuple[int, dict[str, Any]]:
     env = command_env(workcell, invocation_dir, str(stop_gate_ref), break_glass_ref)
     stdout_ref = invocation_dir / "stdout.txt"
     stderr_ref = invocation_dir / "stderr.txt"
-    env = command_env(workcell, invocation_dir, str(stop_gate_ref))
+    break_glass_ref = str(Path(args.break_glass_override).resolve()) if args.break_glass_override else None
+    env = command_env(workcell, invocation_dir, str(stop_gate_ref), break_glass_ref)
     started_at = utc_now()
     completed = run_command(args.command, workspace, env)
     completed_at = utc_now()
