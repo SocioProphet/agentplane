@@ -307,6 +307,7 @@ Written by `scripts/emit_replay_artifact.py`.
 | `inputs.bundlePath` | string | Path to the bundle directory |
 | `inputs.bundleRev` | string|null | Git commit SHA of the bundle |
 | `inputs.bundleRev` | string\|null | Git commit SHA of the bundle |
+| `inputs.bundleRev` | string or null | Git commit SHA of the bundle |
 | `inputs.artifactDir` | string | Absolute path to the artifact output directory |
 
 Optional inputs: `policyPackRef`, `policyPackHash`, `secretsRequired`, `upstreamArtifacts.*`.
