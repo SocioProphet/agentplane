@@ -49,31 +49,6 @@ SOURCEOS_ENV_KEYS = {
     "smokeReceiptRef": "AGENTPLANE_SOURCEOS_SMOKE_RECEIPT_REF",
 }
 
-SOURCEOS_BINDING_KEYS = {
-    "contentSpecRef",
-    "overlayRefs",
-    "buildRequestRef",
-    "releaseManifestRef",
-    "enrollmentProfileRef",
-    "evidenceBundleRef",
-    "localExecutionProtocolRef",
-    "remoteExecutionProtocolRef",
-}
-
-SOURCEOS_ENV_KEYS = {
-    "tektonPipelineRunRef": "AGENTPLANE_SOURCEOS_TEKTON_PIPELINE_RUN_REF",
-    "tektonTaskRunRefs": "AGENTPLANE_SOURCEOS_TEKTON_TASK_RUN_REFS",
-    "katelloContentRef": "AGENTPLANE_SOURCEOS_KATELLO_CONTENT_REF",
-    "katelloContentViewRef": "AGENTPLANE_SOURCEOS_KATELLO_CONTENT_VIEW_REF",
-    "katelloLifecycleEnvironmentRef": "AGENTPLANE_SOURCEOS_KATELLO_LIFECYCLE_ENVIRONMENT_REF",
-    "outputArtifactRef": "AGENTPLANE_SOURCEOS_OUTPUT_ARTIFACT_REF",
-    "outputDigest": "AGENTPLANE_SOURCEOS_OUTPUT_DIGEST",
-    "ostreeRef": "AGENTPLANE_SOURCEOS_OSTREE_REF",
-    "releaseSetRef": "AGENTPLANE_SOURCEOS_RELEASE_SET_REF",
-    "bootReleaseSetRef": "AGENTPLANE_SOURCEOS_BOOT_RELEASE_SET_REF",
-    "smokeReceiptRef": "AGENTPLANE_SOURCEOS_SMOKE_RECEIPT_REF",
-}
-
 
 def die(msg: str, code: int = 2) -> None:
     print(f"[run-artifact] ERROR: {msg}", file=sys.stderr)
@@ -85,7 +60,6 @@ def now_iso() -> str:
 
 
 def load_bundle(path: Path) -> dict[str, Any]:
-def load_bundle(path: Path) -> dict:
     try:
         return json.loads(path.read_text(encoding="utf-8"))
     except Exception as e:
@@ -117,17 +91,12 @@ def _copy_non_empty(source: dict[str, Any], keys: list[str] | tuple[str, ...]) -
 
 
 def extract_sourceos_bindings(spec: dict[str, Any]) -> dict[str, Any]:
-def extract_sourceos_bindings(spec: dict) -> dict:
     integration_refs = spec.get("integrationRefs") or {}
     sourceos = integration_refs.get("sourceos") or spec.get("sourceosBuildRelease") or {}
     if not isinstance(sourceos, dict):
         return {}
 
     out: dict[str, Any] = {}
-    for key in SOURCEOS_BINDING_KEYS:
-        value = sourceos.get(key)
-        if _non_empty(value):
-    out = {}
     for key in SOURCEOS_BINDING_KEYS:
         value = sourceos.get(key)
         if _non_empty(value):
@@ -276,8 +245,6 @@ def main() -> int:
 
     if governance_context is not None:
         artifact["governanceContext"] = governance_context
-
-    }
 
     out = Path(out_dir)
     out.mkdir(parents=True, exist_ok=True)

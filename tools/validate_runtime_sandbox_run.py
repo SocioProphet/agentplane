@@ -17,13 +17,6 @@ VALID_FIXTURES = [
 INVALID_FIXTURES = [
     SANDBOX / "runtime-sandbox-run.allocated.missing-leakcheck.invalid.json",
     SANDBOX / "runtime-sandbox-run.teardown.missing-evidence.invalid.json",
-VALID_FIXTURES = [
-    ROOT / "tests" / "fixtures" / "sandbox" / "runtime-sandbox-run.requested.valid.json",
-    ROOT / "tests" / "fixtures" / "sandbox" / "runtime-sandbox-run.allocated.valid.json",
-    ROOT / "tests" / "fixtures" / "sandbox" / "runtime-sandbox-run.failed.valid.json",
-]
-INVALID_FIXTURES = [
-    ROOT / "tests" / "fixtures" / "sandbox" / "runtime-sandbox-run.allocated.missing-leakcheck.invalid.json",
 ]
 STATUSES = {"runtime_requested", "runtime_allocated", "runtime_failed", "runtime_teardown_complete"}
 PARITY_LEVELS = {"contract_only", "runtime_observed"}

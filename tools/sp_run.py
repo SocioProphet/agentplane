@@ -6,26 +6,7 @@ admission receipt construction, restore admission receipt construction,
 smoke evidence generation, run-store inspection, and the local JSON tool
 adapter. It does not run agents, execute verifier commands, mutate governed
 files, restore rollback state, retry, resume, settle budget, or change
-This CLI exposes operator-facing receipt inspection, preflight projection, and
-admission receipt construction. It does not run agents, execute verifier
-commands, mutate files, restore rollback state, settle budget, or change
 authority.
-This CLI exposes operator-facing receipt inspection and preflight projection.
-It does not run agents, execute verifier commands, mutate files, restore rollback
-state, settle budget, or change authority.
-This v0 CLI exposes operator-facing receipt inspection only. It does not run
-agents, execute verifier commands, mutate files, restore rollback state, or
-change authority.
-admission receipt construction, smoke evidence generation, and run-store
-inspection. It does not run agents, execute verifier commands, mutate governed
-files, restore rollback state, settle budget, or change authority.
-admission receipt construction, and smoke evidence generation. It does not run
-agents, execute verifier commands, mutate governed files, restore rollback
-state, settle budget, or change authority.
-admission receipt construction, smoke evidence generation, run-store inspection,
-and the local JSON tool adapter. It does not run agents, execute verifier
-commands, mutate governed files, restore rollback state, settle budget, or
-change authority.
 """
 
 from __future__ import annotations
@@ -36,8 +17,6 @@ import json
 import re
 import sys
 from datetime import datetime, timezone
-import json
-import sys
 from pathlib import Path
 from typing import Any
 
@@ -62,19 +41,9 @@ REQUIRED_FILES = (
     "tools/run_governed_runner_smoke.py",
     "tools/run_store_inspection.py",
     "tools/validate_restore_admission_receipt.py",
-    "tools/run_governed_runner_smoke.py",
     "tools/validate_run_dossier.py",
     "tools/validate_governed_run_contract.py",
 )
-
-BLOCK_PATTERNS = (
-    re.compile(r"(^|\s)rm\s+-rf(\s|$)", re.I),
-    re.compile(r"git\s+reset\s+--hard", re.I),
-    re.compile(r"git\s+clean\s+-f", re.I),
-    re.compile(r"(curl|wget)\b[^\n|]*\|\s*(sh|bash)", re.I),
-    re.compile(r"(^|\s)sudo(\s|$)", re.I),
-)
-NETWORK_TARGET = re.compile(r"https?://([^/\s\"'`]+)", re.I)
 
 
 def _rx(codes: tuple[int, ...]) -> re.Pattern[str]:
@@ -89,12 +58,6 @@ BLOCK_PATTERNS = (
     _rx((40, 94, 124, 92, 115, 41, 115, 117, 100, 111, 40, 92, 115, 124, 36, 41)),
 )
 NETWORK_TARGET = re.compile(r"https?://([^/\s\"'`]+)", re.I)
-
-    "schemas/receipts/rollback-boundary.v0.1.schema.json",
-    "schemas/receipts/rollback-result.v0.1.schema.json",
-    "tools/build_run_dossier.py",
-    "tools/validate_run_dossier.py",
-)
 
 
 def emit(payload: dict[str, Any]) -> None:
@@ -154,13 +117,6 @@ def command_doctor(_args: argparse.Namespace) -> int:
                 "authority_update",
                 "budget_settlement",
             ],
-            "capabilities": ["doctor", "dossier", "validate-dossier", "preflight", "admit"],
-            "capabilities": ["doctor", "dossier", "validate-dossier", "preflight"],
-            ],
-            "capabilities": ["doctor", "dossier", "validate-dossier", "preflight", "admit", "smoke"],
-            "non_goals": ["execute", "mutate", "restore", "authority_update", "budget_settlement"],
-            "capabilities": ["doctor", "dossier", "validate-dossier"],
-            "non_goals": ["execute", "mutate", "restore", "authority_update"],
             "files": files,
         }
     )
@@ -226,7 +182,6 @@ def command_validate_dossier(args: argparse.Namespace) -> int:
         validate_run_dossier.validate_schema(validate_run_dossier.load_json(validate_run_dossier.SCHEMA))
         validate_run_dossier.validate_dossier(validate_run_dossier.load_json(Path(args.dossier_json)))
     except Exception as exc:  # noqa: BLE001
-    except Exception as exc:  # noqa: BLE001 - command boundary should report any validation failure.
         emit({"ok": False, "dossier": args.dossier_json, "error": str(exc)})
         return 1
     emit({"ok": True, "dossier": args.dossier_json})
@@ -299,19 +254,6 @@ def build_preflight_receipt(contract: dict[str, Any], generated_at: str | None =
         findings.append({"kind": "contract_invalid", "severity": "block", "message": str(exc)})
 
     verification_commands = [str(step.get("command", "")) for step in contract.get("verification_plan", []) if isinstance(step, dict)]
-        findings.append(
-            {
-                "kind": "contract_invalid",
-                "severity": "block",
-                "message": str(exc),
-            }
-        )
-
-    verification_commands = [
-        str(step.get("command", ""))
-        for step in contract.get("verification_plan", [])
-        if isinstance(step, dict)
-    ]
     allowed_paths = [str(item) for item in contract.get("allowed_paths", [])]
     denied_paths = [str(item) for item in contract.get("denied_paths", [])]
     network_mode = str(contract.get("network_mode", "off"))
@@ -323,29 +265,6 @@ def build_preflight_receipt(contract: dict[str, Any], generated_at: str | None =
             findings.append({"kind": "unsafe_verifier_command", "severity": "block", "message": "verifier command matches a blocked command pattern"})
         if network_mode == "off" and NETWORK_TARGET.search(command):
             findings.append({"kind": "network_blocked", "severity": "block", "message": "network target appears while network_mode=off"})
-    approval_policy = {
-        key: bool(value)
-        for key, value in (contract.get("approval_policy", {}) or {}).items()
-        if isinstance(key, str)
-    }
-
-    for command in verification_commands:
-        if any(pattern.search(command) for pattern in BLOCK_PATTERNS):
-            findings.append(
-                {
-                    "kind": "unsafe_verifier_command",
-                    "severity": "block",
-                    "message": "verifier command matches a blocked command pattern",
-                }
-            )
-        if network_mode == "off" and NETWORK_TARGET.search(command):
-            findings.append(
-                {
-                    "kind": "network_blocked",
-                    "severity": "block",
-                    "message": "network target appears while network_mode=off",
-                }
-            )
         if network_mode == "allowlisted":
             for target in NETWORK_TARGET.findall(command):
                 target = target.lower()
@@ -354,22 +273,6 @@ def build_preflight_receipt(contract: dict[str, Any], generated_at: str | None =
 
     if network_mode == "open":
         findings.append({"kind": "open_network_requires_review", "severity": "require-review", "message": "network_mode=open requires review before execution"})
-                    findings.append(
-                        {
-                            "kind": "network_not_allowlisted",
-                            "severity": "block",
-                            "message": f"network target is not allowlisted: {target}",
-                        }
-                    )
-
-    if network_mode == "open":
-        findings.append(
-            {
-                "kind": "open_network_requires_review",
-                "severity": "require-review",
-                "message": "network_mode=open requires review before execution",
-            }
-        )
 
     for path in allowed_paths + denied_paths:
         normalized = path.replace("\\", "/")
@@ -378,27 +281,10 @@ def build_preflight_receipt(contract: dict[str, Any], generated_at: str | None =
 
     if approval_policy.get("external_writes"):
         findings.append({"kind": "external_writes_require_review", "severity": "require-review", "message": "external writes approval flag requires human review before execution"})
-            findings.append(
-                {
-                    "kind": "unsafe_path_pattern",
-                    "severity": "block",
-                    "message": f"path pattern is outside the governed workspace: {path}",
-                }
-            )
-
-    if approval_policy.get("external_writes"):
-        findings.append(
-            {
-                "kind": "external_writes_require_review",
-                "severity": "require-review",
-                "message": "external writes approval flag requires human review before execution",
-            }
-        )
 
     outcome = outcome_from_findings(findings)
     runtime_action = {"pass": "allow", "require-review": "require-review", "block": "block"}[outcome]
     run_id = str(contract.get("run_id", "unknown-run"))
-    generated = generated_at or now_utc()
     receipt: dict[str, Any] = {
         "schemaVersion": "agentplane.preflight-receipt.v0.1",
         "recordType": "PreflightReceipt",
@@ -419,7 +305,6 @@ def build_preflight_receipt(contract: dict[str, Any], generated_at: str | None =
         },
         "findings": findings,
         "generated_at": generated_at or now_utc(),
-        "generated_at": generated,
         "labels": {"source": "sp-run-readonly-preflight"},
     }
     receipt["receipt_hash"] = stable_hash(receipt)

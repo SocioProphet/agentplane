@@ -2,7 +2,6 @@
 """Emit an AgentOperationContract artifact through the Workspace Operation Plane.
 
 Every agent-initiated workspace mutation must produce an AgentOperationContract
-instead of writing artifacts as hidden side effects. This script is the canonical
 instead of writing artifacts as hidden side effects.  This script is the canonical
 emission path for all supported agent operation types.
 
@@ -179,7 +178,6 @@ def build_contract(
     if status in {"completed", "failed", "cancelled"}:
         events.append({
             "eventId": f"evt-{len(events) + 1:03d}",
-            "eventType": status,
             "eventType": status if status != "in-progress" else "updated",
             "emittedAt": captured_at,
             "data": None,
@@ -250,25 +248,6 @@ def main() -> int:
         description="Emit an AgentOperationContract through the Workspace Operation Plane.",
     )
     ap.add_argument("bundle", help="Path to bundle.json")
-    ap.add_argument("--operation-type", required=True, choices=sorted(OPERATION_TYPES))
-    ap.add_argument("--operation-id", required=True)
-    ap.add_argument("--acting-for", required=True)
-    ap.add_argument("--scope", action="append", dest="scopes", default=[], metavar="SCOPE")
-    ap.add_argument("--audit-level", choices=sorted(AUDIT_LEVELS), default="full")
-    ap.add_argument("--policy-profile-ref", default=None)
-    ap.add_argument("--max-tokens", type=int, default=None)
-    ap.add_argument("--max-wall-seconds", type=int, default=None)
-    ap.add_argument("--max-files-mutated", type=int, default=None)
-    ap.add_argument("--status", choices=sorted(LIFECYCLE_STATUSES), default="completed")
-    ap.add_argument("--retryable", action="store_true", default=False)
-    ap.add_argument("--retry-count", type=int, default=0)
-    ap.add_argument("--artifact-type", choices=sorted(ARTIFACT_TYPES), default=None)
-    ap.add_argument("--artifact-ref", default=None)
-    ap.add_argument("--policy-ref", default=None)
-    ap.add_argument("--policy-result", choices=sorted(POLICY_RESULTS), default="allow")
-    ap.add_argument("--policy-reason", default=None)
-    ap.add_argument("--decision", default=None)
-    ap.add_argument("--rationale", default=None)
     ap.add_argument(
         "--operation-type",
         required=True,
@@ -379,12 +358,6 @@ def main() -> int:
     if not bundle_path.exists():
         die(f"bundle not found: {bundle_path}", 2)
 
-    bundle = load_bundle(bundle_path)
-    metadata = bundle.get("metadata") or {}
-    spec = bundle.get("spec") or {}
-    name = metadata.get("name")
-    version = metadata.get("version")
-    if not name or not version:
     b = load_bundle(bundle_path)
     md = b.get("metadata") or {}
     spec = b.get("spec") or {}
@@ -398,7 +371,6 @@ def main() -> int:
     if not out_dir:
         die("bundle spec.artifacts.outDir is required", 2)
 
-    governance_context = spec.get("governanceContext") if isinstance(spec.get("governanceContext"), dict) else None
     governance_context = (
         spec.get("governanceContext")
         if isinstance(spec.get("governanceContext"), dict)
@@ -409,7 +381,6 @@ def main() -> int:
     contract = build_contract(
         operation_id=args.operation_id,
         operation_type=args.operation_type,
-        bundle_ref=f"{name}@{version}",
         bundle_ref=f"{name}@{ver}",
         acting_for=args.acting_for,
         scopes=args.scopes,
@@ -432,9 +403,6 @@ def main() -> int:
         captured_at=captured_at,
     )
 
-    output_dir = Path(out_dir)
-    output_dir.mkdir(parents=True, exist_ok=True)
-    path = output_dir / "agent-operation-contract.json"
     out = Path(out_dir)
     out.mkdir(parents=True, exist_ok=True)
     path = out / "agent-operation-contract.json"

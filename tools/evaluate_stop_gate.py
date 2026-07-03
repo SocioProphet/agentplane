@@ -5,8 +5,6 @@ The evaluator emits a StopGateArtifact without reimplementing guardrail policy
 logic. It consumes repo state, CI/PR/summary evidence, guardrail decision logs,
 and optional PolicyFabric BreakGlassOverride artifacts, then produces actionable
 pass/fail/needs-human/waived evidence for AgentPlane.
-logic. It consumes repo state, CI/PR/summary evidence, and guardrail decision
-logs, then produces actionable pass/fail/needs-human evidence for AgentPlane.
 """
 
 from __future__ import annotations
@@ -333,13 +331,6 @@ def aggregate_result(checks: list[dict[str, Any]], human_override_ref: str | Non
     if invalid_break_glass:
         return "fail"
     if (human_override_ref or break_glass.valid) and (required_failures or required_human):
-    return checks
-
-
-def aggregate_result(checks: list[dict[str, Any]], human_override_ref: str | None) -> str:
-    required_failures = [check for check in checks if check["required"] and check["result"] == "fail"]
-    required_human = [check for check in checks if check["required"] and check["result"] == "needs_human"]
-    if human_override_ref and (required_failures or required_human):
         return "waived"
     if required_failures:
         return "fail"
@@ -350,7 +341,6 @@ def aggregate_result(checks: list[dict[str, Any]], human_override_ref: str | Non
 
 def build_stop_gate_artifact(config: StopGateConfig, state: RepoState, checks: list[dict[str, Any]]) -> dict[str, Any]:
     result = aggregate_result(checks, config.human_override_ref, config.break_glass)
-    result = aggregate_result(checks, config.human_override_ref)
     summary = "Stop gate passed."
     if result == "fail":
         failed = [check["checkId"] for check in checks if check["required"] and check["result"] == "fail"]
@@ -359,7 +349,6 @@ def build_stop_gate_artifact(config: StopGateConfig, state: RepoState, checks: l
         summary = "Stop gate requires human attention before completion."
     elif result == "waived":
         summary = "Stop gate failures were waived by human override or PolicyFabric break-glass override."
-        summary = "Stop gate failures were waived by human override."
 
     return {
         "kind": "StopGateArtifact",
@@ -378,8 +367,6 @@ def build_stop_gate_artifact(config: StopGateConfig, state: RepoState, checks: l
         "artifactRefs": {
             "policyDecisionArtifactRefs": state.unresolved_policy_decision_refs,
             "breakGlassOverrideRef": config.break_glass.ref,
-        "artifactRefs": {
-            "policyDecisionArtifactRefs": state.unresolved_policy_decision_refs,
             "runArtifactRef": None,
             "replayArtifactRef": None,
             "pullRequestRef": state.pr_ref,
@@ -397,7 +384,6 @@ def build_stop_gate_artifact(config: StopGateConfig, state: RepoState, checks: l
                 "resource": config.break_glass.resource,
             } if config.break_glass.ref else None
         },
-        "governanceContext": None,
     }
 
 

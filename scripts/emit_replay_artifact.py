@@ -48,31 +48,6 @@ SOURCEOS_ENV_KEYS = {
     "smokeReceiptRef": "AGENTPLANE_SOURCEOS_SMOKE_RECEIPT_REF",
 }
 
-SOURCEOS_BINDING_KEYS = {
-    "contentSpecRef",
-    "overlayRefs",
-    "buildRequestRef",
-    "releaseManifestRef",
-    "enrollmentProfileRef",
-    "evidenceBundleRef",
-    "localExecutionProtocolRef",
-    "remoteExecutionProtocolRef",
-}
-
-SOURCEOS_ENV_KEYS = {
-    "tektonPipelineRunRef": "AGENTPLANE_SOURCEOS_TEKTON_PIPELINE_RUN_REF",
-    "tektonTaskRunRefs": "AGENTPLANE_SOURCEOS_TEKTON_TASK_RUN_REFS",
-    "katelloContentRef": "AGENTPLANE_SOURCEOS_KATELLO_CONTENT_REF",
-    "katelloContentViewRef": "AGENTPLANE_SOURCEOS_KATELLO_CONTENT_VIEW_REF",
-    "katelloLifecycleEnvironmentRef": "AGENTPLANE_SOURCEOS_KATELLO_LIFECYCLE_ENVIRONMENT_REF",
-    "outputArtifactRef": "AGENTPLANE_SOURCEOS_OUTPUT_ARTIFACT_REF",
-    "outputDigest": "AGENTPLANE_SOURCEOS_OUTPUT_DIGEST",
-    "ostreeRef": "AGENTPLANE_SOURCEOS_OSTREE_REF",
-    "releaseSetRef": "AGENTPLANE_SOURCEOS_RELEASE_SET_REF",
-    "bootReleaseSetRef": "AGENTPLANE_SOURCEOS_BOOT_RELEASE_SET_REF",
-    "smokeReceiptRef": "AGENTPLANE_SOURCEOS_SMOKE_RECEIPT_REF",
-}
-
 
 def die(msg: str, code: int = 2) -> None:
     print(f"[replay-artifact] ERROR: {msg}", file=sys.stderr)
@@ -84,7 +59,6 @@ def now_iso() -> str:
 
 
 def load_bundle(path: Path) -> dict[str, Any]:
-def load_bundle(path: Path) -> dict:
     try:
         return json.loads(path.read_text(encoding="utf-8"))
     except Exception as e:
@@ -116,17 +90,12 @@ def _copy_non_empty(source: dict[str, Any], keys: list[str] | tuple[str, ...]) -
 
 
 def extract_sourceos_bindings(spec: dict[str, Any]) -> dict[str, Any]:
-def extract_sourceos_bindings(spec: dict) -> dict:
     integration_refs = spec.get("integrationRefs") or {}
     sourceos = integration_refs.get("sourceos") or spec.get("sourceosBuildRelease") or {}
     if not isinstance(sourceos, dict):
         return {}
 
     out: dict[str, Any] = {}
-    for key in SOURCEOS_BINDING_KEYS:
-        value = sourceos.get(key)
-        if _non_empty(value):
-    out = {}
     for key in SOURCEOS_BINDING_KEYS:
         value = sourceos.get(key)
         if _non_empty(value):
@@ -267,17 +236,6 @@ def main() -> int:
         "executor": args.executor,
         "backendIntent": backend,
         "inputs": inputs,
-        "inputs": {
-            "bundlePath": args.bundle_path or str(bundle_path),
-            "bundleRev": args.bundle_rev,
-            "artifactDir": str(Path(out_dir).resolve()),
-            "policyPackRef": pol.get("policyPackRef"),
-            "policyPackHash": pol.get("policyPackHash"),
-            "secretsRequired": secrets.get("required") or [],
-            "upstreamArtifacts": upstream,
-            "sourceosBindings": extract_sourceos_bindings(spec),
-            "sourceosImageProduction": extract_sourceos_image_production(spec),
-        },
     }
 
     out = Path(out_dir)

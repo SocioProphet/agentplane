@@ -77,7 +77,6 @@ def sample_policy_decision_artifact() -> dict[str, Any]:
             "adapter": "claude-code",
             "version": "0.1.0",
             "repoRef": "SocioProphet/guardrail-fabric",
-            "commit": "sha-example"
             "commit": "sha-example",
         },
         "decision": {
@@ -95,12 +94,6 @@ def sample_policy_decision_artifact() -> dict[str, Any]:
             "evidence": {
                 "tool": "Bash",
                 "actionClass": "shell",
-                "inputDigest": "sha256:example"
-            },
-            "effects": {
-                "agentMayContinue": False,
-                "requiresHumanApproval": False
-            }
                 "inputDigest": "sha256:example",
             },
             "effects": {
@@ -113,9 +106,6 @@ def sample_policy_decision_artifact() -> dict[str, Any]:
             "decisionLogRef": ".sourceos/logs/guardrail-decisions.jsonl",
             "toolEventRef": None,
             "redactionRef": None,
-            "humanOverrideRef": None
-        },
-        "governanceContext": None
             "humanOverrideRef": None,
         },
         "governanceContext": None,
@@ -143,7 +133,6 @@ def sample_stop_gate_artifact() -> dict[str, Any]:
                 "reason": "No remote branch evidence was found.",
                 "remediation": "Push the branch and re-run the stop gate.",
                 "evidenceRefs": [],
-                "relatedPolicyDecisionRefs": []
                 "relatedPolicyDecisionRefs": [],
             }
         ],
@@ -154,9 +143,6 @@ def sample_stop_gate_artifact() -> dict[str, Any]:
             "replayArtifactRef": None,
             "pullRequestRef": None,
             "ciStatusRef": None,
-            "summaryRef": None
-        },
-        "governanceContext": None
             "summaryRef": None,
         },
         "governanceContext": None,
@@ -171,7 +157,6 @@ def validate_policy_decision_schema(schema: dict[str, Any]) -> None:
         "PolicyDecisionArtifact",
     )
     require_enum(schema, "result", {"allow", "blocked", "needs_human", "redacted", "quarantined", "deferred"}, "PolicyDecisionArtifact")
-    decision = (schema.get("properties") or {}).get("decision") or {}
     decision = ((schema.get("properties") or {}).get("decision") or {})
     require_required_fields(
         decision,
@@ -193,7 +178,6 @@ def validate_stop_gate_schema(schema: dict[str, Any]) -> None:
 def validate_sample_against_top_level(schema: dict[str, Any], sample: dict[str, Any], path: str) -> None:
     require_required_fields(schema, list(schema.get("required") or []), path)
     require_keys(sample, list(schema.get("required") or []), f"sample {path}")
-    kind_schema = (schema.get("properties") or {}).get("kind") or {}
     kind_schema = ((schema.get("properties") or {}).get("kind") or {})
     expected_kind = kind_schema.get("const")
     if expected_kind and sample.get("kind") != expected_kind:

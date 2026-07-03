@@ -20,16 +20,6 @@ Modes:
 - tekton-submit: guarded submit intent. Requires explicit side-effect permission
   and credential refs. Live submission additionally requires --execute-live,
   a manifest, and a kubeconfig environment binding.
-- does not mutate a cluster, invoke Tekton, or publish to Katello unless a future
-  runner backend explicitly implements that behavior.
-- does not inline secrets.
-
-Modes:
-- record-only: render and emit evidence only. No external mutation.
-- tekton-observe: record or observe an existing Tekton PipelineRun/TaskRun surface.
-- tekton-submit: guarded submit intent. Requires explicit side-effect permission
-  and credential refs. Live submission additionally requires --execute-live,
-  a manifest, and a kubeconfig environment binding.
 """
 
 from __future__ import annotations
@@ -182,9 +172,6 @@ def validate_mode(args: argparse.Namespace, bundle: dict[str, Any]) -> dict[str,
             require_non_empty(args.pipeline_run_ref, "--pipeline-run-ref is required for tekton-observe mode")
         mode_gate["requirement"] = "observe_existing_pipeline_run"
         validate_live_adapter(args)
-        require_non_empty(args.pipeline_run_ref, "--pipeline-run-ref is required for tekton-observe mode")
-        mode_gate["requirement"] = "observe_existing_pipeline_run"
-        validate_live_adapter(args)
         return mode_gate
 
     if args.mode == "tekton-submit":
@@ -203,10 +190,6 @@ def validate_mode(args: argparse.Namespace, bundle: dict[str, Any]) -> dict[str,
         mode_gate["tektonServiceAccountRef"] = args.tekton_service_account_ref
         mode_gate["submitImplementation"] = "live_kubectl_apply" if args.execute_live else "recorded_intent_only"
         validate_live_adapter(args)
-        return mode_gate
-
-    validate_live_adapter(args)
-        mode_gate["submitImplementation"] = "not_yet_live_recorded_intent_only"
         return mode_gate
 
     validate_live_adapter(args)
@@ -318,25 +301,11 @@ def render_execution_request(
         "does not inline secrets",
     ]
     if args.mode == "record-only":
-    if args.mode in {"record-only", "tekton-observe"}:
         non_goals.extend([
             "does not invoke Tekton directly",
             "does not mutate host state",
         ])
     if args.mode == "tekton-observe" and not args.execute_live:
-        non_goals.extend([
-            "does not invoke Tekton directly",
-            "does not mutate host state",
-        ])
-    if args.mode == "tekton-submit" and not args.execute_live:
-        non_goals.extend([
-            "does not invoke Tekton directly in this invocation",
-            "records guarded submit intent only",
-        ])
-
-    delegated_pipeline_ref = args.pipeline_run_ref or live_result.get("pipelineRunRef")
-
-    if args.mode == "tekton-submit":
         non_goals.extend([
             "does not invoke Tekton directly",
             "does not mutate host state",
@@ -358,7 +327,6 @@ def render_execution_request(
         "mode": args.mode,
         "modeGate": mode_gate,
         "liveTekton": live_result,
-        "mode": "record-only",
         "executor": args.executor,
         "policy": {
             "lane": policy.get("lane"),
@@ -371,7 +339,6 @@ def render_execution_request(
         "declaredOutputs": outputs,
         "delegatedExecution": {
             "tektonPipelineRunRef": delegated_pipeline_ref,
-            "tektonPipelineRunRef": args.pipeline_run_ref,
             "tektonTaskRunRefs": args.task_run_ref,
             "katelloContentRef": args.katello_content_ref,
             "katelloContentViewRef": args.katello_content_view_ref,
@@ -395,12 +362,6 @@ def render_execution_request(
             "required": secrets.get("required") or [],
         },
         "nonGoals": non_goals,
-        "nonGoals": [
-            "does not invoke Tekton directly",
-            "does not publish to Katello",
-            "does not mutate host state",
-            "does not inline secrets",
-        ],
     }
 
 
@@ -410,18 +371,6 @@ def main() -> int:
     parser.add_argument("--mode", choices=sorted(VALID_MODES), default="record-only")
     parser.add_argument("--allow-side-effects", action="store_true")
     parser.add_argument("--execute-live", action="store_true")
-    parser.add_argument("--executor", default="sourceos-delegated-record", help="Executor name to record in artifacts")
-    parser.add_argument("--pipeline-run-ref", default=os.getenv("AGENTPLANE_SOURCEOS_TEKTON_PIPELINE_RUN_REF"))
-    parser.add_argument("--pipeline-run-name", default=os.getenv("AGENTPLANE_SOURCEOS_TEKTON_PIPELINE_RUN_NAME"))
-    parser.add_argument("--pipeline-run-manifest", default=os.getenv("AGENTPLANE_SOURCEOS_TEKTON_PIPELINE_RUN_MANIFEST"))
-    parser.add_argument("--task-run-ref", action="append", default=[])
-    parser.add_argument("--tekton-namespace", default=os.getenv("AGENTPLANE_SOURCEOS_TEKTON_NAMESPACE"))
-    parser.add_argument("--tekton-pipeline-name", default=os.getenv("AGENTPLANE_SOURCEOS_TEKTON_PIPELINE_NAME"))
-    parser.add_argument("--tekton-service-account-ref", default=os.getenv("AGENTPLANE_SOURCEOS_TEKTON_SERVICE_ACCOUNT_REF"))
-    parser.add_argument("--kubeconfig-ref", default=os.getenv("AGENTPLANE_SOURCEOS_KUBECONFIG_REF"))
-    parser.add_argument("--kubeconfig-env", default=os.getenv("AGENTPLANE_SOURCEOS_KUBECONFIG_ENV", "KUBECONFIG"))
-    parser.add_argument("--kubectl-bin", default=os.getenv("AGENTPLANE_SOURCEOS_KUBECTL_BIN", "kubectl"))
-    parser.add_argument("--live-timeout-seconds", type=int, default=int(os.getenv("AGENTPLANE_SOURCEOS_LIVE_TIMEOUT_SECONDS", "120")))
     parser.add_argument("--executor", default="sourceos-delegated-record", help="Executor name to record in artifacts")
     parser.add_argument("--pipeline-run-ref", default=os.getenv("AGENTPLANE_SOURCEOS_TEKTON_PIPELINE_RUN_REF"))
     parser.add_argument("--pipeline-run-name", default=os.getenv("AGENTPLANE_SOURCEOS_TEKTON_PIPELINE_RUN_NAME"))
@@ -471,8 +420,6 @@ def main() -> int:
         mode_gate["liveResult"] = live_result.get("result")
 
     request = render_execution_request(bundle, bundle_path, args, mode_gate, live_result)
-    request = render_execution_request(bundle, bundle_path, args)
-    request = render_execution_request(bundle, bundle_path, args, mode_gate)
     write_json(out_dir / "sourceos-delegated-execution-request.json", request)
 
     artifact_env = merge_env(
