@@ -76,7 +76,7 @@ validate-stop-gate-evaluator:
 	python3 tools/validate_stop_gate_evaluator.py
 
 validate-stop-gate-artifact:
-	python3 -m pip install --user jsonschema cryptography >/dev/null 2>&1 || true
+	python3 -m pip install --user jsonschema >/dev/null 2>&1 || true
 	python3 -m pytest tools/tests/test_stopgate_artifact.py -q
 
 validate-guarded-workcell-artifact:

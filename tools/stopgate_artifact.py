@@ -34,9 +34,18 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-# `cryptography` (ed25519) is imported lazily inside the signing paths so that the
-# canonicalization / schema surface of this module stays importable in environments
-# without it. Only sign / verify actually require the dependency.
+# Ed25519 signing uses an embedded, stdlib-only RFC 8032 implementation, so this
+# module has zero third-party dependencies and stays CI-portable. Signatures are
+# deterministic and interoperable with any conformant ed25519 verifier. The sibling
+# is loaded robustly whether this file is run as a script, imported as a module, or
+# loaded by path (the repo's test convention uses importlib.spec_from_file_location).
+try:
+    import ed25519_pure
+except ImportError:
+    import os as _os
+
+    sys.path.insert(0, _os.path.dirname(_os.path.abspath(__file__)))
+    import ed25519_pure
 
 SPEC_VERSION = "0.1"
 ARTIFACT_TYPE = "StopGateArtifact"
@@ -110,35 +119,28 @@ def parse_iso(value: str) -> datetime:
 @dataclass(frozen=True)
 class Signer:
     key_id: str
-    _private: Any  # cryptography Ed25519PrivateKey
+    _seed: bytes  # 32-byte ed25519 private seed
 
     @classmethod
     def from_seed(cls, seed: bytes, key_id: str) -> "Signer":
-        from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
-
         if len(seed) != 32:
             raise ValueError("ed25519 seed must be exactly 32 bytes")
-        return cls(key_id=key_id, _private=Ed25519PrivateKey.from_private_bytes(seed))
+        return cls(key_id=key_id, _seed=bytes(seed))
 
     @classmethod
     def generate(cls, key_id: str) -> "Signer":
-        from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
+        import os
 
-        return cls(key_id=key_id, _private=Ed25519PrivateKey.generate())
+        return cls(key_id=key_id, _seed=os.urandom(32))
 
     def public_bytes(self) -> bytes:
-        from cryptography.hazmat.primitives import serialization
-
-        return self._private.public_key().public_bytes(
-            encoding=serialization.Encoding.Raw,
-            format=serialization.PublicFormat.Raw,
-        )
+        return ed25519_pure.public_from_seed(self._seed)
 
     def public_b64(self) -> str:
         return base64.b64encode(self.public_bytes()).decode("ascii")
 
     def sign_bytes(self, data: bytes) -> str:
-        return base64.b64encode(self._private.sign(data)).decode("ascii")
+        return base64.b64encode(ed25519_pure.sign(self._seed, data)).decode("ascii")
 
     def signature_block(self, data: bytes) -> dict[str, str]:
         return {"alg": "ed25519", "key_id": self.key_id, "value": self.sign_bytes(data)}
@@ -163,16 +165,12 @@ class Keyring:
         return self.add(signer.key_id, signer.public_bytes())
 
     def verify(self, key_id: str, data: bytes, signature_b64: str) -> bool:
-        from cryptography.exceptions import InvalidSignature
-        from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PublicKey
-
         pub = self._keys.get(key_id)
         if pub is None:
             return False
         try:
-            Ed25519PublicKey.from_public_bytes(pub).verify(base64.b64decode(signature_b64), data)
-            return True
-        except (InvalidSignature, ValueError):
+            return ed25519_pure.verify(pub, data, base64.b64decode(signature_b64))
+        except (ValueError, TypeError):
             return False
 
 

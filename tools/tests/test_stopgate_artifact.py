@@ -11,9 +11,6 @@ from pathlib import Path
 
 import pytest
 
-# ed25519 signing is intrinsic to the artifact; skip the suite where the dep is absent.
-pytest.importorskip("cryptography")
-
 ROOT = Path(__file__).resolve().parents[2]
 MODULE_PATH = ROOT / "tools" / "stopgate_artifact.py"
 spec = importlib.util.spec_from_file_location("stopgate_artifact", MODULE_PATH)
