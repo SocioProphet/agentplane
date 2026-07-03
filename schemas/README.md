@@ -219,6 +219,20 @@ It records the upstream Policy Fabric promotion verdict needed by AgentPlane exe
 - threshold context;
 - upstream verdict artifact references.
 
+### PolicyFabricVerdictEnvelope (`policy-fabric-verdict-envelope.schema.v0.1.json`)
+
+Consumed by the interim `scripts/validate_bundle_with_policy_fabric_gate.py` wrapper.
+
+It records the upstream Policy Fabric promotion verdict needed by AgentPlane execution admission:
+
+- policy bundle identity;
+- target domain and optional bundle/lane context;
+- promote or block result;
+- fit classification;
+- failed predicates and reason strings;
+- threshold context;
+- upstream verdict artifact references.
+
 ### ReplayArtifact (`replay-artifact.schema.v0.1.json`)
 
 Written by `scripts/emit_replay_artifact.py`.
