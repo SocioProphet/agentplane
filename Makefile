@@ -61,6 +61,9 @@ validate: validate-governance-context validate-lattice-data-governai-execution-r
 .PHONY: validate test validate-governance-context validate-lattice-data-governai-execution-refs validate-lattice-runtime-profile-refs validate-network-native-assistant-evidence validate-guardrail-evidence-artifacts validate-stop-gate-evaluator validate-guarded-workcell-artifact validate-guarded-workcell-executor validate-guarded-invocation-artifact validate-guarded-invocation validate-agentic-pr-work-order validate-agent-operation-contract
 
 validate: validate-governance-context validate-lattice-data-governai-execution-refs validate-lattice-runtime-profile-refs validate-network-native-assistant-evidence validate-guardrail-evidence-artifacts validate-stop-gate-evaluator validate-guarded-workcell-artifact validate-guarded-workcell-executor validate-guarded-invocation-artifact validate-guarded-invocation validate-agentic-pr-work-order validate-agent-operation-contract
+.PHONY: validate test validate-lattice-data-governai-execution-refs validate-lattice-runtime-profile-refs validate-network-native-assistant-evidence validate-evidence-receipt-binding
+
+validate: validate-lattice-data-governai-execution-refs validate-lattice-runtime-profile-refs validate-network-native-assistant-evidence validate-evidence-receipt-binding
 	python3 tools/validate_execution_timing.py
 
 validate-governance-context:
@@ -296,6 +299,9 @@ validate-wallguard-collaboration-admission:
 
 validate-agent-operation-contract:
 	python3 tools/validate_agent_operation_contract.py
+
+validate-evidence-receipt-binding:
+	python3 tools/validate_evidence_receipt_binding.py
 
 test:
 	python3 -m pytest -q tools/tests
