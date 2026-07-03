@@ -272,3 +272,144 @@ def test_break_glass_override_waives_stop_gate_failure(tmp_path, capsys) -> None
     assert artifact["stopGate"]["breakGlassOverrideRef"] == str(break_glass.resolve())
     assert artifact["artifactRefs"]["breakGlassOverrideRef"] == str(break_glass.resolve())
     assert artifact["guardrail"]["environment"]["SOURCEOS_BREAK_GLASS_OVERRIDE"] == str(break_glass.resolve())
+
+
+# --------------------------------------------------------------------------- #
+# Pre-execution formal StopGateArtifact gate (spec v0.1 wiring)
+# --------------------------------------------------------------------------- #
+import stopgate_artifact as _sg  # noqa: E402
+
+_SEED = bytes.fromhex("00112233445566778899aabbccddeeff00112233445566778899aabbccddeeff")
+
+
+def _emit_formal(tmp_path: Path, finding: str, *, evidence=None):
+    signer = _sg.Signer.from_seed(_SEED, "wire-test-key")
+    ev = evidence if evidence is not None else [
+        _sg.Evidence("evt-1", _sg.sha256_evidence("payload"), "semantic", signal="regex:/x/")
+    ]
+    artifact, _ = _sg.evaluate(
+        finding=finding,
+        evidence=ev,
+        signer=signer,
+        gate_id="build-green-before-push",
+        session_id="urn:srcos:session:test-invocation",
+        workcell_id="wc-1",
+        subject=["local command"],
+        predicate="build.exit_code == 0",
+        evaluated_by={"component": "agentplane.stopgate", "version": "0.1.0", "kind": "deterministic-harness"},
+        lift_authority="policy-fabric",
+        window_start="2000-01-01T00:00:00Z",
+        window_end="2000-01-01T00:00:01Z",
+        evaluated_at="2000-01-01T00:00:02Z",
+    )
+    path = tmp_path / f"formal-stopgate-{finding.lower()}.json"
+    path.write_text(json.dumps(artifact), encoding="utf-8")
+    return path, signer.public_b64()
+
+
+def test_require_stopgate_permits_on_verified_pass(tmp_path, capsys) -> None:  # type: ignore[no-untyped-def]
+    workspace = tmp_path / "workspace"
+    workcell = write_workcell(tmp_path, workspace)
+    invocation_dir = tmp_path / "invocation"
+    formal, pub = _emit_formal(tmp_path, "OK")
+
+    exit_code = main([
+        *common_args(workcell, invocation_dir),
+        "--allow-command-execution",
+        "--require-stopgate", str(formal),
+        "--stopgate-key", f"wire-test-key={pub}",
+        "--", sys.executable, "-c", "print('ok')",
+    ])
+    artifact = json.loads(capsys.readouterr().out)
+
+    assert exit_code == 0
+    assert artifact["result"] == "success"
+    assert artifact["stopGateAttestation"]["permitted"] is True
+    assert artifact["stopGateAttestation"]["verdict"] == "PASS"
+    assert artifact["stopGateAttestation"]["signatureValid"] is True
+    assert (invocation_dir / "stdout.txt").read_text().strip() == "ok"
+
+
+def test_require_stopgate_blocks_on_fail_and_does_not_run(tmp_path, capsys) -> None:  # type: ignore[no-untyped-def]
+    workspace = tmp_path / "workspace"
+    workcell = write_workcell(tmp_path, workspace)
+    invocation_dir = tmp_path / "invocation"
+    formal, pub = _emit_formal(tmp_path, "VIOLATION")  # -> FAIL
+
+    exit_code = main([
+        *common_args(workcell, invocation_dir),
+        "--allow-command-execution",
+        "--require-stopgate", str(formal),
+        "--stopgate-key", f"wire-test-key={pub}",
+        "--", sys.executable, "-c", "print('SHOULD-NOT-RUN')",
+    ])
+    artifact = json.loads(capsys.readouterr().out)
+
+    assert exit_code == 2
+    assert artifact["result"] == "blocked"
+    assert artifact["stopGateAttestation"]["permitted"] is False
+    assert artifact["stopGateAttestation"]["verdict"] == "FAIL"
+    assert artifact["sideEffects"]["localCommandExecuted"] is False
+    # the side-effecting command never ran
+    assert not (invocation_dir / "stdout.txt").exists()
+
+
+def test_require_stopgate_blocks_on_bad_signature(tmp_path, capsys) -> None:  # type: ignore[no-untyped-def]
+    workspace = tmp_path / "workspace"
+    workcell = write_workcell(tmp_path, workspace)
+    invocation_dir = tmp_path / "invocation"
+    formal, _pub = _emit_formal(tmp_path, "OK")
+    wrong = _sg.Signer.generate("attacker").public_b64()
+
+    exit_code = main([
+        *common_args(workcell, invocation_dir),
+        "--allow-command-execution",
+        "--require-stopgate", str(formal),
+        "--stopgate-key", f"wire-test-key={wrong}",
+        "--", sys.executable, "-c", "print('SHOULD-NOT-RUN')",
+    ])
+    artifact = json.loads(capsys.readouterr().out)
+
+    assert exit_code == 2
+    assert artifact["result"] == "blocked"
+    assert artifact["stopGateAttestation"]["signatureValid"] is False
+    assert not (invocation_dir / "stdout.txt").exists()
+
+
+def test_require_stopgate_blocks_when_action_precedes_evidence_window(tmp_path, capsys) -> None:  # type: ignore[no-untyped-def]
+    workspace = tmp_path / "workspace"
+    workcell = write_workcell(tmp_path, workspace)
+    invocation_dir = tmp_path / "invocation"
+    formal, pub = _emit_formal(tmp_path, "OK")  # window ends 2000-01-01T00:00:01Z
+
+    # §5.2: action_start before window.end must be rejected.
+    exit_code = main([
+        *common_args(workcell, invocation_dir),
+        "--allow-command-execution",
+        "--require-stopgate", str(formal),
+        "--stopgate-key", f"wire-test-key={pub}",
+        "--stopgate-action-start", "1999-12-31T00:00:00Z",
+        "--", sys.executable, "-c", "print('SHOULD-NOT-RUN')",
+    ])
+    artifact = json.loads(capsys.readouterr().out)
+
+    assert exit_code == 2
+    assert artifact["result"] == "blocked"
+    assert any("5.2" in v for v in artifact["stopGateAttestation"]["violations"])
+
+
+def test_no_require_stopgate_is_backward_compatible(tmp_path, capsys) -> None:  # type: ignore[no-untyped-def]
+    workspace = tmp_path / "workspace"
+    workcell = write_workcell(tmp_path, workspace)
+    invocation_dir = tmp_path / "invocation"
+
+    exit_code = main([
+        *common_args(workcell, invocation_dir),
+        "--allow-command-execution",
+        "--", sys.executable, "-c", "print('ok')",
+    ])
+    artifact = json.loads(capsys.readouterr().out)
+
+    assert exit_code == 0
+    assert artifact["result"] == "success"
+    assert artifact["stopGateAttestation"]["required"] is False
