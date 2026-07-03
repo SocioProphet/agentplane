@@ -46,3 +46,5 @@ jobs:
 
       - name: sp-run tool and store tests
         run: python3 -m pytest -q tools/tests/test_sp_run_tool_adapter.py tools/tests/test_sp_run_run_store_inspection.py
+      - name: Run tool tests
+        run: make test
