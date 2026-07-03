@@ -5,9 +5,12 @@ This wrapper is intentionally narrow and evidence-first:
 
 - it refuses to execute without --allow-command-execution;
 - it reads a GuardedWorkcellArtifact and runs inside its workspace path;
+- it OPTIONALLY refuses to run at all unless a supplied formal StopGateArtifact
+  independently verifies to `permit` (a pre-execution, evidence-bound gate — the
+  side effect fires on a signed artifact, not on a model's say-so);
 - it sets guardrail and stop-gate environment variables for the command;
 - it captures stdout/stderr to files;
-- it runs the stop-gate evaluator after the command;
+- it runs the (legacy, completion-oriented) stop-gate evaluator after the command;
 - it only returns success when the command exits 0 and the stop gate passes or is waived.
 
 It does not contact model providers, push branches, open PRs, mutate GitHub, or
@@ -26,6 +29,14 @@ from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
+
+# Formal StopGateArtifact verifier (sibling module). When invoked as a script,
+# tools/ is sys.path[0]; also handle path-based loading defensively.
+try:
+    import stopgate_artifact
+except ImportError:  # pragma: no cover - import shim
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    import stopgate_artifact
 
 
 STOP_GATE_PASS_RESULTS = {"pass", "waived"}
@@ -158,6 +169,58 @@ def run_stop_gate(args: argparse.Namespace, workcell: dict[str, Any], workspace:
     return True, None if completed.returncode == 0 else (completed.stderr or completed.stdout), artifact
 
 
+def verify_formal_stop_gate(
+    artifact_path: Path, keys: list[str], action_start: str
+) -> dict[str, Any]:
+    """Independently verify a formal StopGateArtifact (spec v0.1) as a
+    pre-execution gate. Returns an attestation block; `permitted` is True only
+    when the artifact verifies to `permit` (PASS with all invariants + signature)."""
+    attestation: dict[str, Any] = {
+        "required": True,
+        "artifactRef": str(artifact_path),
+        "actionStart": action_start,
+        "permitted": False,
+        "verdict": None,
+        "disposition": "deny",
+        "signatureValid": False,
+        "violations": [],
+    }
+    if not artifact_path.exists():
+        attestation["violations"] = [f"formal stop-gate artifact not found: {artifact_path}"]
+        return attestation
+    try:
+        formal = load_json(artifact_path)
+    except SystemExit as exc:
+        attestation["violations"] = [str(exc)]
+        return attestation
+
+    keyring = stopgate_artifact.Keyring()
+    for entry in keys or []:
+        if "=" not in entry:
+            attestation["violations"] = [f"malformed --stopgate-key (want key_id=public_b64): {entry!r}"]
+            return attestation
+        key_id, pub_b64 = entry.split("=", 1)
+        try:
+            keyring.add_b64(key_id, pub_b64)
+        except Exception as exc:  # surface any decode/length error as a violation
+            attestation["violations"] = [f"invalid key {key_id!r}: {exc}"]
+            return attestation
+
+    result = stopgate_artifact.verify_artifact(formal, keyring, action_start=action_start)
+    attestation.update(
+        {
+            "permitted": result.disposition == "permit",
+            "verdict": result.verdict,
+            "disposition": result.disposition,
+            "signatureValid": result.signature_valid,
+            "violations": result.violations,
+            "gateId": formal.get("gate_id"),
+            "subject": formal.get("subject"),
+        }
+    )
+    return attestation
+
+
 def build_artifact(
     *,
     args: argparse.Namespace,
@@ -176,6 +239,7 @@ def build_artifact(
     stop_gate_evaluated: bool,
     stop_gate_ref: Path | None,
     stop_gate_result: str | None,
+    stop_gate_attestation: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     break_glass_ref = str(Path(args.break_glass_override).resolve()) if args.break_glass_override else None
     return {
@@ -219,6 +283,8 @@ def build_artifact(
             "breakGlassOverrideRef": break_glass_ref,
             "result": stop_gate_result,
         },
+        "stopGateAttestation": stop_gate_attestation
+        or {"required": bool(args.require_stopgate), "permitted": None},
         "result": result,
         "sideEffects": {
             "localCommandExecuted": started_at is not None,
@@ -295,6 +361,50 @@ def execute(args: argparse.Namespace) -> tuple[int, dict[str, Any]]:
         return 2, artifact
 
     invocation_dir.mkdir(parents=True, exist_ok=True)
+
+    # Pre-execution evidence-bound gate (§5.2): before any side effect, a supplied
+    # formal StopGateArtifact must independently verify to `permit`. The gated action
+    # is this command, so its imminent start bounds the evidence window.
+    stop_gate_attestation: dict[str, Any] | None = None
+    if args.require_stopgate:
+        action_start = args.stopgate_action_start or utc_now()
+        stop_gate_attestation = verify_formal_stop_gate(
+            Path(args.require_stopgate).resolve(), args.stopgate_key, action_start
+        )
+        if not stop_gate_attestation.get("permitted"):
+            artifact = build_artifact(
+                args=args,
+                workcell=workcell,
+                workspace=workspace,
+                invocation_dir=invocation_dir,
+                stdout_ref=None,
+                stderr_ref=None,
+                started_at=None,
+                completed_at=None,
+                exit_code=None,
+                invocation_status="blocked",
+                result="blocked",
+                reason=(
+                    f"Formal StopGateArtifact did not permit the action "
+                    f"(verdict={stop_gate_attestation.get('verdict')!r}, "
+                    f"disposition={stop_gate_attestation.get('disposition')!r})."
+                ),
+                remediation=(
+                    "Resolve the gate: obtain a PASS artifact backed by semantic evidence, "
+                    "or an attributed human-authority override. Violations: "
+                    + "; ".join(stop_gate_attestation.get("violations") or ["none"])
+                ),
+                stop_gate_evaluated=False,
+                stop_gate_ref=stop_gate_ref,
+                stop_gate_result=None,
+                stop_gate_attestation=stop_gate_attestation,
+            )
+            invocation_artifact_ref.parent.mkdir(parents=True, exist_ok=True)
+            invocation_artifact_ref.write_text(
+                json.dumps(artifact, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+            )
+            return 2, artifact
+
     stdout_ref = invocation_dir / "stdout.txt"
     stderr_ref = invocation_dir / "stderr.txt"
     break_glass_ref = str(Path(args.break_glass_override).resolve()) if args.break_glass_override else None
@@ -344,6 +454,7 @@ def execute(args: argparse.Namespace) -> tuple[int, dict[str, Any]]:
         stop_gate_evaluated=stop_gate_evaluated,
         stop_gate_ref=stop_gate_ref,
         stop_gate_result=stop_gate_result,
+        stop_gate_attestation=stop_gate_attestation,
     )
     invocation_artifact_ref.parent.mkdir(parents=True, exist_ok=True)
     invocation_artifact_ref.write_text(json.dumps(artifact, indent=2, sort_keys=True) + "\n", encoding="utf-8")
@@ -364,6 +475,23 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--stop-gate-evaluator", default="tools/evaluate_stop_gate.py")
     parser.add_argument("--stop-gate-artifact")
     parser.add_argument("--no-stop-gate", action="store_true")
+    parser.add_argument(
+        "--require-stopgate",
+        help="Path to a formal StopGateArtifact (spec v0.1) that MUST verify to `permit` "
+        "before the command runs. Enables the pre-execution evidence-bound gate.",
+    )
+    parser.add_argument(
+        "--stopgate-key",
+        action="append",
+        default=[],
+        metavar="key_id=public_b64",
+        help="A trusted ed25519 public key for verifying --require-stopgate (repeatable).",
+    )
+    parser.add_argument(
+        "--stopgate-action-start",
+        help="ISO timestamp bounding the evidence window's end (§5.2). Defaults to the "
+        "moment just before the command runs.",
+    )
     parser.add_argument("--branch")
     parser.add_argument("--commit")
     parser.add_argument("--clean", action=argparse.BooleanOptionalAction, default=True)
