@@ -46,6 +46,12 @@ def require(condition: bool, message: str) -> None:
         raise ValueError(message)
 
 
+def require_str(mapping: dict[str, Any], key: str) -> str:
+    value = mapping.get(key)
+    require(isinstance(value, str) and bool(value), f"{key} must be a non-empty string")
+    return value
+
+
 def require_list(mapping: dict[str, Any], key: str) -> list[Any]:
     value = mapping.get(key)
     require(isinstance(value, list), f"{key} must be a list")
