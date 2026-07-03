@@ -340,3 +340,4 @@ Records a rollback/reversal event. `sourcePromotionReceiptRef` must match
 - Patch fragments (`.patch.json`) are staging areas; they are not enforced until promoted to a
   versioned schema.
   versioned schema.
+  versioned schema.
