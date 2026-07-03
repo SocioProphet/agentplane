@@ -1,0 +1,74 @@
+{
+  "apiVersion": "agentplane.socioprophet.org/v0.1",
+  "kind": "Bundle",
+  "metadata": {
+    "createdAt": "2026-04-09T10:10:00Z",
+    "licensePolicy": {
+      "allowAGPL": false,
+      "notes": "Assessment example remains shippable under permissive-friendly policy."
+    },
+    "name": "example-assessment-vendor-acme",
+    "source": {
+      "git": {
+        "dirty": true,
+        "rev": "UNSET"
+      }
+    },
+    "version": "0.1.0"
+  },
+  "spec": {
+    "artifacts": {
+      "outDir": "./artifacts/example-assessment-vendor-acme"
+    },
+    "policy": {
+      "failOnTimeout": true,
+      "humanGateRequired": true,
+      "lane": "staging",
+      "maxRunSeconds": 30,
+      "policyPackHash": "UNSET",
+      "policyPackRef": "policy-bundles/vendor-assessment/nist-800-53-rev5@0.1.0"
+    },
+    "assessment": {
+      "subjectId": "vendor:acme-cloud",
+      "subjectKind": "vendor",
+      "frameworkId": "nist-800-53-rev5",
+      "frameworkVersion": "rev5",
+      "controlRows": [
+        "ac-2-account-management"
+      ]
+    },
+    "secrets": {
+      "required": [
+        "ASSESSMENT_EVIDENCE_ROOT"
+      ],
+      "secretRefRoot": "secrets://user"
+    },
+    "smoke": {
+      "script": "bundles/example-assessment-vendor-acme/smoke.sh"
+    },
+    "vm": {
+      "backendIntent": "lima-process",
+      "modulePath": "bundles/example-assessment-vendor-acme/vm.nix",
+      "mounts": [
+        {
+          "ro": false,
+          "source": "./artifacts/example-assessment-vendor-acme",
+          "target": "/mnt/artifacts",
+          "type": "9p"
+        }
+      ],
+      "network": {
+        "egressAllowlist": [
+          "dns",
+          "https"
+        ],
+        "mode": "nat"
+      },
+      "resources": {
+        "diskGiB": 8,
+        "memMiB": 2048,
+        "vcpu": 2
+      }
+    }
+  }
+}
