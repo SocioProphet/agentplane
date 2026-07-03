@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.socioprophet.ai/agentplane/ops-history-context-intake.schema.json",
+  "title": "OpsHistoryContextIntake",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "intakeId",
+    "specVersion",
+    "bundleRef",
+    "contextPackRef",
+    "scope",
+    "policyDecisionRefs",
+    "agentRegistryRefs"
+  ],
+  "properties": {
+    "intakeId": {"type": "string", "pattern": "^urn:srcos:agentplane-context-intake:"},
+    "specVersion": {"type": "string"},
+    "bundleRef": {"type": "string"},
+    "contextPackRef": {"type": "string", "pattern": "^urn:srcos:context-pack:"},
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["workroomRef"],
+      "properties": {
+        "roomRef": {"type": ["string", "null"]},
+        "threadRef": {"type": ["string", "null"]},
+        "workroomRef": {"type": "string"},
+        "topicRef": {"type": ["string", "null"]},
+        "sessionRef": {"type": ["string", "null"]}
+      }
+    },
+    "sourceEventRefs": {"type": "array", "items": {"type": "string"}, "default": []},
+    "artifactRefs": {"type": "array", "items": {"type": "string"}, "default": []},
+    "redactionRefs": {"type": "array", "items": {"type": "string"}, "default": []},
+    "policyDecisionRefs": {"type": "array", "items": {"type": "string"}},
+    "agentRegistryRefs": {"type": "array", "items": {"type": "string"}},
+    "dryRun": {"type": "boolean", "default": true}
+  }
+}

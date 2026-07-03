@@ -1,0 +1,41 @@
+{
+  "events": [
+    {
+      "eventId": "urn:srcos:ops-history-event:agentplane-validation-demo-0001",
+      "specVersion": "0.1.0",
+      "eventClass": "agentplane.validation",
+      "occurredAt": "2026-05-05T21:45:00Z",
+      "contextIntakeRef": "urn:srcos:agentplane-context-intake:ops-history-demo-0001",
+      "bundleRef": "urn:srcos:agentplane-bundle:professional-intelligence-demo",
+      "agentPlaneArtifactRefs": [
+        "urn:srcos:agentplane-artifact:validation-demo-0001"
+      ],
+      "policyDecisionRefs": [
+        "urn:srcos:policy-decision:ops-history-hydrate-context-demo-0001"
+      ],
+      "evidenceRefs": [
+        "urn:srcos:evidence:agentplane-validation-demo-0001"
+      ],
+      "payloadMode": "ref-only"
+    },
+    {
+      "eventId": "urn:srcos:ops-history-event:agentplane-run-demo-0001",
+      "specVersion": "0.1.0",
+      "eventClass": "agentplane.run",
+      "occurredAt": "2026-05-05T21:46:00Z",
+      "contextIntakeRef": "urn:srcos:agentplane-context-intake:ops-history-demo-0001",
+      "bundleRef": "urn:srcos:agentplane-bundle:professional-intelligence-demo",
+      "agentPlaneArtifactRefs": [
+        "urn:srcos:agentplane-artifact:run-demo-0001",
+        "urn:srcos:agentplane-artifact:replay-demo-0001"
+      ],
+      "policyDecisionRefs": [
+        "urn:srcos:policy-decision:ops-history-hydrate-context-demo-0001"
+      ],
+      "evidenceRefs": [
+        "urn:srcos:evidence:agentplane-run-demo-0001"
+      ],
+      "payloadMode": "ref-only"
+    }
+  ]
+}
