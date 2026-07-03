@@ -68,6 +68,9 @@ sp-run status <run-dir>
 sp-run inspect <run-dir>
 sp-run preflight <governed-run-contract.json>
 sp-run admit <governed-run-contract.json> --preflight <preflight.json> --authority-state <authority-state.json>
+sp-run list --runs-root <runs-root>
+sp-run status <run-dir>
+sp-run inspect <run-dir>
 sp-run dossier <run_dir>
 sp-run validate-dossier <dossier.json>
 ```
