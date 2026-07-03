@@ -15,6 +15,7 @@ SCHEMA = ROOT / "schemas" / "bounded-action-loop.v0.schema.json"
 FIXTURES = ROOT / "tests" / "fixtures" / "bounded-action-loop"
 
 INTERVENTION_STATUSES = {"blocked", "modified", "escalated"}
+VALID = FIXTURES / "valid.record-event-instance.json"
 
 
 def load_json(path: Path) -> dict[str, Any]:
@@ -63,6 +64,7 @@ def main() -> int:
         raise SystemExit("missing valid bounded-action-loop fixtures")
     for path in valids:
         validate_file(path, schema)
+    validate_file(VALID, schema)
     invalids = sorted(FIXTURES.glob("invalid.*.json"))
     if not invalids:
         raise SystemExit("missing invalid bounded-action-loop fixtures")
