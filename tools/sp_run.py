@@ -6,6 +6,9 @@ admission receipt construction, restore admission receipt construction,
 smoke evidence generation, run-store inspection, and the local JSON tool
 adapter. It does not run agents, execute verifier commands, mutate governed
 files, restore rollback state, retry, resume, settle budget, or change
+This CLI exposes operator-facing receipt inspection, preflight projection, and
+admission receipt construction. It does not run agents, execute verifier
+commands, mutate files, restore rollback state, settle budget, or change
 authority.
 """
 
@@ -117,6 +120,8 @@ def command_doctor(_args: argparse.Namespace) -> int:
                 "authority_update",
                 "budget_settlement",
             ],
+            "capabilities": ["doctor", "dossier", "validate-dossier", "preflight", "admit"],
+            "non_goals": ["execute", "mutate", "restore", "authority_update", "budget_settlement"],
             "files": files,
         }
     )
