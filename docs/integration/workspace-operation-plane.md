@@ -13,6 +13,7 @@ governable, and auditable.
 ## Why this matters
 
 Without Operation Plane routing, agent writes are hidden side effects. There is no
+Without Operation Plane routing, agent writes are hidden side effects.  There is no
 shared lifecycle record, no admission gate before artifact activation, and no
 structured evidence for the Operation Inspector, replay, or ledger.
 
@@ -69,6 +70,11 @@ Execute your agent command. The agent must not write workspace artifacts directl
 ### 3. Emit the operation contract
 
 After the agent run completes, or when updating lifecycle state, emit the contract:
+Execute your agent command.  The agent must not write workspace artifacts directly.
+
+### 3. Emit the operation contract
+
+After the agent run completes (or when updating lifecycle state), emit the contract:
 
 ```bash
 python3 scripts/emit_agent_operation_contract.py path/to/bundle.json \
@@ -106,6 +112,7 @@ python3 scripts/emit_replay_artifact.py path/to/bundle.json my-executor --bundle
 An authorised reviewer inspects the `artifacts[]` array in the contract and
 explicitly sets `admissionStatus` to `admitted` or `rejected` before any artifact
 is activated in the workspace. Agents must not perform this step themselves.
+is activated in the workspace.  Agents must not perform this step themselves.
 
 ## Idempotency and retries
 
@@ -121,6 +128,8 @@ If an operation fails and is retried:
 When an operation is cancelled before completion, emit the contract with
 `--status cancelled`. The `lifecycle.cancellation` block, populated programmatically
 or by the runtime, records:
+`--status cancelled`.  The `lifecycle.cancellation` block (populated programmatically
+or by the runtime) records:
 
 - `cancelledAt` — when the cancellation occurred.
 - `cancelledBy` — who or what triggered the cancellation.
@@ -139,6 +148,7 @@ When a completed operation needs to be rolled back, emit an updated contract wit
 ## Non-goals
 
 - `agentplane` does not re-scan the workspace for agent side effects. Operations
+- `agentplane` does not re-scan the workspace for agent side effects.  Operations
   that bypass the contract path are not governed.
 - Artifact admission is not performed by agentplane; it is the responsibility of
   an authorised reviewer in the appropriate admission tool.

@@ -10,6 +10,7 @@ Checks that:
 from __future__ import annotations
 
 import json
+import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -123,6 +124,10 @@ def validate_example(example: dict) -> None:
     )
     require(isinstance(lifecycle.get("retryable"), bool), "example lifecycle.retryable must be a boolean")
     require(
+        isinstance(lifecycle.get("retryable"), bool),
+        "example lifecycle.retryable must be a boolean",
+    )
+    require(
         isinstance(lifecycle.get("retryCount"), int) and lifecycle["retryCount"] >= 0,
         "example lifecycle.retryCount must be a non-negative integer",
     )
@@ -147,6 +152,10 @@ def validate_example(example: dict) -> None:
     for i, event in enumerate(events):
         require(isinstance(event.get("eventId"), str) and event["eventId"], f"events[{i}].eventId must be non-empty")
         require(event.get("eventType") in valid_event_types, f"events[{i}].eventType must be valid")
+        require(
+            event.get("eventType") in valid_event_types,
+            f"events[{i}].eventType must be a valid event type, got {event.get('eventType')!r}",
+        )
         require(isinstance(event.get("emittedAt"), str) and event["emittedAt"], f"events[{i}].emittedAt must be non-empty")
 
     artifacts = example.get("artifacts", [])
@@ -157,6 +166,14 @@ def validate_example(example: dict) -> None:
         require(isinstance(art.get("artifactId"), str) and art["artifactId"], f"artifacts[{i}].artifactId must be non-empty")
         require(art.get("artifactType") in valid_artifact_types, f"artifacts[{i}].artifactType must be valid")
         require(art.get("admissionStatus") in valid_admission_statuses, f"artifacts[{i}].admissionStatus must be valid")
+        require(
+            art.get("artifactType") in valid_artifact_types,
+            f"artifacts[{i}].artifactType must be a valid artifact type",
+        )
+        require(
+            art.get("admissionStatus") in valid_admission_statuses,
+            f"artifacts[{i}].admissionStatus must be a valid admission status",
+        )
         require(isinstance(art.get("createdAt"), str) and art["createdAt"], f"artifacts[{i}].createdAt must be non-empty")
 
     policy_gate = example.get("policyGate", {})

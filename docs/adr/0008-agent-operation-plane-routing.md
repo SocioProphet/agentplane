@@ -7,12 +7,14 @@ Status: Accepted
 
 Agent runs in agentplane historically wrote workspace artifacts (patches, reports,
 metadata updates, terminal transcripts) as hidden side effects. There was no
+metadata updates, terminal transcripts) as hidden side effects.  There was no
 shared lifecycle record, no admission gate before activation, no ledger-facing
 evidence, and no structured cancellation or compensation path.
 
 The Operation Plane work (`SocioProphet/prophet-core-contracts#1`) introduces a
 shared lifecycle for workspace mutations: `WorkspaceOperation`, `OperationTask`,
 `OperationEvent`, `Artifact`, `DecisionCard`, and `PolicyGateRecord`. Agent runs
+`OperationEvent`, `Artifact`, `DecisionCard`, and `PolicyGateRecord`.  Agent runs
 are workspace mutations and should participate in this lifecycle.
 
 Two routing models were considered:
@@ -23,6 +25,8 @@ Two routing models were considered:
    `AgentOperationContract` record that carries the full lifecycle, authority,
    artifacts in `pending-review` state, policy gate result, and event trail
    before any artifact is activated.
+   artifacts (in `pending-review` state), policy gate result, and event trail
+   *before* any artifact is activated.
 
 ## Decision
 
@@ -32,18 +36,21 @@ All supported agent operation types — `agent.patch.propose`, `agent.report.cre
 `agent.metadata.fill`, `agent.failure.explain`, `agent.remediation.propose`, and
 `agent.terminal.assist` — must emit an `AgentOperationContract` through
 `scripts/emit_agent_operation_contract.py`, or the equivalent programmatic call,
+`scripts/emit_agent_operation_contract.py` (or the equivalent programmatic call)
 instead of writing workspace artifacts as side effects.
 
 Key invariants:
 
 - **Admission gate**: agent-created artifacts are emitted with `admissionStatus:
   pending-review`. They must not be activated without an explicit admission step
+  pending-review`.  They must not be activated without an explicit admission step
   by an authorised reviewer.
 - **Delegated authority**: every contract records who the agent acts for
   (`authority.actingFor`), the explicit capability scopes granted, an optional
   resource budget, and the policy profile that governs the authority.
 - **Idempotency and retry**: `lifecycle.idempotencyKey` is a stable key per
   attempt. Repeated submissions with the same key must not duplicate effects.
+  attempt.  Repeated submissions with the same key must not duplicate effects.
   `lifecycle.retryable` and `lifecycle.retryCount` govern retry policy.
 - **Cancellation evidence**: if the operation is cancelled, a `lifecycle.cancellation`
   record is emitted that identifies recoverable artifact refs.

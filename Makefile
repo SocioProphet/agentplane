@@ -58,6 +58,9 @@ validate: validate-agent-cycle-health validate-authority-dependency-evidence val
 .PHONY: validate test validate-governance-context validate-lattice-data-governai-execution-refs validate-lattice-runtime-profile-refs validate-network-native-assistant-evidence validate-guardrail-evidence-artifacts validate-stop-gate-evaluator validate-guarded-workcell-artifact validate-guarded-workcell-executor validate-guarded-invocation-artifact validate-guarded-invocation validate-agentic-pr-work-order validate-semantic-enterprise-agent-boundary validate-ops-history-contracts validate-action-contracts
 
 validate: validate-governance-context validate-lattice-data-governai-execution-refs validate-lattice-runtime-profile-refs validate-network-native-assistant-evidence validate-guardrail-evidence-artifacts validate-stop-gate-evaluator validate-guarded-workcell-artifact validate-guarded-workcell-executor validate-guarded-invocation-artifact validate-guarded-invocation validate-agentic-pr-work-order validate-semantic-enterprise-agent-boundary validate-ops-history-contracts validate-action-contracts
+.PHONY: validate test validate-governance-context validate-lattice-data-governai-execution-refs validate-lattice-runtime-profile-refs validate-network-native-assistant-evidence validate-guardrail-evidence-artifacts validate-stop-gate-evaluator validate-guarded-workcell-artifact validate-guarded-workcell-executor validate-guarded-invocation-artifact validate-guarded-invocation validate-agentic-pr-work-order validate-agent-operation-contract
+
+validate: validate-governance-context validate-lattice-data-governai-execution-refs validate-lattice-runtime-profile-refs validate-network-native-assistant-evidence validate-guardrail-evidence-artifacts validate-stop-gate-evaluator validate-guarded-workcell-artifact validate-guarded-workcell-executor validate-guarded-invocation-artifact validate-guarded-invocation validate-agentic-pr-work-order validate-agent-operation-contract
 	python3 tools/validate_execution_timing.py
 
 validate-governance-context:
@@ -290,6 +293,9 @@ validate-wallguard-collaboration-admission:
 	python3 -m json.tool tests/fixtures/receipts/wallguard-collaboration-admission.cross-wall.invalid.json >/dev/null
 	python3 -m json.tool tests/fixtures/receipts/wallguard-collaboration-admission.missing-context.invalid.json >/dev/null
 	python3 tools/validate_wallguard_collaboration_admission.py
+
+validate-agent-operation-contract:
+	python3 tools/validate_agent_operation_contract.py
 
 test:
 	python3 -m pytest -q tools/tests

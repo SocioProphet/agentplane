@@ -21,10 +21,15 @@ spec.loader.exec_module(module)
 
 validate_schema = module.validate_schema
 validate_example = module.validate_example
+load = module.load
 SCHEMA = module.SCHEMA
 EXAMPLE = module.EXAMPLE
 REQUIRED_OPERATION_TYPES = module.REQUIRED_OPERATION_TYPES
 
+
+# ---------------------------------------------------------------------------
+# Helpers
+# ---------------------------------------------------------------------------
 
 def make_valid_example(**overrides) -> dict:
     base = {
@@ -55,6 +60,23 @@ def make_valid_example(**overrides) -> dict:
         "artifacts": [],
         "decisionCard": None,
         "policyGate": {"evaluated": True, "result": "allow", "policyRef": None, "evaluatedAt": None, "reason": None},
+        "events": [
+            {
+                "eventId": "evt-001",
+                "eventType": "created",
+                "emittedAt": "2026-05-06T19:00:00Z",
+                "data": None,
+            }
+        ],
+        "artifacts": [],
+        "decisionCard": None,
+        "policyGate": {
+            "evaluated": True,
+            "result": "allow",
+            "policyRef": None,
+            "evaluatedAt": None,
+            "reason": None,
+        },
         "replayRef": None,
         "ledgerRef": None,
         "governanceContext": None,
@@ -62,6 +84,10 @@ def make_valid_example(**overrides) -> dict:
     base.update(overrides)
     return base
 
+
+# ---------------------------------------------------------------------------
+# Schema surface tests
+# ---------------------------------------------------------------------------
 
 class TestSchemaFile:
     def test_schema_file_exists(self) -> None:
@@ -74,6 +100,7 @@ class TestSchemaFile:
     def test_schema_passes_validate_schema(self) -> None:
         schema = json.loads(SCHEMA.read_text(encoding="utf-8"))
         validate_schema(schema)
+        validate_schema(schema)  # must not raise
 
     def test_schema_contains_all_operation_types(self) -> None:
         schema = json.loads(SCHEMA.read_text(encoding="utf-8"))
@@ -87,6 +114,10 @@ class TestSchemaFile:
             validate_schema(schema)
 
 
+# ---------------------------------------------------------------------------
+# Example file tests
+# ---------------------------------------------------------------------------
+
 class TestExampleFile:
     def test_example_file_exists(self) -> None:
         assert EXAMPLE.exists(), f"missing example: {EXAMPLE}"
@@ -98,6 +129,7 @@ class TestExampleFile:
     def test_example_passes_validate_example(self) -> None:
         example = json.loads(EXAMPLE.read_text(encoding="utf-8"))
         validate_example(example)
+        validate_example(example)  # must not raise
 
     def test_example_kind(self) -> None:
         example = json.loads(EXAMPLE.read_text(encoding="utf-8"))
@@ -139,6 +171,41 @@ class TestValidateExample:
 
     def test_invalid_event_type_rejected(self) -> None:
         ex = make_valid_example(events=[{"eventId": "evt-001", "eventType": "invalid_event", "emittedAt": "2026-05-06T19:00:00Z", "data": None}])
+# ---------------------------------------------------------------------------
+# validate_example unit tests
+# ---------------------------------------------------------------------------
+
+class TestValidateExample:
+    def test_valid_minimal_example(self) -> None:
+        validate_example(make_valid_example())  # must not raise
+
+    def test_wrong_kind_rejected(self) -> None:
+        ex = make_valid_example(kind="WrongKind")
+        with pytest.raises(SystemExit):
+            validate_example(ex)
+
+    def test_invalid_operation_type_rejected(self) -> None:
+        ex = make_valid_example(operationType="agent.unknown.operation")
+        with pytest.raises(SystemExit):
+            validate_example(ex)
+
+    def test_all_supported_operation_types_pass(self) -> None:
+        for op_type in REQUIRED_OPERATION_TYPES:
+            ex = make_valid_example(operationType=op_type)
+            validate_example(ex)  # must not raise
+
+    def test_empty_events_rejected(self) -> None:
+        ex = make_valid_example(events=[])
+        with pytest.raises(SystemExit):
+            validate_example(ex)
+
+    def test_invalid_event_type_rejected(self) -> None:
+        ex = make_valid_example(events=[{
+            "eventId": "evt-001",
+            "eventType": "invalid_event",
+            "emittedAt": "2026-05-06T19:00:00Z",
+            "data": None,
+        }])
         with pytest.raises(SystemExit):
             validate_example(ex)
 
@@ -147,24 +214,35 @@ class TestValidateExample:
         lifecycle["status"] = "unknown-status"
         with pytest.raises(SystemExit):
             validate_example(make_valid_example(lifecycle=lifecycle))
+        ex = make_valid_example(lifecycle=lifecycle)
+        with pytest.raises(SystemExit):
+            validate_example(ex)
 
     def test_empty_scope_rejected(self) -> None:
         authority = make_valid_example()["authority"].copy()
         authority["scope"] = []
         with pytest.raises(SystemExit):
             validate_example(make_valid_example(authority=authority))
+        ex = make_valid_example(authority=authority)
+        with pytest.raises(SystemExit):
+            validate_example(ex)
 
     def test_invalid_audit_level_rejected(self) -> None:
         authority = make_valid_example()["authority"].copy()
         authority["auditLevel"] = "very-detailed"
         with pytest.raises(SystemExit):
             validate_example(make_valid_example(authority=authority))
+        ex = make_valid_example(authority=authority)
+        with pytest.raises(SystemExit):
+            validate_example(ex)
 
     def test_audit_levels_pass(self) -> None:
         for level in ("full", "summary", "minimal"):
             authority = make_valid_example()["authority"].copy()
             authority["auditLevel"] = level
             validate_example(make_valid_example(authority=authority))
+            ex = make_valid_example(authority=authority)
+            validate_example(ex)  # must not raise
 
     def test_artifact_pending_review_admission_status(self) -> None:
         artifact = {
@@ -196,6 +274,59 @@ class TestValidateExample:
         gate = {"evaluated": True, "result": "unknown", "policyRef": None, "evaluatedAt": None, "reason": None}
         with pytest.raises(SystemExit):
             validate_example(make_valid_example(policyGate=gate))
+        ex = make_valid_example(artifacts=[artifact])
+        validate_example(ex)  # must not raise
+
+    def test_artifact_invalid_type_rejected(self) -> None:
+        artifact = {
+            "artifactId": "artifact-001",
+            "artifactType": "unknown-type",
+            "admissionStatus": "pending-review",
+            "ref": "artifacts/patch/test.diff",
+            "createdAt": "2026-05-06T19:00:00Z",
+            "admittedAt": None,
+            "admittedBy": None,
+        }
+        ex = make_valid_example(artifacts=[artifact])
+        with pytest.raises(SystemExit):
+            validate_example(ex)
+
+    def test_artifact_invalid_admission_status_rejected(self) -> None:
+        artifact = {
+            "artifactId": "artifact-001",
+            "artifactType": "patch",
+            "admissionStatus": "activated",  # invalid — agents cannot activate
+            "ref": "artifacts/patch/test.diff",
+            "createdAt": "2026-05-06T19:00:00Z",
+            "admittedAt": None,
+            "admittedBy": None,
+        }
+        ex = make_valid_example(artifacts=[artifact])
+        with pytest.raises(SystemExit):
+            validate_example(ex)
+
+    def test_policy_gate_deny_allowed(self) -> None:
+        gate = {
+            "evaluated": True,
+            "result": "deny",
+            "policyRef": None,
+            "evaluatedAt": None,
+            "reason": "policy block",
+        }
+        ex = make_valid_example(policyGate=gate)
+        validate_example(ex)  # must not raise
+
+    def test_policy_gate_invalid_result_rejected(self) -> None:
+        gate = {
+            "evaluated": True,
+            "result": "unknown",
+            "policyRef": None,
+            "evaluatedAt": None,
+            "reason": None,
+        }
+        ex = make_valid_example(policyGate=gate)
+        with pytest.raises(SystemExit):
+            validate_example(ex)
 
     def test_negative_retry_count_rejected(self) -> None:
         lifecycle = make_valid_example()["lifecycle"].copy()
@@ -211,3 +342,35 @@ class TestValidateExample:
         task = {"taskId": "task-001", "taskType": "read-context", "status": "not-a-status", "startedAt": None, "completedAt": None, "inputRef": None, "outputRef": None, "notes": None}
         with pytest.raises(SystemExit):
             validate_example(make_valid_example(tasks=[task]))
+        ex = make_valid_example(lifecycle=lifecycle)
+        with pytest.raises(SystemExit):
+            validate_example(ex)
+
+    def test_task_fields_validated(self) -> None:
+        task = {
+            "taskId": "task-001",
+            "taskType": "read-context",
+            "status": "completed",
+            "startedAt": None,
+            "completedAt": None,
+            "inputRef": None,
+            "outputRef": None,
+            "notes": None,
+        }
+        ex = make_valid_example(tasks=[task])
+        validate_example(ex)  # must not raise
+
+    def test_task_invalid_status_rejected(self) -> None:
+        task = {
+            "taskId": "task-001",
+            "taskType": "read-context",
+            "status": "not-a-status",
+            "startedAt": None,
+            "completedAt": None,
+            "inputRef": None,
+            "outputRef": None,
+            "notes": None,
+        }
+        ex = make_valid_example(tasks=[task])
+        with pytest.raises(SystemExit):
+            validate_example(ex)

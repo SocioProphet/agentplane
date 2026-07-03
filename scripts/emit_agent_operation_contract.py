@@ -3,6 +3,7 @@
 
 Every agent-initiated workspace mutation must produce an AgentOperationContract
 instead of writing artifacts as hidden side effects. This script is the canonical
+instead of writing artifacts as hidden side effects.  This script is the canonical
 emission path for all supported agent operation types.
 
 Supported operation types
@@ -13,6 +14,21 @@ Supported operation types
   agent.failure.explain     Agent explains an observed failure.
   agent.remediation.propose Agent proposes a remediation action.
   agent.terminal.assist     Agent assists with a terminal operation.
+
+Usage
+-----
+  scripts/emit_agent_operation_contract.py <bundle.json> \\
+      --operation-type agent.patch.propose \\
+      --operation-id op-20260506-001 \\
+      --acting-for user:octocat \\
+      --scope workspace:write pr:propose artifacts:emit \\
+      --status completed \\
+      [--artifact-type patch --artifact-ref artifacts/patch/my.diff] \\
+      [--policy-ref policy://agentplane/default-patch-propose] \\
+      [--policy-result allow] \\
+      [--audit-level full] \\
+      [--retryable] \\
+      [--retry-count 0]
 
 Output
 ------
@@ -164,6 +180,7 @@ def build_contract(
         events.append({
             "eventId": f"evt-{len(events) + 1:03d}",
             "eventType": status,
+            "eventType": status if status != "in-progress" else "updated",
             "emittedAt": captured_at,
             "data": None,
         })
@@ -252,6 +269,103 @@ def main() -> int:
     ap.add_argument("--policy-reason", default=None)
     ap.add_argument("--decision", default=None)
     ap.add_argument("--rationale", default=None)
+    ap.add_argument(
+        "--operation-type",
+        required=True,
+        choices=sorted(OPERATION_TYPES),
+        help="Agent operation type.",
+    )
+    ap.add_argument(
+        "--operation-id",
+        required=True,
+        help="Unique stable operation identifier.",
+    )
+    ap.add_argument(
+        "--acting-for",
+        required=True,
+        help="Identity (user, org, system) on whose behalf the agent acts.",
+    )
+    ap.add_argument(
+        "--scope",
+        action="append",
+        dest="scopes",
+        default=[],
+        metavar="SCOPE",
+        help="Capability scope granted for this operation (repeatable).",
+    )
+    ap.add_argument(
+        "--audit-level",
+        choices=sorted(AUDIT_LEVELS),
+        default="full",
+        help="Audit level for this operation (default: full).",
+    )
+    ap.add_argument(
+        "--policy-profile-ref",
+        default=None,
+        help="Reference to the policy profile governing delegated authority.",
+    )
+    ap.add_argument("--max-tokens", type=int, default=None, help="Budget: max tokens.")
+    ap.add_argument(
+        "--max-wall-seconds", type=int, default=None, help="Budget: max wall-clock seconds."
+    )
+    ap.add_argument(
+        "--max-files-mutated", type=int, default=None, help="Budget: max files mutated."
+    )
+    ap.add_argument(
+        "--status",
+        choices=sorted(LIFECYCLE_STATUSES),
+        default="completed",
+        help="Lifecycle status at emission time (default: completed).",
+    )
+    ap.add_argument(
+        "--retryable",
+        action="store_true",
+        default=False,
+        help="Mark this operation as retryable after transient failure.",
+    )
+    ap.add_argument(
+        "--retry-count",
+        type=int,
+        default=0,
+        help="Number of retry attempts so far (default: 0).",
+    )
+    ap.add_argument(
+        "--artifact-type",
+        choices=sorted(ARTIFACT_TYPES),
+        default=None,
+        help="Type of agent-created artifact (emits an artifact record).",
+    )
+    ap.add_argument(
+        "--artifact-ref",
+        default=None,
+        help="Reference path/URN for the artifact (required when --artifact-type is set).",
+    )
+    ap.add_argument(
+        "--policy-ref",
+        default=None,
+        help="Reference to the policy that was evaluated.",
+    )
+    ap.add_argument(
+        "--policy-result",
+        choices=sorted(POLICY_RESULTS),
+        default="allow",
+        help="Policy gate result (default: allow).",
+    )
+    ap.add_argument(
+        "--policy-reason",
+        default=None,
+        help="Human-readable reason for the policy gate result.",
+    )
+    ap.add_argument(
+        "--decision",
+        default=None,
+        help="DecisionCard: what the agent decided.",
+    )
+    ap.add_argument(
+        "--rationale",
+        default=None,
+        help="DecisionCard: why the agent made this decision.",
+    )
     args = ap.parse_args()
 
     if args.artifact_type and not args.artifact_ref:
@@ -271,6 +385,13 @@ def main() -> int:
     name = metadata.get("name")
     version = metadata.get("version")
     if not name or not version:
+    b = load_bundle(bundle_path)
+    md = b.get("metadata") or {}
+    spec = b.get("spec") or {}
+
+    name = md.get("name")
+    ver = md.get("version")
+    if not name or not ver:
         die("bundle metadata.name and metadata.version are required", 2)
 
     out_dir = (spec.get("artifacts") or {}).get("outDir")
@@ -278,11 +399,18 @@ def main() -> int:
         die("bundle spec.artifacts.outDir is required", 2)
 
     governance_context = spec.get("governanceContext") if isinstance(spec.get("governanceContext"), dict) else None
+    governance_context = (
+        spec.get("governanceContext")
+        if isinstance(spec.get("governanceContext"), dict)
+        else None
+    )
+
     captured_at = now_iso()
     contract = build_contract(
         operation_id=args.operation_id,
         operation_type=args.operation_type,
         bundle_ref=f"{name}@{version}",
+        bundle_ref=f"{name}@{ver}",
         acting_for=args.acting_for,
         scopes=args.scopes,
         audit_level=args.audit_level,
@@ -307,6 +435,9 @@ def main() -> int:
     output_dir = Path(out_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
     path = output_dir / "agent-operation-contract.json"
+    out = Path(out_dir)
+    out.mkdir(parents=True, exist_ok=True)
+    path = out / "agent-operation-contract.json"
     path.write_text(json.dumps(contract, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     print(f"[agent-operation-contract] OK: wrote {path}")
     return 0
