@@ -20,6 +20,17 @@ Modes:
 - tekton-submit: guarded submit intent. Requires explicit side-effect permission
   and credential refs. Live submission additionally requires --execute-live,
   a manifest, and a kubeconfig environment binding.
+- does not mutate a cluster, invoke Tekton, or publish to Katello unless a future
+  runner backend explicitly implements that behavior.
+
+Usage:
+  scripts/run_sourceos_delegated.py bundles/sourceos-image-production-smoke/bundle.json \
+    --executor ci-sourceos-delegated \
+    --pipeline-run-ref tekton://sourceos-customize-live-iso/pr-smoke \
+    --task-run-ref tekton://task/customize-live-iso \
+    --task-run-ref tekton://task/publish-katello-file-repo \
+    --katello-content-ref katello://SourceOS/SourceOS-Recovery/sourceos-live.iso@ci-smoke \
+    --output-digest sha256:UNSET-CI-SMOKE
 """
 
 from __future__ import annotations
@@ -327,6 +338,7 @@ def render_execution_request(
         "mode": args.mode,
         "modeGate": mode_gate,
         "liveTekton": live_result,
+        "mode": "record-only",
         "executor": args.executor,
         "policy": {
             "lane": policy.get("lane"),
@@ -339,6 +351,7 @@ def render_execution_request(
         "declaredOutputs": outputs,
         "delegatedExecution": {
             "tektonPipelineRunRef": delegated_pipeline_ref,
+            "tektonPipelineRunRef": args.pipeline_run_ref,
             "tektonTaskRunRefs": args.task_run_ref,
             "katelloContentRef": args.katello_content_ref,
             "katelloContentViewRef": args.katello_content_view_ref,
@@ -362,6 +375,12 @@ def render_execution_request(
             "required": secrets.get("required") or [],
         },
         "nonGoals": non_goals,
+        "nonGoals": [
+            "does not invoke Tekton directly",
+            "does not publish to Katello",
+            "does not mutate host state",
+            "does not inline secrets",
+        ],
     }
 
 
@@ -383,6 +402,9 @@ def main() -> int:
     parser.add_argument("--kubeconfig-env", default=os.getenv("AGENTPLANE_SOURCEOS_KUBECONFIG_ENV", "KUBECONFIG"))
     parser.add_argument("--kubectl-bin", default=os.getenv("AGENTPLANE_SOURCEOS_KUBECTL_BIN", "kubectl"))
     parser.add_argument("--live-timeout-seconds", type=int, default=int(os.getenv("AGENTPLANE_SOURCEOS_LIVE_TIMEOUT_SECONDS", "120")))
+    parser.add_argument("--executor", default="sourceos-delegated-record", help="Executor name to record in artifacts")
+    parser.add_argument("--pipeline-run-ref", default=os.getenv("AGENTPLANE_SOURCEOS_TEKTON_PIPELINE_RUN_REF"))
+    parser.add_argument("--task-run-ref", action="append", default=[])
     parser.add_argument("--katello-content-ref", default=os.getenv("AGENTPLANE_SOURCEOS_KATELLO_CONTENT_REF"))
     parser.add_argument("--katello-content-view-ref", default=os.getenv("AGENTPLANE_SOURCEOS_KATELLO_CONTENT_VIEW_REF"))
     parser.add_argument("--katello-lifecycle-environment-ref", default=os.getenv("AGENTPLANE_SOURCEOS_KATELLO_LIFECYCLE_ENVIRONMENT_REF"))
@@ -420,6 +442,7 @@ def main() -> int:
         mode_gate["liveResult"] = live_result.get("result")
 
     request = render_execution_request(bundle, bundle_path, args, mode_gate, live_result)
+    request = render_execution_request(bundle, bundle_path, args)
     write_json(out_dir / "sourceos-delegated-execution-request.json", request)
 
     artifact_env = merge_env(
