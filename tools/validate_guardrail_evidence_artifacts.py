@@ -78,6 +78,7 @@ def sample_policy_decision_artifact() -> dict[str, Any]:
             "version": "0.1.0",
             "repoRef": "SocioProphet/guardrail-fabric",
             "commit": "sha-example"
+            "commit": "sha-example",
         },
         "decision": {
             "schema": "sourceos.guardrail.decision.v0.1",
@@ -100,6 +101,12 @@ def sample_policy_decision_artifact() -> dict[str, Any]:
                 "agentMayContinue": False,
                 "requiresHumanApproval": False
             }
+                "inputDigest": "sha256:example",
+            },
+            "effects": {
+                "agentMayContinue": False,
+                "requiresHumanApproval": False,
+            },
         },
         "result": "blocked",
         "artifactRefs": {
@@ -109,6 +116,9 @@ def sample_policy_decision_artifact() -> dict[str, Any]:
             "humanOverrideRef": None
         },
         "governanceContext": None
+            "humanOverrideRef": None,
+        },
+        "governanceContext": None,
     }
 
 
@@ -134,6 +144,7 @@ def sample_stop_gate_artifact() -> dict[str, Any]:
                 "remediation": "Push the branch and re-run the stop gate.",
                 "evidenceRefs": [],
                 "relatedPolicyDecisionRefs": []
+                "relatedPolicyDecisionRefs": [],
             }
         ],
         "humanOverrideRef": None,
@@ -146,6 +157,9 @@ def sample_stop_gate_artifact() -> dict[str, Any]:
             "summaryRef": None
         },
         "governanceContext": None
+            "summaryRef": None,
+        },
+        "governanceContext": None,
     }
 
 
@@ -158,6 +172,7 @@ def validate_policy_decision_schema(schema: dict[str, Any]) -> None:
     )
     require_enum(schema, "result", {"allow", "blocked", "needs_human", "redacted", "quarantined", "deferred"}, "PolicyDecisionArtifact")
     decision = (schema.get("properties") or {}).get("decision") or {}
+    decision = ((schema.get("properties") or {}).get("decision") or {})
     require_required_fields(
         decision,
         ["schema", "decisionId", "timestamp", "policyId", "policyVersion", "scope", "severity", "decision", "reason", "remediation", "evidence", "effects"],
@@ -179,6 +194,7 @@ def validate_sample_against_top_level(schema: dict[str, Any], sample: dict[str, 
     require_required_fields(schema, list(schema.get("required") or []), path)
     require_keys(sample, list(schema.get("required") or []), f"sample {path}")
     kind_schema = (schema.get("properties") or {}).get("kind") or {}
+    kind_schema = ((schema.get("properties") or {}).get("kind") or {})
     expected_kind = kind_schema.get("const")
     if expected_kind and sample.get("kind") != expected_kind:
         die(f"sample {path}.kind must be {expected_kind}")

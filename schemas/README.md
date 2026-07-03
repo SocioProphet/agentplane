@@ -20,6 +20,8 @@ All schemas use [JSON Schema Draft 2020-12](https://json-schema.org/specificatio
 | [`run-artifact.schema.v0.1.json`](run-artifact.schema.v0.1.json) | `RunArtifact` | v0.1 | Evidence record of a completed run. |
 | [`replay-artifact.schema.v0.1.json`](replay-artifact.schema.v0.1.json) | `ReplayArtifact` | v0.1 | Inputs needed for deterministic replay. |
 | [`session-artifact.schema.v0.1.json`](session-artifact.schema.v0.1.json) | `SessionArtifact` | v0.1 | Session-level lifecycle record (status, receipt/run/replay refs). |
+| [`policy-decision-artifact.schema.v0.1.json`](policy-decision-artifact.schema.v0.1.json) | `PolicyDecisionArtifact` | v0.1 | AgentPlane evidence wrapper for SourceOS guardrail-fabric policy decisions. |
+| [`stop-gate-artifact.schema.v0.1.json`](stop-gate-artifact.schema.v0.1.json) | `StopGateArtifact` | v0.1 | Evidence record for agent completion gates, false-done prevention, and human override posture. |
 | [`promotion-artifact.schema.v0.1.json`](promotion-artifact.schema.v0.1.json) | `PromotionArtifact` | v0.1 | Evidence record of a bundle promotion event. |
 | [`reversal-artifact.schema.v0.1.json`](reversal-artifact.schema.v0.1.json) | `ReversalArtifact` | v0.1 | Evidence record of a rollback/reversal event. |
 | [`placement-decision.schema.v0.1.json`](placement-decision.schema.v0.1.json) | `PlacementDecision` | v0.1 | Executor placement decision and rejection record. |
@@ -36,8 +38,7 @@ All schemas use [JSON Schema Draft 2020-12](https://json-schema.org/specificatio
 
 ## Bundle schema (`bundle.schema.v0.1.json`)
 
-The bundle schema defines the contract for `bundle.json` files. Validated by
-`scripts/validate_bundle.py`.
+The bundle schema defines the contract for `bundle.json` files. Validated by `scripts/validate_bundle.py`.
 
 ### Required fields
 
@@ -59,24 +60,7 @@ The bundle schema defines the contract for `bundle.json` files. Validated by
 
 ### License policy constraint
 
-`metadata.licensePolicy.allowAGPL` must be `false`. This is validated at bundle
-validation time and cannot be overridden. See [ADR-0001](../docs/adr/0001-no-agpl-dependencies.md).
-
-### Agent Machine binding
-
-`spec.agentMachine` is an optional SourceOS Agent Machine binding. It references canonical contracts in `SourceOS-Linux/sourceos-spec` rather than redefining local mount policy inside AgentPlane.
-
-Key fields:
-
-| Field | Purpose |
-|---|---|
-| `profileRef` | Agent Machine profile reference. |
-| `localDataPlaneRef` | `AgentMachineLocalDataPlane` reference. |
-| `mountPolicyRef` | `AgentMachineMountPolicy` reference. |
-| `secureHostInterfaceRef` | Secure Host Interface profile/grant reference. |
-| `topolvmPlacementProfileRef` | Optional `TopoLVMPlacementProfile` reference for cluster-local mode. |
-| `workspaceId` | Local/cluster workspace identity. |
-| `toolSurfaceRefs` | Agent tool surfaces such as OpenCLAW/OpenClaw, Hermes, Codex, Claude Code, local shell, GitHub bot, or CI bot. |
+`metadata.licensePolicy.allowAGPL` must be `false`. This is validated at bundle validation time and cannot be overridden. See [ADR-0001](../docs/adr/0001-no-agpl-dependencies.md).
 
 ---
 
@@ -107,9 +91,7 @@ Validated by `tools/validate_agentic_pr_work_order.py`.
 
 ## Patch fragment (`bundle.schema.patch.json`)
 
-This file is a **JSON Merge Patch-style fragment** staging new `spec` fields for future
-agent-runtime bundles. It is not a complete schema and is not yet enforced by
-`scripts/validate_bundle.py`.
+This file is a **JSON Merge Patch-style fragment** staging new `spec` fields for future agent-runtime bundles. It is not a complete schema and is not yet enforced by `scripts/validate_bundle.py`.
 
 ### Staged fields
 
@@ -123,8 +105,7 @@ agent-runtime bundles. It is not a complete schema and is not yet enforced by
 | `spec.telemetrySink` | string | Telemetry destination URI |
 | `spec.receiptSchemaVersion` | string | Version of the MAIPJ run receipt schema to validate against |
 
-These fields will be promoted to a `bundle.schema.v0.2.json` once the agent-runtime integration
-is ready. Do not use them in production bundles until they are promoted.
+These fields will be promoted to a `bundle.schema.v0.2.json` once the agent-runtime integration is ready. Do not use them in production bundles until they are promoted.
 
 ---
 
@@ -178,21 +159,20 @@ Written by `scripts/emit_run_artifact.py` and by `runners/qemu-local.sh`.
 
 Optional: `bundlePath`, `stdoutRef`, `stderrRef`, `upstreamArtifacts.*`.
 
-### AgentMachineMountEvidence (`agent-machine-mount-evidence.schema.v0.1.json`)
+### PolicyDecisionArtifact (`policy-decision-artifact.schema.v0.1.json`)
 
-Emitted by Agent Machine executor adapters or imported from `sourceosctl agent-machine mounts ...` evidence records.
+Wraps a `sourceos.guardrail.decision.v0.1` decision emitted by `SocioProphet/guardrail-fabric` so AgentPlane can treat policy decisions as first-class evidence.
 
 It records:
 
-- `localDataPlaneRef` and `mountPolicyRef` from SourceOS contracts;
-- storage backend (`podman-machine-bind`, `native-bind`, `wsl-bind`, `topolvm-local-pv`, etc.);
-- mount path classes (`code`, `documents`, `downloads`, `cache`, `artifacts`, `media`, `app-bridge`);
-- scoped browser download evidence;
-- denied mount attempts;
-- optional TopoLVM node/PVC/PV metadata;
-- redaction summary.
+- AgentPlane session/task refs;
+- guardrail source system, adapter, version, repo, and commit;
+- embedded SourceOS policy decision artifact;
+- AgentPlane result interpretation (`allow`, `blocked`, `needs_human`, `redacted`, `quarantined`, or `deferred`);
+- decision log, tool event, redaction, and human override refs;
+- optional governance context.
 
-Browser downloads are intentionally represented as a distinct path class. Downloaded artifacts should be hashed, and promotion into code or document-output space should emit separate evidence.
+AgentPlane should not reimplement guardrail policy logic. It should ingest and preserve the decision, then use the interpreted result for stop gates and runtime transitions.
 
 ### SourceOSContextToolProviderEvidence (`sourceos-context-tool-provider-evidence.schema.v0.1.json`)
 
@@ -210,74 +190,20 @@ It records:
 This evidence does not dispatch a run. It is a registration/control-plane artifact for later AgentPlane routing.
 
 ### OfficeArtifactEvidence (`office-artifact-evidence.schema.v0.1.json`)
+### StopGateArtifact (`stop-gate-artifact.schema.v0.1.json`)
 
-Emitted by Office Plane executor adapters or imported from `sourceosctl office ...` evidence records.
-
-It records:
-
-- `workroomId` and `artifactId` from `SocioProphet/prophet-workspace` OfficeArtifact contracts;
-- artifact type and format for documents, sheets, slide decks, PDFs, mail drafts, calendar items, task lists, notes, and media assets;
-- operation (`plan`, `generate`, `inspect`, `convert`, `render`, `analyze`, `review`, `promote`, `publish`, or `send-draft`);
-- backend (`libreoffice`, `collabora`, `onlyoffice`, `microsoft-graph`, `google-workspace`, `sourceos-native`, or `manual`);
-- artifact hashes and derived artifact refs;
-- conversion metadata;
-- review state;
-- side-effect flags for email, external publish, and calendar modification;
-- policy refs and redaction summary.
-
-Email sending and external publishing should remain explicit policy-gated side effects. Generated mail should normally be represented as a draft artifact before send.
-
-### NetworkDoorPlanEvidence (`network-door-plan-evidence.schema.v0.1.json`)
-
-Emitted by Network Door executor adapters or imported from `sourceosctl network ...` plan records.
+Records the evidence behind an agent completion gate. Stop gates prevent false-done completion by requiring branch, commit, push, PR, CI, policy, summary, and human-review evidence where applicable.
 
 It records:
 
-- NetworkAccessProfile references;
-- user and enterprise firewall binding refs;
-- optional mesh binding refs;
-- BYOM/external model provider refs;
-- route decision and scope;
-- hash-only destination evidence;
-- enterprise/user precedence posture;
-- side-effect flags proving the plan did not mutate firewall or mesh state;
-- policy refs and redaction summary.
+- session/task refs;
+- gate identity and policy ref;
+- final result (`pass`, `fail`, `needs_human`, `waived`, or `not_applicable`);
+- per-check result, reason, remediation, evidence refs, and related policy decision refs;
+- optional human override ref;
+- related policy decision, run, replay, PR, CI, and summary artifact refs.
 
-Mesh binding and firewall binding should be represented as complementary policy layers, not interchangeable controls.
-
-### ExternalModelProviderRouteEvidence (`external-model-provider-route-evidence.schema.v0.1.json`)
-
-Emitted by external model provider route adapters or imported from `sourceosctl network provider ...` plan records.
-
-It records:
-
-- provider refs and provider class;
-- owner (`user`, `enterprise`, `workspace`, `tenant`, or `device`);
-- NetworkAccessProfile, FirewallBindingProfile, and optional MeshBindingProfile refs;
-- Model Router binding refs and route target;
-- auth reference posture without inline credentials;
-- prompt hash-only evidence;
-- prompt egress policy;
-- provider health metadata when explicitly checked;
-- side-effect flags for provider contact and prompt transmission.
-
-Provider credentials must remain references. Do not inline tokens, API keys, base credentials, or secrets in evidence records.
-
-### NativeAssistantBridgeEvidence (`native-assistant-bridge-evidence.schema.v0.1.json`)
-
-Emitted by Native Assistant Door adapters or imported from `sourceosctl native-assistant ...` plan records.
-
-It records:
-
-- native bridge refs for Apple App Intents/Siri/Shortcuts, Android intents, Windows shell integrations, browser extensions, MCP, or other bridge classes;
-- operation (`open-workroom`, `create-office-artifact`, `summarize`, `route-local-model`, `handoff-to-agent-machine`, `inspect-evidence`, `search-workspace`, `create-reminder`, `create-note`, `share-artifact`, or `other`);
-- prompt hash-only evidence;
-- user confirmation posture;
-- network/model-router/agent-registry refs;
-- policy posture for prompt egress, personal context reads, cross-device handoff, side effects, and raw app database access;
-- side-effect flags proving whether any native assistant or app action occurred.
-
-Native assistant bridge evidence should default to non-mutating plans. Real assistant invocation, reminder/note creation, sharing, cross-device handoff, or personal context reads must be explicit policy-gated side effects.
+A stop gate that fails should produce actionable remediation rather than a generic blocked state.
 
 ### PolicyFabricVerdictEnvelope (`policy-fabric-verdict-envelope.schema.v0.1.json`)
 
@@ -314,18 +240,15 @@ Optional inputs: `policyPackRef`, `policyPackHash`, `secretsRequired`, `upstream
 
 ### SessionArtifact (`session-artifact.schema.v0.1.json`)
 
-Records the lifecycle of an agent session. `sessionRef` must match the pattern
-`urn:srcos:session:*`.
+Records the lifecycle of an agent session. `sessionRef` must match the pattern `urn:srcos:session:*`.
 
 ### PromotionArtifact (`promotion-artifact.schema.v0.1.json`)
 
-Records a bundle promotion event. `promotionReceiptRef` must match
-`urn:srcos:receipt:promotion:*`.
+Records a bundle promotion event. `promotionReceiptRef` must match `urn:srcos:receipt:promotion:*`.
 
 ### ReversalArtifact (`reversal-artifact.schema.v0.1.json`)
 
-Records a rollback/reversal event. `sourcePromotionReceiptRef` must match
-`urn:srcos:receipt:promotion:*`.
+Records a rollback/reversal event. `sourcePromotionReceiptRef` must match `urn:srcos:receipt:promotion:*`.
 
 ---
 
@@ -342,3 +265,7 @@ Records a rollback/reversal event. `sourcePromotionReceiptRef` must match
   versioned schema.
   versioned schema.
   versioned schema.
+- **Breaking changes** to a schema require a new version file (e.g., `v0.2`). Do not edit a released schema in place.
+- **Additive, backward-compatible changes** (new optional fields) may be made in a minor version increment.
+- The validator (`scripts/validate_bundle.py`) must be updated when a new bundle schema version is introduced.
+- Patch fragments (`.patch.json`) are staging areas; they are not enforced until promoted to a versioned schema.
