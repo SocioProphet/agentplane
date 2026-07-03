@@ -39,8 +39,40 @@ Agentplane treats execution as evidence-producing work. The current public evide
 - `NetworkDoorPlanEvidence`
 - `ExternalModelProviderRouteEvidence`
 - `NativeAssistantBridgeEvidence`
+- `SupplyChainValidationArtifact`
 
 The Network Door / BYOM / Native Assistant evidence types are non-mutating by default. They record policy posture, references, route decisions, hash-only prompt/destination evidence, and side-effect flags without directly mutating firewall state, installing mesh components, contacting model providers, invoking native assistant APIs, or storing credentials.
+
+---
+
+## Prophet Trust Chain supply-chain validation
+
+Agentplane owns the validation, replay, and receipt evidence slice of Prophet Trust Chain. The platform standard and admission contract live in `SocioProphet/prophet-platform`:
+
+- `docs/standards/PROPHET_TRUST_CHAIN_V0.md`
+- `docs/TRUST_CHAIN_ADMISSION_CONTRACT.md`
+- `docs/standards/PROPHET_TRUST_CHAIN_IMPLEMENTATION_MAP.md`
+
+The first Agentplane Trust Chain slice defines `SupplyChainValidationArtifact`, which binds runtime supply-chain evidence to Agentplane validation/replay/receipt evidence.
+
+Relevant files:
+
+- `schemas/trust-chain/supply-chain-validation-artifact.v0.1.schema.json`
+- `tests/fixtures/trust-chain/supply-chain-validation.valid.json`
+- `tests/fixtures/trust-chain/supply-chain-validation.blocked.json`
+- `tools/validate_trust_chain_supply_chain_validation.py`
+- `tools/tests/test_trust_chain_supply_chain_validation.py`
+
+Validation:
+
+```bash
+python3 tools/validate_trust_chain_supply_chain_validation.py
+python3 -m pytest -q tools/tests/test_trust_chain_supply_chain_validation.py
+```
+
+The valid fixture requires SBOM, VEX, lockfile, signature, scan, promotion, rollback, policy, guardrail, validation, replay, and runtime receipt references before production-scope execution and promotion are allowed. The blocked fixture denies execution and promotion, requires repair and human review, and preserves remediation authority.
+
+Boundary: Agentplane records validation, replay, and runtime receipt evidence. It does not perform live package scanning, certify runtime production readiness by itself, replace Lattice Forge runtime evidence, replace Policy Fabric policy profiles, or replace Guardrail Fabric action admission.
 
 ---
 
