@@ -12,6 +12,8 @@ on:
       - "tools/sp_run.py"
       - "tools/tests/test_restore_admission_builder.py"
       - "tools/validate_restore_admission_receipt.py"
+      - "tools/sp_run.py"
+      - "tools/tests/test_restore_admission_builder.py"
       - "docs/runtime-governance/restore-admission-receipt-v0.1.md"
       - ".github/workflows/restore-admission-receipt.yml"
   push:
@@ -27,6 +29,8 @@ on:
       - "tools/sp_run.py"
       - "tools/tests/test_restore_admission_builder.py"
       - "tools/validate_restore_admission_receipt.py"
+      - "tools/sp_run.py"
+      - "tools/tests/test_restore_admission_builder.py"
       - "docs/runtime-governance/restore-admission-receipt-v0.1.md"
       - ".github/workflows/restore-admission-receipt.yml"
   workflow_dispatch:
