@@ -6,3 +6,4 @@ cd ../../prophet-platform
 
 # Run the Regis ACR smoke target via Makefile
 make smoke-regis-acr
+make smoke-regis-acr
