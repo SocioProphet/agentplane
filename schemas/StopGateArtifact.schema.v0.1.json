@@ -1,0 +1,148 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.srcos.ai/agentplane/StopGateArtifact.schema.v0.1.json",
+  "title": "StopGateArtifact",
+  "description": "Formal, signed, evidence-bound stop-gate attestation; a specialization of ReceiptIR that binds a deterministic gate verdict to hashed EvidenceIR and a temporal window. Emitted by the harness, consumed by a lift_authority. Distinct from the legacy check-based stop-gate-artifact.schema.v0.1.json.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "type",
+    "spec_version",
+    "gate_id",
+    "session_id",
+    "workcell_id",
+    "subject",
+    "predicate",
+    "verdict",
+    "evidence",
+    "evaluated_by",
+    "evaluated_at",
+    "evidence_window",
+    "lift_authority"
+  ],
+  "properties": {
+    "type": { "const": "StopGateArtifact" },
+    "spec_version": { "const": "0.1" },
+    "gate_id": { "type": "string", "minLength": 1, "description": "Stable gate identifier, e.g. build-green-before-push." },
+    "session_id": { "type": "string", "minLength": 1 },
+    "workcell_id": { "type": "string", "minLength": 1 },
+    "subject": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "minLength": 1 },
+      "description": "The action(s) being gated, e.g. [\"git push\", \"git tag\"]."
+    },
+    "predicate": { "type": "string", "minLength": 1, "description": "Human-readable condition, e.g. build.exit_code == 0." },
+    "predicate_layer": {
+      "enum": ["semantic", "transport"],
+      "default": "semantic",
+      "description": "The layer the predicate binds to. A gate on task outcome is semantic. Enforces invariant 5.3."
+    },
+    "verdict": {
+      "enum": ["PASS", "FAIL", "REVIEW", "INDETERMINATE"],
+      "description": "PASS=permit, FAIL=hard deny, REVIEW=deny-pending-human, INDETERMINATE=deny require override."
+    },
+    "evidence": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/evidenceEntry" },
+      "description": "Hashed EvidenceIR the predicate was checked against. May be empty only for INDETERMINATE."
+    },
+    "evaluated_by": { "$ref": "#/$defs/evaluatedBy" },
+    "evaluated_at": { "type": "string", "format": "date-time" },
+    "evidence_window": { "$ref": "#/$defs/window" },
+    "log_completeness_attestation": { "$ref": "#/$defs/completenessAttestation" },
+    "lift_authority": { "type": "string", "minLength": 1, "description": "Who may consume a PASS, e.g. policy-fabric." },
+    "obligations": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "ObligationIR duties attached on consume, e.g. post_hoc.reverify_remote_ref within 300s."
+    },
+    "override_of": {
+      "type": "string",
+      "description": "Present only on human-authority override artifacts (invariant 5.5): the artifact_id / hash of the denying artifact being overridden."
+    },
+    "operator": {
+      "type": "object",
+      "description": "Present only on human-authority override artifacts (invariant 5.5): the attributed operator identity.",
+      "required": ["id"],
+      "additionalProperties": true,
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "display_name": { "type": "string" }
+      }
+    },
+    "signature": { "$ref": "#/$defs/signature" }
+  },
+  "allOf": [
+    {
+      "$comment": "Invariant 5.5: a human-authority artifact must attribute the override and its target.",
+      "if": { "properties": { "evaluated_by": { "properties": { "kind": { "const": "human-authority" } } } } },
+      "then": { "required": ["override_of", "operator"] }
+    }
+  ],
+  "$defs": {
+    "evidenceEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_event_uuid", "evidence_hash", "layer"],
+      "properties": {
+        "source_event_uuid": { "type": "string", "minLength": 1, "description": "The tool_result / invocation record narrated." },
+        "evidence_hash": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+        "layer": { "enum": ["semantic", "transport"], "description": "semantic=task outcome; transport=tool ran. See invariant 5.3." },
+        "mode": {
+          "enum": ["presence", "absence"],
+          "default": "presence",
+          "description": "presence=observed payload; absence=absence-based finding, gated by invariant 5.4."
+        },
+        "signal": { "type": "string", "description": "The extractor signal matched, e.g. regex:/build failed/i." },
+        "observed_at": { "type": "string", "format": "date-time", "description": "When observed; if present, must fall within evidence_window." }
+      }
+    },
+    "evaluatedBy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["component", "version", "kind"],
+      "properties": {
+        "component": { "type": "string", "minLength": 1 },
+        "version": { "type": "string", "minLength": 1 },
+        "kind": {
+          "enum": ["deterministic-harness", "human-authority"],
+          "description": "Invariant 5.1: MUST NOT be a model. human-authority is reserved for attributed overrides (5.5)."
+        }
+      }
+    },
+    "window": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["start", "end"],
+      "properties": {
+        "start": { "type": "string", "format": "date-time" },
+        "end": { "type": "string", "format": "date-time" }
+      }
+    },
+    "completenessAttestation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["asserted", "basis", "attested_by"],
+      "properties": {
+        "asserted": { "type": "boolean" },
+        "basis": { "type": "string" },
+        "attested_by": { "type": "string" },
+        "signature": {
+          "$ref": "#/$defs/signature",
+          "description": "Optional hardening (open item 10.4): a verifiable signature over the attestation by the recorder."
+        }
+      }
+    },
+    "signature": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["alg", "key_id", "value"],
+      "properties": {
+        "alg": { "const": "ed25519" },
+        "key_id": { "type": "string", "minLength": 1 },
+        "value": { "type": "string", "minLength": 1, "description": "base64(signature) over canonical serialization of the artifact with the signature object removed." }
+      }
+    }
+  }
+}

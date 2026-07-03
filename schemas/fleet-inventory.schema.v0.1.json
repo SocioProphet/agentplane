@@ -1,0 +1,194 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Agentplane Fleet Inventory v0.1",
+  "type": "object",
+  "required": [
+    "apiVersion",
+    "kind",
+    "metadata",
+    "builders",
+    "executors",
+    "defaultBuilder",
+    "defaultExecutor",
+    "selectionPolicy"
+  ],
+  "properties": {
+    "apiVersion": {
+      "const": "agentplane.socioprophet.org/v0.1"
+    },
+    "kind": {
+      "const": "FleetInventory"
+    },
+    "metadata": {
+      "type": "object",
+      "required": [
+        "name",
+        "version",
+        "createdAt"
+      ],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "notes": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "builders": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/node"
+      },
+      "minItems": 1
+    },
+    "executors": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/node"
+      },
+      "minItems": 1
+    },
+    "defaultBuilder": {
+      "type": "string"
+    },
+    "defaultExecutor": {
+      "type": "string"
+    },
+    "selectionPolicy": {
+      "type": "object",
+      "required": [
+        "preferHealthy",
+        "requireEnabled"
+      ],
+      "properties": {
+        "preferHealthy": {
+          "type": "boolean"
+        },
+        "requireEnabled": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "$defs": {
+    "platform": {
+      "type": "object",
+      "required": [
+        "os",
+        "arch"
+      ],
+      "properties": {
+        "os": {
+          "type": "string"
+        },
+        "arch": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "health": {
+      "type": "object",
+      "required": [
+        "state"
+      ],
+      "properties": {
+        "state": {
+          "type": "string",
+          "enum": [
+            "ready",
+            "degraded",
+            "drained",
+            "offline"
+          ]
+        },
+        "notes": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "capabilities": {
+      "type": "object",
+      "properties": {
+        "kvm": {
+          "type": "boolean"
+        },
+        "nixBuild": {
+          "type": "boolean"
+        },
+        "vmBuild": {
+          "type": "boolean"
+        },
+        "qcowBuild": {
+          "type": "boolean"
+        },
+        "rawBuild": {
+          "type": "boolean"
+        },
+        "notes": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": true
+    },
+    "node": {
+      "type": "object",
+      "required": [
+        "name",
+        "sshRef",
+        "enabled",
+        "platform",
+        "health",
+        "trustZone"
+      ],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "sshRef": {
+          "type": "string"
+        },
+        "enabled": {
+          "type": "boolean"
+        },
+        "platform": {
+          "$ref": "#/$defs/platform"
+        },
+        "supportedBackends": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "qemu",
+              "microvm",
+              "lima-process",
+              "fleet"
+            ]
+          }
+        },
+        "capabilities": {
+          "$ref": "#/$defs/capabilities"
+        },
+        "health": {
+          "$ref": "#/$defs/health"
+        },
+        "trustZone": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

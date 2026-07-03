@@ -3,85 +3,42 @@
   "$id": "https://agentplane.socioprophet.org/schemas/sct-control-profile.schema.v0.1.json",
   "title": "SCTControlProfile v0.1",
   "type": "object",
-  "required": [
-    "apiVersion",
-    "kind",
-    "metadata",
-    "spec"
-  ],
+  "additionalProperties": false,
+  "required": ["apiVersion", "kind", "metadata", "spec"],
   "properties": {
-    "apiVersion": {
-      "const": "sct.socioprophet.org/v0.1",
-      "type": "string"
-    },
-    "kind": {
-      "const": "SCTControlProfile",
-      "type": "string"
-    },
+    "apiVersion": {"const": "sct.socioprophet.org/v0.1", "type": "string"},
+    "kind": {"const": "SCTControlProfile", "type": "string"},
     "metadata": {
       "type": "object",
-      "required": [
-        "name",
-        "version",
-        "issuedAt",
-        "expiresAt",
-        "issuer",
-        "audience",
-        "profileSha256"
-      ],
+      "additionalProperties": false,
+      "required": ["name", "version", "issuedAt", "expiresAt", "issuer", "audience", "keyId", "profileSha256", "signatureRef"],
       "properties": {
-        "name": {"type": "string"},
+        "name": {"type": "string", "pattern": "^[a-z0-9][a-z0-9_.:-]{1,126}$"},
         "version": {"type": "string"},
         "issuedAt": {"type": "string", "format": "date-time"},
         "expiresAt": {"type": "string", "format": "date-time"},
         "issuer": {"type": "string"},
-        "audience": {
-          "type": "array",
-          "items": {"type": "string"},
-          "minItems": 1
-        },
+        "audience": {"type": "array", "items": {"type": "string"}, "minItems": 1},
         "keyId": {"type": "string"},
-        "profileSha256": {
-          "type": "string",
-          "pattern": "^[a-fA-F0-9]{64}$"
-        },
+        "profileSha256": {"type": "string", "pattern": "^[a-fA-F0-9]{64}$"},
         "signatureRef": {"type": "string"},
-        "tags": {
-          "type": "array",
-          "items": {"type": "string"}
-        }
+        "tags": {"type": "array", "items": {"type": "string"}}
       }
     },
     "spec": {
       "type": "object",
-      "required": [
-        "motifs",
-        "runtimeProjection",
-        "delivery",
-        "deconfliction",
-        "failMode"
-      ],
+      "additionalProperties": false,
+      "required": ["motifs", "runtimeProjection", "delivery", "deconfliction", "replayPolicy", "failMode"],
       "properties": {
         "motifs": {
           "type": "array",
           "minItems": 1,
           "items": {
             "type": "object",
+            "additionalProperties": false,
             "required": ["name"],
             "properties": {
-              "name": {
-                "type": "string",
-                "enum": [
-                  "gate",
-                  "river",
-                  "fork",
-                  "neck",
-                  "chapel",
-                  "bridge",
-                  "rupture",
-                  "seal"
-                ]
-              },
+              "name": {"type": "string", "enum": ["gate", "channel", "river", "bridge", "neck", "fork", "seal", "rupture", "chapel", "court"]},
               "weight": {"type": "number", "minimum": 0.0, "maximum": 1.0},
               "notes": {"type": "string"}
             }
@@ -89,53 +46,56 @@
         },
         "runtimeProjection": {
           "type": "object",
+          "additionalProperties": false,
           "properties": {
             "lane": {"type": "string"},
             "plannerBranchBudget": {"type": "integer", "minimum": 0},
             "toolBudget": {"type": "integer", "minimum": 0},
-            "memoryScope": {"type": "string"},
-            "disclosureScope": {"type": "string"},
+            "memoryScope": {"type": "string", "enum": ["none", "local-only", "session", "workspace"]},
+            "disclosureScope": {"type": "string", "enum": ["minimal", "bounded", "expanded"]},
             "handoffPolicy": {"type": "string"},
             "interruptPolicy": {"type": "string"},
             "humanGateRequired": {"type": "boolean"},
-            "maxRunSeconds": {"type": "integer", "minimum": 1}
-          },
-          "additionalProperties": false
+            "breakGlassAllowed": {"type": "boolean"},
+            "maxRunSeconds": {"type": "integer", "minimum": 5, "maximum": 3600},
+            "auditMode": {"type": "string", "enum": ["off", "standard", "strict"]}
+          }
         },
         "delivery": {
           "type": "object",
+          "additionalProperties": false,
           "required": ["mode", "authorizedAudience", "failClosed"],
           "properties": {
-            "mode": {
-              "type": "string",
-              "enum": ["mcp-sidecar", "a2a-envelope", "local-host-context"]
-            },
-            "authorizedAudience": {
-              "type": "array",
-              "items": {"type": "string"},
-              "minItems": 1
-            },
-            "failClosed": {"type": "boolean"},
+            "mode": {"type": "string", "enum": ["mcp-sidecar", "a2a-envelope", "local-host-context", "zero-trust-selective-delivery"]},
+            "authorizedAudience": {"type": "array", "items": {"type": "string"}, "minItems": 1},
+            "failClosed": {"type": "boolean", "const": true},
             "redactionMode": {"type": "string"}
           }
         },
         "deconfliction": {
           "type": "object",
+          "additionalProperties": false,
           "properties": {
             "breakGlassAllowed": {"type": "boolean"},
             "breakGlassReasonRequired": {"type": "boolean"},
             "unauthorizedTelemetry": {"type": "boolean"},
             "replayBindProfileHash": {"type": "boolean"}
-          },
-          "additionalProperties": false
+          }
         },
-        "failMode": {
-          "type": "string",
-          "enum": ["deny", "degrade", "human-escalate"]
-        }
-      },
-      "additionalProperties": false
+        "replayPolicy": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["bindSameHash", "allowAuthorizedSuccessor", "successorProofRequired"],
+          "properties": {
+            "bindSameHash": {"type": "boolean"},
+            "allowAuthorizedSuccessor": {"type": "boolean"},
+            "successorProofRequired": {"type": "boolean"},
+            "authorizedSuccessorOf": {"type": "string", "pattern": "^[a-fA-F0-9]{64}$"},
+            "successorSignatureRef": {"type": "string"}
+          }
+        },
+        "failMode": {"type": "string", "enum": ["deny", "degrade", "human-escalate", "audit-only"]}
+      }
     }
-  },
-  "additionalProperties": false
+  }
 }

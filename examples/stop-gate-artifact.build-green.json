@@ -1,0 +1,48 @@
+{
+  "type": "StopGateArtifact",
+  "spec_version": "0.1",
+  "gate_id": "build-green-before-push",
+  "session_id": "777499e1-1111-4000-8000-000000000abc",
+  "workcell_id": "noetica-static-export",
+  "subject": [
+    "git push",
+    "git tag"
+  ],
+  "predicate": "build.exit_code == 0",
+  "predicate_layer": "semantic",
+  "verdict": "FAIL",
+  "evidence": [
+    {
+      "source_event_uuid": "4fdc4906-0000-4000-8000-000000000001",
+      "evidence_hash": "sha256:12ac2f2749744021149fafd4c1601b6e00760f10ff0b091b59d2cc6ddfd32b69",
+      "layer": "semantic",
+      "mode": "presence",
+      "signal": "regex:/build failed|webpack errors/i",
+      "observed_at": "2026-06-10T18:22:37Z"
+    }
+  ],
+  "evaluated_by": {
+    "component": "agentplane.stopgate",
+    "version": "0.1.0",
+    "kind": "deterministic-harness"
+  },
+  "evaluated_at": "2026-06-10T18:22:39Z",
+  "evidence_window": {
+    "start": "2026-06-10T18:22:35Z",
+    "end": "2026-06-10T18:22:38Z"
+  },
+  "lift_authority": "policy-fabric",
+  "obligations": [
+    "post_hoc.reverify_remote_ref within 300s"
+  ],
+  "log_completeness_attestation": {
+    "asserted": true,
+    "basis": "harness-recorded tool_use stream; no gap markers in window",
+    "attested_by": "agentplane.recorder@0.1.0"
+  },
+  "signature": {
+    "alg": "ed25519",
+    "key_id": "agentplane-signing-key-2026-06",
+    "value": "f8YObRQfLlbHnP3fmj3xV7mSmmHEiFmWP8raIgTRfWOQEWpP26DwPzmE2U29E8yuVfO0stguGAr/5VTCVc1vCA=="
+  }
+}
