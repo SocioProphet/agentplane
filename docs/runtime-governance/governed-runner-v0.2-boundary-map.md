@@ -178,7 +178,7 @@ The following remain blocked:
 Before any real verifier runner is implemented, open a new issue with explicit acceptance criteria for a policy-gated verifier runner.
 ## Required next implementation issue before runtime work
 
-Before any runtime-producing command is implemented, open a new issue with explicit acceptance criteria for a synthetic, non-mutating verifier-result producer.
+Before any real verifier runner is implemented, open a new issue with explicit acceptance criteria for a policy-gated verifier runner.
 
 That issue must require:
 
