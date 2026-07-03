@@ -55,8 +55,6 @@ Two fields in the example `bundle.json` are intentionally set to `"UNSET"`:
 scripts/demo.sh
 # Full demo: hygiene → doctor → validate → run → emit artifacts
 scripts/demo.sh
-
-# Or run the bundle directly
 runners/qemu-local.sh run bundles/example-agent --profile staging --watch
 ```
 
