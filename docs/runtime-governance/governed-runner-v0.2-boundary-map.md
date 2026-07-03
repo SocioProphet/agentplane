@@ -9,6 +9,7 @@ Owning repo: `SocioProphet/agentplane`
 This document records the governed-runner v0.2 boundary map after the cross-plane contract tranches landed.
 
 It is the canonical map for what is implemented as a contract or safe producer, what is owned by adjacent planes, what remains evidence-only, and what must not be implemented without a separate policy-gated tranche.
+It is the canonical map for what is implemented as a contract, what is owned by adjacent planes, what remains evidence-only, and what must not be implemented without a separate policy-gated tranche.
 
 ## Current cross-plane contracts
 
@@ -134,6 +135,7 @@ generated receipt validates
 ```
 
 This producer does not execute a verifier command and does not create live runtime behavior.
+This contract does not add a runner.
 
 ### Integrity evidence contract
 
@@ -157,6 +159,7 @@ This contract is evidence-only.
 The following remain blocked:
 
 - real verifier runner implementation;
+- verifier-result production implementation;
 - shell or arbitrary command execution;
 - workspace mutation;
 - integrity evidence production from live files;
@@ -173,6 +176,9 @@ The following remain blocked:
 ## Required next implementation issue before real verifier runner work
 
 Before any real verifier runner is implemented, open a new issue with explicit acceptance criteria for a policy-gated verifier runner.
+## Required next implementation issue before runtime work
+
+Before any runtime-producing command is implemented, open a new issue with explicit acceptance criteria for a synthetic, non-mutating verifier-result producer.
 
 That issue must require:
 
@@ -181,11 +187,15 @@ That issue must require:
 - allowlisted verifier plan only;
 - network mode off by default;
 - mutation mode none by default;
+- fixture-only verifier plan;
+- network mode off;
+- mutation mode none;
 - authority lookup consumed from Agent Registry output;
 - safety handoff consumed from Guardrail Fabric output;
 - `AttemptAdmissionReceipt` must admit;
 - emitted `VerificationExecutionReceipt` must validate;
 - no budget settlement integration in the first runner tranche unless explicitly designed.
+- no budget settlement integration in the first implementation tranche.
 
 ## Stopping rule
 
