@@ -21,6 +21,9 @@ permissions:
 
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   validate-shir-governed-chain-job:
     runs-on: ubuntu-latest
