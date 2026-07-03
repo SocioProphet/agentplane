@@ -111,7 +111,7 @@ The tests cover:
 
 ## prophet-cli integration
 
-After this surface lands, `prophet-cli` should delegate to `sp-run` through its existing façade model:
+`prophet-cli` delegates to `sp-run` through its existing façade model:
 
 ```bash
 prophet agentplane doctor

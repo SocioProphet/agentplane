@@ -19,6 +19,9 @@ change authority.
 admission receipt construction, smoke evidence generation, and run-store
 inspection. It does not run agents, execute verifier commands, mutate governed
 files, restore rollback state, settle budget, or change authority.
+admission receipt construction, and smoke evidence generation. It does not run
+agents, execute verifier commands, mutate governed files, restore rollback
+state, settle budget, or change authority.
 """
 
 from __future__ import annotations
@@ -55,6 +58,7 @@ REQUIRED_FILES = (
     "tools/run_governed_runner_smoke.py",
     "tools/run_store_inspection.py",
     "tools/validate_restore_admission_receipt.py",
+    "tools/run_governed_runner_smoke.py",
     "tools/validate_run_dossier.py",
     "tools/validate_governed_run_contract.py",
 )
@@ -149,6 +153,7 @@ def command_doctor(_args: argparse.Namespace) -> int:
             "capabilities": ["doctor", "dossier", "validate-dossier", "preflight", "admit"],
             "capabilities": ["doctor", "dossier", "validate-dossier", "preflight"],
             ],
+            "capabilities": ["doctor", "dossier", "validate-dossier", "preflight", "admit", "smoke"],
             "non_goals": ["execute", "mutate", "restore", "authority_update", "budget_settlement"],
             "capabilities": ["doctor", "dossier", "validate-dossier"],
             "non_goals": ["execute", "mutate", "restore", "authority_update"],
