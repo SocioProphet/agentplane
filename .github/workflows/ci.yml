@@ -65,7 +65,8 @@ jobs:
         run: |
           rm -rf artifacts/sourceos-image-production-smoke
           python3 scripts/run_sourceos_delegated.py bundles/sourceos-image-production-smoke/bundle.json \
-            --executor ci-sourceos-delegated-runner \
+            --mode record-only \
+            --executor ci-sourceos-delegated-record \
             --pipeline-run-ref tekton://sourceos-customize-live-iso/pr-smoke \
             --task-run-ref tekton://task/customize-live-iso \
             --task-run-ref tekton://task/publish-katello-file-repo \
@@ -225,7 +226,9 @@ jobs:
           assert request['modeGate']['liveExternalMutationPerformed'] is True
           print('[ci] SourceOS live Tekton adapter guards validated')
           assert request['mode'] == 'record-only'
+          assert request['modeGate']['submitImplementation'] == 'not_yet_live_recorded_intent_only'
+          assert request['submitIntent']['kubeconfigRef'] == 'secrets://sourceos/kubeconfig'
           assert run['sourceosImageProduction']['delegatedExecution']['tektonPipelineRunRef']
           assert replay['inputs']['sourceosImageProduction']['delegatedExecution']['katelloContentRef']
-          print('[ci] SourceOS delegated runner validated')
+          print('[ci] SourceOS delegated runner modes validated')
           PY
