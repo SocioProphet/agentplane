@@ -1,0 +1,85 @@
+{
+  "_doc": "SP-RETR-FIBER-001 WO_ADAPT_004 fixture: a known GLEIF Level-2 ownership chain across two filings (two fibers). ParentCo (filing A §4.2) --controls--> SubCo (filing B §2.1). graph-node.v0 + evidence.v0 records are schema-faithful; confidentiality_class is adapter-attached (WallGuard access axis) and is intentionally distinct from graph-node distribution_class (redistribution axis).",
+  "tenant_id": "acme-tenant",
+  "nodes": [
+    {
+      "graph_node": {
+        "node_id": "filing-A/root", "tenant_id": "acme-tenant", "node_kind": "document",
+        "display_name": "ParentCo Inc. Form 10-K (FY2025)",
+        "distribution_class": "public_derived",
+        "created_at": "2026-02-14T00:00:00Z", "updated_at": "2026-02-14T00:00:00Z"
+      },
+      "confidentiality_class": "public"
+    },
+    {
+      "graph_node": {
+        "node_id": "filing-A/s4.2", "tenant_id": "acme-tenant", "node_kind": "clause",
+        "display_name": "Item 4.2 — Subsidiaries and Controlled Entities",
+        "distribution_class": "public_derived",
+        "created_at": "2026-02-14T00:00:00Z", "updated_at": "2026-02-14T00:00:00Z"
+      },
+      "confidentiality_class": "firm_approved"
+    },
+    {
+      "graph_node": {
+        "node_id": "entity/parentco", "tenant_id": "acme-tenant", "node_kind": "organization",
+        "display_name": "ParentCo Inc.",
+        "aliases": ["ParentCo", "ParentCo Incorporated"],
+        "attributes": { "lei": "5493001KJTIIGC8Y1R12", "jurisdiction": "US-DE" },
+        "distribution_class": "public_derived",
+        "created_at": "2026-02-14T00:00:00Z", "updated_at": "2026-02-14T00:00:00Z"
+      },
+      "confidentiality_class": "firm_approved",
+      "evidence": {
+        "evidence_id": "ev-parentco-42", "tenant_id": "acme-tenant",
+        "source_ref": "filing-A", "anchor_ref": "filing-A#p87§4.2",
+        "observed_at": "2026-02-14T00:00:00Z", "ingested_at": "2026-07-04T00:00:00Z",
+        "extractor_ref": "tree-adapter/sec-10k@v0", "confidence": 0.98,
+        "distribution_class": "public_derived", "receipt_ref": "rcpt-ev-parentco-42"
+      }
+    },
+    {
+      "graph_node": {
+        "node_id": "filing-B/root", "tenant_id": "acme-tenant", "node_kind": "document",
+        "display_name": "SubCo LLC Form 10-K (FY2025)",
+        "distribution_class": "internal_private",
+        "created_at": "2026-03-01T00:00:00Z", "updated_at": "2026-03-01T00:00:00Z"
+      },
+      "confidentiality_class": "client_confidential"
+    },
+    {
+      "graph_node": {
+        "node_id": "filing-B/s2.1", "tenant_id": "acme-tenant", "node_kind": "clause",
+        "display_name": "Item 2.1 — Ownership and Capital Structure",
+        "distribution_class": "internal_private",
+        "created_at": "2026-03-01T00:00:00Z", "updated_at": "2026-03-01T00:00:00Z"
+      },
+      "confidentiality_class": "client_confidential"
+    },
+    {
+      "graph_node": {
+        "node_id": "entity/subco", "tenant_id": "acme-tenant", "node_kind": "organization",
+        "display_name": "SubCo LLC",
+        "attributes": { "lei": "213800WSGIIZCXF1P572", "jurisdiction": "US-DE" },
+        "distribution_class": "internal_private",
+        "created_at": "2026-03-01T00:00:00Z", "updated_at": "2026-03-01T00:00:00Z"
+      },
+      "confidentiality_class": "matter_restricted",
+      "evidence": {
+        "evidence_id": "ev-subco-21", "tenant_id": "acme-tenant",
+        "source_ref": "filing-B", "anchor_ref": "filing-B#p14§2.1",
+        "observed_at": "2026-03-01T00:00:00Z", "ingested_at": "2026-07-04T00:00:00Z",
+        "extractor_ref": "tree-adapter/sec-10k@v0", "confidence": 0.95,
+        "distribution_class": "internal_private", "receipt_ref": "rcpt-ev-subco-21"
+      }
+    }
+  ],
+  "edges": [
+    { "class": "containment", "parent": "filing-A/root", "child": "filing-A/s4.2" },
+    { "class": "containment", "parent": "filing-A/s4.2", "child": "entity/parentco" },
+    { "class": "containment", "parent": "filing-B/root", "child": "filing-B/s2.1" },
+    { "class": "containment", "parent": "filing-B/s2.1", "child": "entity/subco" },
+    { "class": "relational", "type_name": "gleif-L2:isDirectParentOf",
+      "src": "entity/parentco", "dst": "entity/subco" }
+  ]
+}
