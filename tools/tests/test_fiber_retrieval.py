@@ -17,6 +17,7 @@ Stdlib + pytest + the real conformal_gate. Run: python3 -m pytest -q tools/tests
 from __future__ import annotations
 
 import importlib.util
+import json
 import os
 import sys
 
@@ -259,3 +260,109 @@ def test_inv_f2_edge_class_purity():
     # descend follows ONLY E^⊑: the relational target is never a containment child.
     assert a["entity/subco"] not in fr.containment_children(g, a["entity/parentco"])
     assert fr.containment_children(g, a["filing-A/s4.2"]) == [a["entity/parentco"]]
+
+
+# --------------------------------------------------------------------------- #
+# Branch scorers: keyword navigator + real model-backed scorer (fake client).
+# --------------------------------------------------------------------------- #
+_DEMO = os.path.join(_HERE, "fixtures", "fiber_demo_ownership.json")
+_DEMO_QUERY = ("Which subsidiaries and controlled entities does Acme own, "
+               "and what is Globex's ownership and capital structure?")
+
+
+def _demo_graph():
+    with open(_DEMO, encoding="utf-8") as fh:
+        return fp.project(json.load(fh))
+
+
+def _root(g, node_id):
+    return g.id_map[("acme-tenant", node_id)]
+
+
+class _FakeBlock:
+    type = "tool_use"
+
+    def __init__(self, best_index, confidence):
+        self.input = {"best_index": best_index, "confidence": confidence}
+
+
+class _FakeMessages:
+    def __init__(self, script):
+        self._script = script
+
+    def create(self, **kwargs):
+        best, conf = self._script(kwargs)
+        return type("R", (), {"content": [_FakeBlock(best, conf)]})()
+
+
+class _FakeClient:
+    """Stands in for anthropic.Anthropic() — the scorer can't tell the difference."""
+
+    def __init__(self, script):
+        self.messages = _FakeMessages(script)
+
+
+def _pick_ownership_section(kwargs):
+    """A 'smart model': descend a single obvious child, else confidently pick the section
+    whose title is about ownership, else abstain."""
+    listing = kwargs["messages"][0]["content"]
+    rows = [l for l in listing.splitlines() if l.startswith("[")]
+    if len(rows) == 1:
+        return 0, 0.9  # one candidate — the descent is unambiguous
+    for i, row in enumerate(rows):
+        if any(w in row for w in ("Subsidiaries", "Ownership", "Controlled")):
+            return i, 0.95
+    return -1, 0.2
+
+
+def test_keyword_scorer_navigates_past_the_decoy_section():
+    g = _demo_graph()
+    leaf, status = fr.descend(g, _root(g, "filing-A/root"), fr.keyword_scorer(),
+                              confident_gate(), _DEMO_QUERY)
+    assert status == "reached_leaf"
+    assert g.display_of(leaf) == "Acme Corp"  # chose Item 4.2, not Item 1 (Business Overview)
+
+
+def test_llm_scorer_confident_pick_descends_to_the_right_leaf():
+    g = _demo_graph()
+    scorer = fr.llm_scorer(_FakeClient(_pick_ownership_section), model="fake")
+    leaf, status = fr.descend(g, _root(g, "filing-B/root"), scorer, confident_gate(), _DEMO_QUERY)
+    assert status == "reached_leaf"
+    assert g.display_of(leaf) == "Globex LLC"  # navigated Item 2.1, not Item 7 (MD&A)
+
+
+def test_llm_scorer_abstains_when_model_declines():
+    g = _demo_graph()
+    scorer = fr.llm_scorer(_FakeClient(lambda _k: (-1, 0.2)), model="fake")  # model won't commit
+    leaf, status = fr.descend(g, _root(g, "filing-A/root"), scorer, confident_gate(), _DEMO_QUERY)
+    assert status == fr.INDETERMINATE  # abstains instead of guessing
+    assert leaf is None
+
+
+def test_cli_end_to_end_pos_signed_and_verifiable(capsys):
+    seed = "02" * 32
+    rc = fr.main([
+        "retrieve", "--bundle", _DEMO, "--start", "entity/acme",
+        "--rel", "gleif-L2:isDirectParentOf", "--query", _DEMO_QUERY,
+        "--key-seed", seed, "--json",
+    ])
+    assert rc == 0
+    artifact = json.loads(capsys.readouterr().out)
+    assert artifact["verdict"] == sg.VERDICT_PASS
+    assert artifact["native_verdict"] == fr.POS
+    assert artifact["evidence_grade"] == "verified"
+    assert set(artifact["fiber_episode"]["Artifact"]) == {"filing-A#p87§4.2", "filing-B#p14§2.1"}
+    keyring = sg.Keyring().add_signer(sg.Signer.from_seed(bytes.fromhex(seed), "fiber-retrieval"))
+    assert sg.verify_artifact(artifact, keyring).ok  # the CLI's receipt verifies independently
+
+
+def test_cli_report_mode_is_human_readable(capsys):
+    rc = fr.main([
+        "retrieve", "--bundle", _DEMO, "--start", "entity/acme",
+        "--rel", "gleif-L2:isDirectParentOf", "--query", _DEMO_QUERY,
+    ])
+    assert rc == 0
+    out = capsys.readouterr().out
+    assert "POS  →  StopGate PASS  (permit)" in out
+    assert "Globex LLC" in out  # answer shown by name, not raw u128
+    assert "filing-A#p87§4.2" in out and "filing-B#p14§2.1" in out

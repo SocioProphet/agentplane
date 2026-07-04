@@ -101,6 +101,14 @@ class ProjectedGraph:
                 return v.payload
         return None
 
+    def display_of(self, atom_id: int):
+        """The node's display_name — the human-readable section/entity title a descend
+        scorer (LLM or oracle) reads to pick a branch. None if absent."""
+        for v in self.values:
+            if v.subject_atom == atom_id and v.key == "display_name":
+                return v.payload
+        return None
+
     def relational_links(self):
         return [l for l in self.links if l.edge_class == EDGE_RELATIONAL]
 
@@ -169,6 +177,7 @@ def project(fragment: dict, into: ProjectedGraph | None = None) -> ProjectedGrap
         g.nodes[atom_id] = NodeAtomView(atom_id=atom_id, type_name=gn["node_kind"])
 
         confidentiality = entry.get("confidentiality_class")  # WallGuard label (access axis)
+        _replace_value(g, atom_id, "display_name", gn["display_name"], security=confidentiality)
         _replace_value(g, atom_id, "distribution_class",
                        gn.get("distribution_class"), security=None)  # redistribution axis, NOT visibility
         for k, v in (gn.get("attributes") or {}).items():

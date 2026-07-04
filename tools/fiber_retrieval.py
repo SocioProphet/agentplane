@@ -30,6 +30,7 @@ Run:  python3 -m pytest -q tools/tests/test_fiber_retrieval.py
 from __future__ import annotations
 
 import os
+import re
 import sys
 from dataclasses import dataclass, field
 
@@ -354,3 +355,200 @@ def seal_episode(result, *, signer, session_id, workcell_id,
     )
     signed = sg.sign_artifact(unsigned, signer)
     return signed, sg.DISPOSITION[verdict]
+
+
+# --------------------------------------------------------------------------- #
+# Branch scorers for descend. The scorer is the ONE swappable seam: the algebra,
+# the conformal gate, and the sealing are identical whether the branch decision
+# comes from a lexical heuristic or a frontier model.
+# --------------------------------------------------------------------------- #
+def _words(text):
+    return set(re.findall(r"[a-z0-9]+", (text or "").lower()))
+
+
+def keyword_scorer():
+    """A deterministic, dependency-free navigator: nonconformity = low for the child whose
+    title UNIQUELY best-overlaps the query, high for the rest. Ties or no-overlap push every
+    child high, so the conformal gate abstains rather than guess. The honest floor beneath
+    llm_scorer — it navigates real branches with no model and no network."""
+
+    def scorer(g, _node, children, query):
+        q = _words(query)
+        overlap = {c: len(q & _words(g.display_of(c))) for c in children}
+        best = max(overlap.values()) if overlap else 0
+        if best == 0 or list(overlap.values()).count(best) > 1:
+            return {c: 1.0 for c in children}  # no clear winner → abstain
+        return {c: (0.1 if overlap[c] == best else 0.9) for c in children}
+
+    return scorer
+
+
+# ---- live model-backed scorer (turns the oracle into real reasoning) ---- #
+MODEL = "claude-opus-4-8"  # matches model_policy.MODEL; adaptive thinking on
+
+RANK_TOOL = {
+    "name": "rank_child_section",
+    "description": (
+        "Given a query and candidate child sections (by index + title), pick the single child "
+        "most likely to contain the answer. If none clearly fits or two are equally plausible, "
+        "return best_index = -1 so the retriever abstains instead of guessing."
+    ),
+    "input_schema": {
+        "type": "object",
+        "properties": {
+            "best_index": {"type": "integer",
+                           "description": "0-based index of the single best child, or -1 if ambiguous/none fits"},
+            "confidence": {"type": "number", "description": "0..1 confidence in best_index"},
+        },
+        "required": ["best_index", "confidence"],
+    },
+}
+
+
+def _first_tool_use(response):
+    for block in getattr(response, "content", []) or []:
+        if getattr(block, "type", None) == "tool_use":
+            return block
+    return None
+
+
+def default_node_text(g, atom):
+    name = g.display_of(atom)
+    if name:
+        return name
+    node = g.nodes.get(atom)
+    return node.type_name if node else str(atom)
+
+
+def llm_scorer(client, *, model=MODEL, node_text=default_node_text, max_tokens=512):
+    """A descend scorer backed by a real Claude model. The Anthropic `client` is
+    dependency-injected — pass a live `anthropic.Anthropic()` in production or a scripted fake
+    in tests; the algebra + gate + sealing are identical either way. For each internal node it
+    asks the model which child section best answers the query and how confident it is, then
+    maps that to a per-child NONCONFORMITY score (HIGH = more likely wrong). Ambiguity
+    (best_index = -1) or low confidence keeps every child high, so the conformal gate abstains
+    instead of hallucinating a branch — the exact failure mode this design exists to prevent."""
+
+    def scorer(g, _node, children, query):
+        titles = [node_text(g, c) for c in children]
+        listing = "\n".join(f"[{i}] {t}" for i, t in enumerate(titles))
+        response = client.messages.create(
+            model=model,
+            max_tokens=max_tokens,
+            thinking={"type": "adaptive"},
+            system=("You navigate a document's table of contents to locate an answer. Pick the one "
+                    "child section to descend into, and prefer abstaining (best_index = -1) over a "
+                    "wrong guess."),
+            tools=[RANK_TOOL],
+            tool_choice={"type": "tool", "name": "rank_child_section"},
+            messages=[{"role": "user",
+                       "content": f"Query: {query}\n\nCandidate child sections:\n{listing}"}],
+        )
+        tu = _first_tool_use(response)
+        scores = {c: 1.0 for c in children}  # default high (abstain) unless a confident in-range pick
+        if tu is not None:
+            best = tu.input.get("best_index", -1)
+            conf = float(tu.input.get("confidence", 0.0))
+            if isinstance(best, int) and 0 <= best < len(children):
+                scores[children[best]] = max(0.0, 1.0 - conf)
+        return scores
+
+    return scorer
+
+
+# --------------------------------------------------------------------------- #
+# CLI — end-to-end demo: answer a multi-hop query with a signed, cited receipt.
+# --------------------------------------------------------------------------- #
+def _default_gate(alpha):
+    """A split-CRC gate calibrated so a confident pick (score ~0.1) is accepted and an
+    ambiguous one (~0.9) abstains, at risk budget `alpha`."""
+    scores = [i / 100 for i in range(100)]
+    correct = [s <= 0.4 for s in scores]
+    return cg.calibrate(scores, correct, alpha)
+
+
+def _live_client():
+    import anthropic  # noqa: PLC0415  (lazy: only when actually using --model)
+
+    return anthropic.Anthropic()
+
+
+def _report(result, artifact, disposition, answer_label=None):
+    lines = [
+        f"verdict         : {result.verdict}  →  StopGate {artifact['verdict']}  ({disposition})",
+        f"evidence grade  : {result.egrade}",
+        f"answer          : {answer_label or result.answer}",
+        f"doubly grounded : {result.doubly_grounded}",
+        f"citations       : {result.citations}",
+        f"witness         : {result.witness}",
+        f"artifact_id     : {sg.artifact_id(artifact)}",
+        "trace           :",
+    ]
+    lines += [f"    {step}" for step in result.trace]
+    return "\n".join(lines)
+
+
+def cmd_retrieve(args):
+    import json  # noqa: PLC0415
+
+    with open(args.bundle, encoding="utf-8") as fh:
+        fragment = json.load(fh)
+    g = fp.project(fragment)
+    start = g.id_map[(fragment["tenant_id"], args.start)]
+    scorer = llm_scorer(_live_client()) if args.model else keyword_scorer()
+    visible = label_gate(args.cleared) if args.cleared else allow_all
+    result = retrieve_edge(
+        g, start, args.rel, scorer=scorer, gate=_default_gate(args.alpha), query=args.query,
+        beam_k=args.beam_k, e_floor=args.e_floor, visible=visible)
+    signer = (sg.Signer.from_seed(bytes.fromhex(args.key_seed), args.key_id)
+              if args.key_seed else sg.Signer.generate(args.key_id))
+    artifact, disposition = seal_episode(
+        result, signer=signer, session_id=args.session_id, workcell_id=args.workcell_id,
+        window_start=args.window_start, window_end=args.window_end, evaluated_at=args.evaluated_at)
+    answer_label = g.display_of(result.answer) if result.answer is not None else None
+    print(json.dumps(artifact, indent=2, ensure_ascii=False) if args.json
+          else _report(result, artifact, disposition, answer_label))
+    return 0
+
+
+def build_parser():
+    import argparse  # noqa: PLC0415
+
+    p = argparse.ArgumentParser(
+        prog="fiber_retrieval",
+        description="Fibered retrieval: cross a fiber boundary, locate page anchors, verdict the "
+                    "cross-document claim, and seal a signed, cited receipt.")
+    sub = p.add_subparsers(dest="command", required=True)
+    r = sub.add_parser("retrieve", help="Run traverse;descend;verdict;seal on a fiber bundle.")
+    r.add_argument("--bundle", required=True, help="Crystal Atlas fiber-bundle JSON (fragment).")
+    r.add_argument("--start", required=True, help="Start node_id to hop from.")
+    r.add_argument("--rel", required=True, help="Relational edge type to traverse (E_R).")
+    r.add_argument("--query", required=True, help="Retrieval query (guides descend).")
+    r.add_argument("--model", action="store_true",
+                   help="Use a live Claude branch scorer (default: deterministic keyword navigator).")
+    r.add_argument("--alpha", type=float, default=0.10, help="Conformal risk budget.")
+    r.add_argument("--beam-k", type=int, default=8, dest="beam_k")
+    r.add_argument("--e-floor", default="sampled", dest="e_floor",
+                   choices=["sampled", "verified", "exact"])
+    r.add_argument("--cleared", nargs="*", default=None,
+                   help="WallGuard confidentiality labels the caller is cleared for.")
+    r.add_argument("--key-seed", dest="key_seed", default=None,
+                   help="32-byte ed25519 seed (hex) for the signer; else ephemeral.")
+    r.add_argument("--key-id", dest="key_id", default="fiber-retrieval")
+    r.add_argument("--session-id", dest="session_id", default="fiber-cli")
+    r.add_argument("--workcell-id", dest="workcell_id", default="fiber-cli")
+    r.add_argument("--window-start", dest="window_start", default="2026-07-04T00:00:00Z")
+    r.add_argument("--window-end", dest="window_end", default="2026-07-04T00:00:01Z")
+    r.add_argument("--evaluated-at", dest="evaluated_at", default=None)
+    r.add_argument("--json", action="store_true", help="Emit the signed StopGate artifact JSON.")
+    r.set_defaults(func=cmd_retrieve)
+    return p
+
+
+def main(argv=None):
+    args = build_parser().parse_args(argv)
+    return args.func(args)
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
