@@ -16,21 +16,29 @@ primitives with `SP_TRACE_CFR_001_SPEC.md` so we build each mechanism once.
 | Memory Mesh | ✅ EXISTS | `~/dev/memory-mesh`, `~/dev/memorymesh` (107 refs) |
 | WallGuard | ✅ EXISTS | `tools/wallguard_collaboration_gate.py` (29 refs) |
 | Policy Fabric / Constitutional Policy Engine | ✅ EXISTS | `~/dev/policy-fabric` (353 refs); Constitutional (7 refs) |
-| `ObligationIR` base schema | ❌ MISSING | no `obligation*.schema.json`; only a concept in the StopGate spec |
-| `VerifierIR` base schema | ❌ MISSING | concept lives in `tools/stopgate_artifact.py`, no standalone schema |
-| `EvidenceIR` base schema | ❌ MISSING | many concrete `*-evidence` schemas, no base `evidence.ir` |
-| `ClaimIR` base schema | ❌ MISSING | (SP-TRACE-CFR WO-0.B is defining a minimal one) |
-| `LedgerIR` base schema | ❌ MISSING | only `agentic-ops-budget-ledger` (a specific ledger) |
+| `ObligationIR` base schema | ✅ AUTHORED | `schemas/obligation-ir.schema.v0.1.json` (§6 kind system; v2 delta adds graph/taint) |
+| `VerifierIR` base schema | ✅ AUTHORED | `schemas/verifier-ir.schema.v0.1.json` (grounded in `stopgate_artifact.py` finding domain) |
+| `EvidenceIR` base schema | ✅ AUTHORED | `schemas/evidence-ir.schema.v0.1.json` (grounded in `Evidence` dataclass) |
+| `ClaimIR` base schema | ✅ AUTHORED | `schemas/claim-ir.schema.v0.1.json` (WO-0.B design; α-compiler input) |
+| `LedgerIR` base schema | ❌ MISSING (deferred) | only `agentic-ops-budget-ledger`; §5 marks it MUST-NOT-touch/advisory, so not on the §8→§6→§9 critical path |
 | **Mellumwork** framework (T1/T2) | ❌ NOT LOCATABLE | 0 files; the entire tiering doctrine rests on it |
 | **CBES** axioms (A1–A7) | ❌ NOT LOCATABLE | 0 files; §6 `prohibition` claims "CBES axioms already express prohibitions" |
 
-### Consequences (must resolve before the §13 deltas are buildable)
-1. **The §13 "v2 deltas" amend v1 bases that do not exist for 5 of 6 IRs.** ObligationIR/VerifierIR/
-   EvidenceIR/ClaimIR/LedgerIR need a **base v1 schema authored first**, then the v2 delta applied.
-   Only ReceiptIR can take its v2 `fold` delta directly.
-2. **§13.6 StepGateArtifact `allOf $ref "stopgate.artifact/v1"` is a dangling ref** — the base
-   `stop-gate-artifact.schema.v0.1.json` has **no `$id`**. Fix: add `"$id": "stopgate.artifact/v1"`
-   to the base schema (a one-line, backward-compatible change) before StepGateArtifact validates.
+### Consequences
+1. **Base v1 schemas — DONE for 4 of 5** (Obligation/Verifier/Evidence/Claim authored 2026-07-03,
+   Draft-2020 valid). ReceiptIR already existed; LedgerIR deferred (off critical path). The §13 v2
+   deltas now apply additively on top of these bases.
+2. **id-scheme mismatch (corrected finding).** The canonical StopGate schema
+   `StopGateArtifact.schema.v0.1.json` **does have an `$id`**:
+   `https://schemas.srcos.ai/agentplane/StopGateArtifact.schema.v0.1.json` (my earlier "no `$id`"
+   checked the wrong kebab/bundle file). The real gap: the composition spec's §13 `$ref`s use **short
+   logical ids** (`stopgate.artifact/v1`, `obligation.ir/v2`) while the repo uses **URL `$id`s**. The
+   new base schemas carry URL `$id`s + the logical id in `title`/`description`; when §13.6
+   StepGateArtifact is authored as a file, its `$ref` MUST resolve to
+   `.../StopGateArtifact.schema.v0.1.json`, not the short id. Short→URL map:
+   `evidence.ir/v1 → evidence-ir.schema.v0.1.json`, `verifier.ir/v1 → verifier-ir...`,
+   `obligation.ir/v1 → obligation-ir...`, `claim.ir/v1 → claim-ir...`, `receipt.ir → receipt.schema...`,
+   `stopgate.artifact/v1 → StopGateArtifact.schema.v0.1.json`.
 3. **Mellumwork and CBES are cited as normative dependencies but are not in-repo.** Either they live
    outside these repos (Documents / another estate) and must be linked, or the T1/T2 tiering and the
    `prohibition`↔CBES claim are **asserted, not grounded** — treat as such until located. (Same

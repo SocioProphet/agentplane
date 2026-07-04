@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.srcos.ai/agentplane/obligation-ir.schema.v0.1.json",
+  "title": "ObligationIR (base v1)",
+  "description": "Base obligation: a gateable or structural commitment in the orchestration. Logical id 'obligation.ir/v1'. The kind system is from AGENTPLANE_COMPOSITION_PRIMITIVES_SPEC §6; the §13.1 v2 delta adds the task 'graph' and resource 'taint' fields additively. SP_TRACE_CFR_001 binds GOV-SC-DETACH to kind∈{prohibition,resource} and GOV-IRRED capability-class escalation to resource taint.",
+  "type": "object",
+  "properties": {
+    "obligation_id": { "type": "string" },
+    "kind": {
+      "type": "string",
+      "enum": ["goal", "prohibition", "softgoal", "task", "resource"],
+      "description": "goal=verify-at-completion; prohibition=must-not, continuous; softgoal=advisory, never gates; task=decomposition; resource=capability grant"
+    },
+    "gateable": {
+      "type": "boolean",
+      "description": "goal/prohibition true; softgoal MUST be false; task/resource structural"
+    },
+    "verifier_ref": {
+      "type": ["string", "null"],
+      "description": "VerifierIR that decides a goal/prohibition; null for softgoal/task/resource"
+    },
+    "description": { "type": "string" }
+  },
+  "required": ["obligation_id", "kind"],
+  "allOf": [
+    {
+      "if": { "properties": { "kind": { "const": "softgoal" } } },
+      "then": { "properties": { "gateable": { "const": false } } }
+    }
+  ],
+  "additionalProperties": true
+}

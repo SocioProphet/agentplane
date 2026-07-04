@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.srcos.ai/agentplane/evidence-ir.schema.v0.1.json",
+  "title": "EvidenceIR (base v1)",
+  "description": "Base evidence record consumed by StopGate/VerifierIR gates. Grounded in tools/stopgate_artifact.py::Evidence. Logical id 'evidence.ir/v1'. Extended additively by AGENTPLANE_COMPOSITION_PRIMITIVES_SPEC §13.3 (latents) and SP_TRACE_CFR_001_SPEC §3.2 (cfr_witness).",
+  "type": "object",
+  "properties": {
+    "source_event_uuid": { "type": "string", "description": "the replay/trajectory event this evidence is drawn from" },
+    "evidence_hash": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+    "layer": { "type": "string", "enum": ["semantic", "transport"], "description": "predicate-binding layer (§5.3)" },
+    "signal": { "type": ["string", "null"], "description": "optional matched signal descriptor" },
+    "mode": { "type": "string", "enum": ["presence", "absence"], "default": "presence", "description": "absence needs a completeness attestation (§5.4)" },
+    "observed_at": { "type": ["string", "null"], "format": "date-time" }
+  },
+  "required": ["source_event_uuid", "evidence_hash", "layer", "mode"],
+  "additionalProperties": true
+}

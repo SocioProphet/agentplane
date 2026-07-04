@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.srcos.ai/agentplane/verifier-ir.schema.v0.1.json",
+  "title": "VerifierIR (base v1)",
+  "description": "Base verifier record: a non-model gate function's finding over hashed evidence. Grounded in tools/stopgate_artifact.py finding domain {OK, VIOLATION, REVIEW, null} -> verdict {PASS, FAIL, REVIEW, INDETERMINATE}. Logical id 'verifier.ir/v1'. Extended additively by AGENTPLANE_COMPOSITION_PRIMITIVES_SPEC §13.2 (properties_constraints, conformal) and SP_TRACE_CFR_001_SPEC §3.1 (trace_cfr).",
+  "type": "object",
+  "properties": {
+    "verifier_class": { "type": "string", "description": "e.g. trace_cfr, build_exit_code, guardrail" },
+    "predicate": { "type": "string", "description": "the gate condition, evaluated by non-model code (§5.1)" },
+    "predicate_layer": { "type": "string", "enum": ["semantic", "transport"], "default": "semantic" },
+    "finding": {
+      "type": ["string", "null"],
+      "enum": ["OK", "VIOLATION", "REVIEW", null],
+      "description": "sourced from evidence, never authored freely; null = no bindable evidence (§4)"
+    },
+    "evidence_refs": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+      "description": "EvidenceIR hashes this finding is bound to"
+    }
+  },
+  "required": ["verifier_class", "finding"],
+  "additionalProperties": true
+}

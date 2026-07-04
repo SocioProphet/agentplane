@@ -1,0 +1,37 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.srcos.ai/agentplane/claim-ir.schema.v0.1.json",
+  "title": "ClaimIR (base v1)",
+  "description": "A structured narration claim, input to the α-compiler (SP_TRACE_CFR_001 D5/P4, WO-0.B). Logical id 'claim.ir/v1'. α: ClaimIR -> AST(Π) compiles 'clause'; an unparseable clause yields ZERO/CLAIM_UNSTRUCTURED, an absent 'covers' yields ZERO/CLAIM_UNANCHORED.",
+  "type": "object",
+  "$defs": {
+    "clause": {
+      "type": "object",
+      "properties": {
+        "primitive": {
+          "type": "string",
+          "enum": ["SEQ", "IF", "IF_ELSE", "WHILE", "DO_WHILE", "SWITCH", "SPAWN_JOIN", "SPAWN_DETACHED"]
+        },
+        "children": { "type": "array", "items": { "$ref": "#/$defs/clause" } },
+        "guard_ref": { "type": ["string", "null"], "description": "predicate identity, identity-compared in P4 (§4.4)" }
+      },
+      "required": ["primitive"],
+      "additionalProperties": false
+    }
+  },
+  "properties": {
+    "claim_id": { "type": "string" },
+    "narration_event_id": { "type": "string" },
+    "covers": {
+      "type": "array",
+      "items": { "type": "string" },
+      "minItems": 2,
+      "maxItems": 2,
+      "description": "[first_event_id, last_event_id]; absent -> ZERO CLAIM_UNANCHORED"
+    },
+    "clause": { "$ref": "#/$defs/clause" },
+    "raw": { "type": "string", "description": "the natural-language narration span" }
+  },
+  "required": ["claim_id", "narration_event_id", "raw"],
+  "additionalProperties": true
+}
