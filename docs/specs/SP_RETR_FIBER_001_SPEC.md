@@ -1,9 +1,11 @@
 # SP-RETR-FIBER-001 — Fibered Retrieval over HellGraph
 ### companion: SP-ADAPT-TREE-001 — Structural (PageIndex-class) Ingestion Adapter
 
-**Version:** 0.2.0 (DRAFT — public-review stop point pending WO_FIBER_001 binding)
+**Version:** 0.2.0 (DRAFT — **WO_FIBER_001 binding COMPLETE**; see reconciliation banner below)
 **Layer:** AgentPlane / retrieval + evidence-emission family
 **Home:** `~/dev/agentplane` (branch `spec/retr-fiber-001`)
+
+> ⚠️ **BINDING RECONCILED — read `SP_RETR_FIBER_001_BINDING.md` + `SP_RETR_FIBER_001_axis_binding.md` first.** WO_FIBER_001 read the live repos and corrected several v0.2.0 interface assumptions. Where this spec and those files disagree, **those files win** (they are repo-grounded; this spec was memory-grounded). Headline corrections: (1) `H` spans **two substrates** — hellgraph (`AtomId=u128`, not `Uuid`) + prophet-platform Crystal Atlas contracts — not one; (2) `EdgeClass` does **not** exist in hellgraph (WO_FIBER_002 builds it); (3) the conformal guard is real but is **CRC, not APS/prediction-sets**, and Mondrian → per-stratum `calibration_set_id` (§6.2 rewrites); (4) `EGrade{E0..E5}` does not exist — rebind to `{exact,sampled,verified}` (see axis-binding); (5) Mellumwork is T1/T2 tiering, the 5-field Episode builds on the real **StopGate artifact**; (6) `DatasetCatalogEntry v1` is fictional → `asset-catalog-entry.v0` + `evidence.v0` (`anchor_ref`); GLEIF/FIBO/eCFR source adapters are **not registered in prophet-platform** (Catalog Gateway is pre-MVP).
 **Evidence grade at author time:** `E1` — design-level; architecture reasoned from estate memory, **not** a fresh repo read.
 **Promotion gate:** `E4` requires Michael-only sign-off (mirror SCOPE-D E4/E5/E6 lane).
 **Depends on:**
