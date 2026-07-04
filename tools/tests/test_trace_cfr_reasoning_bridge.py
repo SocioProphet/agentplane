@@ -41,9 +41,9 @@ def _dowhile_events():
     return [
         _ev("e0", "reasoning.run.created"),                                  # skipped (not control-flow)
         _ev("e1", "reasoning.tool.called", site="body"),
-        _ev("e2", "reasoning.decision.branched", site="guard", branch_taken="true", guard_position="post"),
+        _ev("e2", "reasoning.decision.branched", site="guard", branchTaken="true", guardPosition="post"),
         _ev("e3", "reasoning.tool.called", site="body"),
-        _ev("e4", "reasoning.decision.branched", site="guard", branch_taken="false", guard_position="post"),
+        _ev("e4", "reasoning.decision.branched", site="guard", branchTaken="false", guardPosition="post"),
         _ev("e5", "reasoning.run.completed", site="exit"),
     ]
 

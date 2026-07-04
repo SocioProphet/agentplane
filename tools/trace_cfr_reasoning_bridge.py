@@ -77,14 +77,18 @@ def reasoning_events_to_segment(events: list[dict], session_id: str = "") -> dic
             continue
         cf = ev.get("controlFlow", {})
         site = cf.get("site") or ev.get("id", "site")
+        # canonical sourceos-spec fields are camelCase; snake_case kept as a fallback
+        branch = cf.get("branchTaken", cf.get("branch_taken", "unknown"))
+        guard = cf.get("guardPosition", cf.get("guard_position"))
+        sidechain = cf.get("sidechainId", cf.get("sidechain_id", "sc"))
         if kind == "tool_call":
             e.tool_call(site)
         elif kind == "decision":
-            e.decision(site, cf.get("branch_taken", "unknown"), cf.get("guard_position"))
+            e.decision(site, branch, guard)
         elif kind == "spawn":
-            e.spawn(site, cf.get("sidechain_id", "sc"))
+            e.spawn(site, sidechain)
         elif kind == "join":
-            e.join(site, cf.get("sidechain_id", "sc"))
+            e.join(site, sidechain)
         elif kind == "terminal":
             e.terminal(site)
     if not e._events:
