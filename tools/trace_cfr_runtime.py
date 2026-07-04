@@ -43,6 +43,7 @@ class RunFidelityReport:
     failure_traces: list = field(default_factory=list)
     segment: dict | None = None
     reason: str = ""
+    normalization_version: str = ""
 
     @property
     def permitted(self) -> bool:
@@ -98,6 +99,64 @@ def gate_segment(segment: dict, claims: list[dict], signer: "sg.Signer", session
     gate = rf.fold(mapped, rf.verdict_monoid) if mapped else "PASS"
     return RunFidelityReport(
         gate_verdict=gate, claim_verdicts=verdicts, stepgates=gates,
-        failure_traces=traces, segment=segment,
+        failure_traces=traces, segment=segment, normalization_version=n.normalization_version,
         reason="ok" if gate == "PASS" else f"{sum(1 for v in verdicts if v.verdict == nfv.NEG)} unfaithful claim(s)",
     )
+
+
+# --------------------------------------------------------------------------- #
+# Run-level signed attestation (§5) — the first-class evidence object
+# --------------------------------------------------------------------------- #
+import hashlib  # noqa: E402
+from collections import Counter  # noqa: E402
+
+RUN_ATTESTATION_KIND = "trace_cfr_run_attestation"
+ENGINE_VERSIONS = {"hammock": "R_H@0.1.0", "interval": "R_I@0.1.0"}
+_GATE_DOMAIN = ("PASS", "FAIL", "REVIEW", "INDETERMINATE")
+
+
+def _art_hash(obj) -> str:
+    return "sha256:" + hashlib.sha256(sg.canonical_bytes(obj)).hexdigest()
+
+
+def build_run_attestation(report: RunFidelityReport, signer: "sg.Signer", session_id: str = "") -> dict:
+    """Bundle a gated run into one signed attestation (schema trace-cfr-run-attestation)."""
+    segref = (report.segment or {}).get("segment", {})
+    counts = Counter(v.verdict for v in report.claim_verdicts)
+    stepgate_refs = [_art_hash(a) for a in report.stepgates]
+    body = {
+        "artifact_kind": RUN_ATTESTATION_KIND,
+        "spec_version": sg.SPEC_VERSION,
+        "session_id": session_id,
+        "segment_ref": {
+            "first_event_id": segref.get("first_event_id", ""),
+            "last_event_id": segref.get("last_event_id", ""),
+            "segment_hash": segref.get("segment_hash", ""),
+        },
+        "normalization_version": report.normalization_version,
+        "engine_versions": ENGINE_VERSIONS,
+        "gate_verdict": report.gate_verdict,
+        "claims_evaluated": len(report.claim_verdicts),
+        "verdicts": {k: counts.get(k, 0) for k in ("POS", "ZERO", "NEG", "INDETERMINATE")},
+        "anomalies": sorted({t.get("failure_cluster") for t in report.failure_traces if t.get("failure_cluster")}),
+        "stepgate_refs": stepgate_refs,
+        "evidence_hashes": stepgate_refs,
+        "evaluated_by": {"kind": "deterministic-harness"},
+        "evaluated_at": sg.utc_now_iso(),
+    }
+    body["signature"] = signer.signature_block(sg.canonical_bytes(body))
+    return body
+
+
+def verify_run_attestation(att: dict, keyring: "sg.Keyring") -> tuple[bool, list[str]]:
+    """Independent re-check: model-exclusion, verdict domain, ed25519 signature."""
+    problems: list[str] = []
+    if att.get("evaluated_by", {}).get("kind") != "deterministic-harness":
+        problems.append("model-exclusion: attestation not signed by deterministic harness")
+    if att.get("gate_verdict") not in _GATE_DOMAIN:
+        problems.append(f"gate_verdict {att.get('gate_verdict')!r} not in {_GATE_DOMAIN}")
+    sig = att.get("signature") or {}
+    body = {k: v for k, v in att.items() if k != "signature"}
+    if not (sig and keyring.verify(sig.get("key_id", ""), sg.canonical_bytes(body), sig.get("value", ""))):
+        problems.append("signature invalid or missing")
+    return (not problems), problems

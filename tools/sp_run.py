@@ -444,7 +444,10 @@ def command_narration_gate(args: argparse.Namespace) -> int:
     seed = bytes.fromhex(args.key_seed) if args.key_seed else b"\x07" * 32
     signer = stopgate_artifact.Signer.from_seed(seed, key_id=args.key_id)
 
-    report = trace_cfr_runtime.gate_segment(segment, claims, signer)
+    report = trace_cfr_runtime.gate_segment(segment, claims, signer, session_id=args.session_id or "")
+    attestation = trace_cfr_runtime.build_run_attestation(report, signer, session_id=args.session_id or "")
+    if args.out:
+        Path(args.out).write_text(json.dumps(attestation, indent=2, sort_keys=True), encoding="utf-8")
     emit({
         "ok": report.permitted,
         "gate_verdict": report.gate_verdict,
@@ -453,6 +456,8 @@ def command_narration_gate(args: argparse.Namespace) -> int:
         "unfaithful_claims": [v.claim_id for v in report.claim_verdicts if v.verdict == "NEG"],
         "failure_clusters": [t.get("failure_cluster") for t in report.failure_traces],
         "stepgate_count": len(report.stepgates),
+        "attestation_segment_hash": attestation["segment_ref"]["segment_hash"],
+        "attestation_written": args.out,
     })
     return 0 if report.permitted else 1
 
@@ -528,6 +533,8 @@ def build_parser() -> argparse.ArgumentParser:
     narration_gate.add_argument("--claims", help="Path to a JSON list of ClaimIR narration claims.")
     narration_gate.add_argument("--key-id", default="dev-harness", help="Harness signing key id.")
     narration_gate.add_argument("--key-seed", help="32-byte hex ed25519 seed (deployment supplies; dev default otherwise).")
+    narration_gate.add_argument("--session-id", help="Run/session id recorded in the attestation.")
+    narration_gate.add_argument("--out", help="Write the signed run attestation JSON to this path.")
     narration_gate.set_defaults(func=command_narration_gate)
 
     return parser

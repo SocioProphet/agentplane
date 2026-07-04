@@ -393,4 +393,5 @@ validate: validate-trace-cfr
 validate-trace-cfr:
 	python3 -m json.tool schemas/trace-cfr-segment.schema.v0.1.json >/dev/null
 	python3 -m json.tool schemas/stepgate-artifact.schema.v0.1.json >/dev/null
+	python3 -m json.tool schemas/trace-cfr-run-attestation.schema.v0.1.json >/dev/null
 	python3 tools/validate_trace_cfr.py
