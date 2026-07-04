@@ -291,3 +291,34 @@ def unanchored_relational_endpoints(g: ProjectedGraph) -> list:
             if g.anchor_of(target) is None and target not in bad:
                 bad.append(target)
     return bad
+
+
+# --------------------------------------------------------------------------- #
+# Interchange: emit H in a language-neutral form the real hellgraph substrate ingests.
+# --------------------------------------------------------------------------- #
+def to_bundle(g: ProjectedGraph) -> str:
+    """Serialize the composite graph H to a tab-delimited, node_id-keyed bundle:
+
+        N<TAB>node_id<TAB>node_kind
+        C<TAB>parent_node_id<TAB>child_node_id            (E^⊑, containment)
+        R<TAB>rel_type<TAB>src_node_id<TAB>dst_node_id     (E_R, relational)
+
+    It is keyed by the stable string node_id (NOT the Python-internal u128 atom id), so a
+    Rust ingest adapter (`hg_fiber::ingest_bundle`) rebuilds the SAME two-edge-class graph on
+    the hellgraph substrate, minting its own atom ids. This is the parity contract:
+    fiber_projection is the reference oracle, hg_fiber is the real engine, this bundle is what
+    they must agree on. Deterministic (sorted) so it is a stable golden vector. Structural
+    only in v0 — anchors/labels/claims layer in once the Rust value-write path is bound.
+    """
+    rev = {atom_id: node_id for (_tenant, node_id), atom_id in g.id_map.items()}
+    nodes = [f"N\t{rev[a]}\t{g.nodes[a].type_name}" for a in sorted(g.nodes, key=lambda a: rev[a])]
+    cont, rel = [], []
+    for l in g.containment_links():
+        p = next(t for (r, t, _o) in l.members if r == "parent")
+        c = next(t for (r, t, _o) in l.members if r == "child")
+        cont.append(f"C\t{rev[p]}\t{rev[c]}")
+    for l in g.relational_links():
+        s = next(t for (r, t, _o) in l.members if r == "src")
+        d = next(t for (r, t, _o) in l.members if r == "dst")
+        rel.append(f"R\t{l.type_name}\t{rev[s]}\t{rev[d]}")
+    return "\n".join(nodes + sorted(cont) + sorted(rel)) + "\n"
