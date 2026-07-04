@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.srcos.ai/agentplane/trace-cfr-segment.schema.v0.1.json",
+  "title": "Trace CFR Segment (SP-TRACE-CFR D1 control-flow projection)",
+  "description": "A sealed segment of control-flow replay events, the input WO-1 ingest recovers a CFG from (SP_TRACE_CFR_001_SPEC §2 D1, §4.0). This is a SEPARATE schema, not a mutation of agentic-ops-trajectory-event: the existing trajectory contract carries only stepKind {model_call,tool_call,...} + governance decisions, so the control-flow view (spawn/join/decision kinds + site_id/branch_taken/guard_position/sidechain_id) is projected/emitted here. Produced by tools/trace_cfr_emitter.py.",
+  "$defs": {
+    "event": {
+      "type": "object",
+      "properties": {
+        "event_id": { "type": "string" },
+        "session_id": { "type": "string" },
+        "parent_event_id": { "type": ["string", "null"] },
+        "agent_id": { "type": "string" },
+        "site_id": { "type": "string", "description": "stable orchestration-site identity; the P1 decision-fold key (NOT payload_hash)" },
+        "sidechain_id": { "type": ["string", "null"] },
+        "kind": {
+          "type": "string",
+          "enum": ["tool_call", "tool_result", "decision", "spawn", "join", "narration", "gate", "terminal"]
+        },
+        "ts_mono_ns": { "type": "integer", "minimum": 0 },
+        "payload_hash": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+        "branch_taken": { "type": ["string", "null"], "description": "edge label on a decision successor" },
+        "guard_position": {
+          "type": ["string", "null"],
+          "enum": ["pre", "post", null],
+          "description": "loop guard vs first body exec: pre=WHILE, post=DO_WHILE (§4.1)"
+        }
+      },
+      "required": ["event_id", "session_id", "agent_id", "site_id", "kind", "ts_mono_ns", "payload_hash"],
+      "additionalProperties": false
+    }
+  },
+  "type": "object",
+  "properties": {
+    "events": { "type": "array", "items": { "$ref": "#/$defs/event" }, "minItems": 1 },
+    "segment": {
+      "type": "object",
+      "properties": {
+        "log_uri": { "type": "string" },
+        "first_event_id": { "type": "string" },
+        "last_event_id": { "type": "string" },
+        "segment_hash": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$", "description": "over the raw JSONL bytes, inclusive (§4.0 seal, computed BEFORE parsing)" }
+      },
+      "required": ["first_event_id", "last_event_id", "segment_hash"],
+      "additionalProperties": false
+    }
+  },
+  "required": ["events", "segment"],
+  "additionalProperties": false
+}
