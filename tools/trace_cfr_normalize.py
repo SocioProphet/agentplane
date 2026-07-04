@@ -5,17 +5,16 @@ Applied in order to a Trace CFG (tools/trace_cfr_cfg.py). The blake2b of the
 canonical transform list IS the `normalization_version`; changing the order is a
 new version. The two load-bearing transforms for recovery are implemented in full:
 
-  * T5 backedge derivation — dominators (iterative dataflow); an edge (u->v) is a
-    natural-loop `backedge` iff v dominates u. Cycle edges that are NOT dominated
-    (v reaches u but does not dominate it) are `retreat_nondom` — the raw material
-    of GOV-IRRED-001 (irreducible regions). This is what lets R_H match WHILE/DO_WHILE.
-  * T2 seq-chain compression — maximal runs of `seq` edges whose interior nodes are
-    in-deg-1/out-deg-1 collapse into a SEQ region (member list retained). Backedges
-    are excluded so loops are not compressed across the header.
+  * T5 backedge derivation — Cooper-Harvey-Kennedy immediate dominators (near-linear,
+    no full dom-sets) + iterative DFS retreating-edge detection. An edge (u->v) is a
+    natural-loop `backedge` iff v dominates u; retreating edges that are NOT dominated
+    are `retreat_nondom` — the raw material of GOV-IRRED-001 (irreducible regions).
+  * T2 seq-chain compression — maximal `seq` runs of straight-line nodes collapse into
+    a SEQ region; backedges and control-flow nodes are excluded.
 
-T1 (empty-node elision), T3 (short-circuit fold), T4 (jump-thread flag-only) are
-included in the ordered pipeline with conservative v0.1 behavior (documented on
-each). Stdlib-only.
+Both dominators and DFS are ITERATIVE so a 2,000-node linear segment neither blows
+the Tier-0 latency budget nor Python's recursion limit. T1 (empty-node elision),
+T3 (short-circuit fold), T4 (jump-thread flag-only) are conservative v0.1. Stdlib-only.
 """
 
 from __future__ import annotations
@@ -24,27 +23,12 @@ import hashlib
 import json
 from dataclasses import dataclass, field
 
-# ordered transform list; its canonical hash is the normalization_version
 TRANSFORMS = ["T1-empty@0.1", "T2-seq@0.1", "T3-shortcircuit@0.1", "T4-thread@0.1", "T5-backedge@0.1"]
 
 
 def normalization_version() -> str:
     canon = json.dumps(TRANSFORMS, separators=(",", ":")).encode("utf-8")
     return "N-0.1.0-" + hashlib.blake2b(canon, digest_size=8).hexdigest()
-
-
-@dataclass
-class NormalizedCFG:
-    dominators: dict[str, set[str]]
-    backedges: set[tuple[str, str, str]]
-    retreat_nondom: set[tuple[str, str, str]]
-    seq_regions: list[list[str]]
-    threaded_suspect: set[str] = field(default_factory=set)
-    normalization_version: str = ""
-
-    @property
-    def reducible(self) -> bool:
-        return not self.retreat_nondom
 
 
 def _preds_succs(nodes, edges):
@@ -56,65 +40,112 @@ def _preds_succs(nodes, edges):
     return preds, succs
 
 
-def dominators(nodes: set[str], edges: set, entry: str) -> dict[str, set[str]]:
-    """Iterative dominator dataflow: dom(n) = {n} U (intersection of dom over preds)."""
-    preds, _ = _preds_succs(nodes, edges)
-    alln = set(nodes)
-    dom = {n: set(alln) for n in nodes}
-    dom[entry] = {entry}
+def _postorder(nodes, succs, entry) -> list[str]:
+    """Iterative DFS postorder (entry last). Unreached nodes appended after."""
+    visited = {entry}
+    order: list[str] = []
+    stack = [(entry, iter(succs.get(entry, [])))]
+    while stack:
+        node, it = stack[-1]
+        advanced = False
+        for v, _l in it:
+            if v not in visited:
+                visited.add(v)
+                stack.append((v, iter(succs.get(v, []))))
+                advanced = True
+                break
+        if not advanced:
+            order.append(node)
+            stack.pop()
+    for n in nodes:
+        if n not in visited:
+            order.append(n)
+    return order
+
+
+def compute_idom(nodes, edges, entry) -> dict[str, str]:
+    """Cooper-Harvey-Kennedy immediate dominators (postorder-numbered fingers)."""
+    preds, succs = _preds_succs(nodes, edges)
+    post = _postorder(nodes, succs, entry)
+    pnum = {n: i for i, n in enumerate(post)}   # entry has the highest number
+    idom: dict[str, str] = {entry: entry}
+
+    def intersect(a: str, b: str) -> str:
+        while a != b:
+            while pnum[a] < pnum[b]:
+                a = idom[a]
+            while pnum[b] < pnum[a]:
+                b = idom[b]
+        return a
+
     changed = True
     while changed:
         changed = False
-        for n in nodes:
-            if n == entry:
+        for b in reversed(post):            # reverse postorder, entry first
+            if b == entry:
                 continue
-            ps = [p for p, _ in preds[n]]
-            if ps:
-                inter = set(alln)
-                for p in ps:
-                    inter &= dom[p]
-                new = {n} | inter
-            else:
-                new = {n}  # unreachable from entry -> dominates only itself
-            if new != dom[n]:
-                dom[n] = new
+            new_idom = None
+            for p, _l in preds[b]:
+                if p in idom:
+                    new_idom = p if new_idom is None else intersect(p, new_idom)
+            if new_idom is not None and idom.get(b) != new_idom:
+                idom[b] = new_idom
                 changed = True
-    return dom
+    return idom
+
+
+def _dominates(v: str, u: str, idom: dict[str, str]) -> bool:
+    """True iff v is on u's immediate-dominator chain (v dominates u)."""
+    x = u
+    while True:
+        if x == v:
+            return True
+        nxt = idom.get(x)
+        if nxt is None or nxt == x:
+            return False
+        x = nxt
 
 
 def retreating_edges(nodes, edges, entry) -> set[tuple[str, str, str]]:
-    """DFS back-edges: (u->v) is retreating iff v is gray (an ancestor on the DFS
-    stack) when u->v is traversed. Forward edges into a loop body are NOT retreating."""
-    succs = {n: [] for n in nodes}
-    for u, v, l in edges:
-        succs[u].append((v, l))
+    """Iterative-DFS back-edges: (u->v) retreating iff v is gray (an ancestor on the
+    DFS stack) when u->v is traversed. Forward edges into a loop body are NOT retreating."""
+    _, succs = _preds_succs(nodes, edges)
     color = {n: 0 for n in nodes}   # 0 white, 1 gray, 2 black
     retreating: set[tuple[str, str, str]] = set()
 
-    def visit(u):
-        color[u] = 1
-        for v, l in succs[u]:
-            if color[v] == 1:
-                retreating.add((u, v, l))
-            elif color[v] == 0:
-                visit(v)
-        color[u] = 2
+    def dfs(start):
+        color[start] = 1
+        stack = [(start, iter(succs.get(start, [])))]
+        while stack:
+            node, it = stack[-1]
+            advanced = False
+            for v, l in it:
+                if color[v] == 1:
+                    retreating.add((node, v, l))
+                elif color[v] == 0:
+                    color[v] = 1
+                    stack.append((v, iter(succs.get(v, []))))
+                    advanced = True
+                    break
+            if not advanced:
+                color[node] = 2
+                stack.pop()
 
-    visit(entry)
-    for n in nodes:  # any node unreachable from entry (should not occur in a trace)
+    dfs(entry)
+    for n in nodes:
         if color[n] == 0:
-            visit(n)
+            dfs(n)
     return retreating
 
 
 def classify_edges(nodes, edges, entry):
     """T5: among retreating edges, natural-loop backedge iff v dominates u; the rest
-    (v does not dominate u) are irreducible retreat_nondom (GOV-IRRED material)."""
-    dom = dominators(nodes, edges, entry)
+    are irreducible retreat_nondom (GOV-IRRED material)."""
+    idom = compute_idom(nodes, edges, entry)
     retreating = retreating_edges(nodes, edges, entry)
-    backedges = {(u, v, l) for (u, v, l) in retreating if v in dom[u]}
+    backedges = {(u, v, l) for (u, v, l) in retreating if _dominates(v, u, idom)}
     retreat = retreating - backedges
-    return dom, backedges, retreat
+    return idom, backedges, retreat
 
 
 def compress_seq(nodes, edges, backedges, linear: set | None = None) -> list[list[str]]:
@@ -151,24 +182,50 @@ def compress_seq(nodes, edges, backedges, linear: set | None = None) -> list[lis
     return regions
 
 
+@dataclass
+class NormalizedCFG:
+    idom: dict[str, str]
+    backedges: set[tuple[str, str, str]]
+    retreat_nondom: set[tuple[str, str, str]]
+    seq_regions: list[list[str]]
+    threaded_suspect: set[str] = field(default_factory=set)
+    normalization_version: str = ""
+
+    @property
+    def reducible(self) -> bool:
+        return not self.retreat_nondom
+
+    def dominates(self, v: str, u: str) -> bool:
+        return _dominates(v, u, self.idom)
+
+    @property
+    def dominators(self) -> dict[str, set[str]]:
+        """Lazily materialize full dominator sets from idom (diagnostics/tests only —
+        NOT used on the Tier-0 hot path)."""
+        out: dict[str, set[str]] = {}
+        for n in self.idom:
+            s, x = set(), n
+            while True:
+                s.add(x)
+                nx = self.idom.get(x)
+                if nx is None or nx == x:
+                    break
+                x = nx
+            out[n] = s
+        return out
+
+
 def normalize(cfg) -> NormalizedCFG:
     """Run N = [T1..T5] to produce the normalized view R_H/R_I consume."""
     nodes, edges, entry = set(cfg.nodes), set(cfg.edges), cfg.entry
-    # T1 empty-node elision: v0.1 conservative no-op (our trace nodes carry tool effect;
-    # no non-effectful pass-throughs are emitted). Mechanism reserved.
-    # T5 first computes backedges so T2 does not compress across a loop header.
-    dom, backedges, retreat = classify_edges(nodes, edges, entry)
-    # T2 chain compression — only straight-line nodes are absorbable.
+    idom, backedges, retreat = classify_edges(nodes, edges, entry)
     linear = {nid for nid, n in cfg.nodes.items() if n.kind in ("tool_call", "terminal")}
     seq_regions = compress_seq(nodes, edges, backedges, linear)
-    # T3 short-circuit fold: detect-only in v0.1 (no canonical a&&b/a||b shape is
-    # synthesized here); T4 jump-thread: flag-only, none flagged on well-formed traces.
-    threaded: set[str] = set()
     return NormalizedCFG(
-        dominators=dom,
+        idom=idom,
         backedges=backedges,
         retreat_nondom=retreat,
         seq_regions=seq_regions,
-        threaded_suspect=threaded,
+        threaded_suspect=set(),
         normalization_version=normalization_version(),
     )
