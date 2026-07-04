@@ -36,9 +36,20 @@ from dataclasses import dataclass, field
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import conformal_gate as cg  # noqa: E402  (real CRC abstention gate)
 import fiber_projection as fp  # noqa: E402  (the ι_d projection: builds H)
+import stopgate_artifact as sg  # noqa: E402  (real ed25519 StopGate sealing)
 
 # Verdict axis — mirror narration_fidelity_verifier.py:33 (do not invent a new enum).
 POS, ZERO, NEG, INDETERMINATE = "POS", "ZERO", "NEG", "INDETERMINATE"
+
+# Verdict → VerifierIR finding (axis-binding §2.1; mirrors narration_fidelity_verifier.py:36).
+# StopGate then maps finding → PASS/FAIL/INDETERMINATE. Only POS is permit-eligible; ZERO and
+# a conformal abstention are both no-permit (finding None), kept distinct only in the trace.
+_VERDICT_TO_FINDING = {
+    POS: sg.FINDING_OK,
+    NEG: sg.FINDING_VIOLATION,
+    ZERO: sg.FINDING_NONE,
+    INDETERMINATE: sg.FINDING_NONE,
+}
 
 # Evidence-grade axis — CTRL243.evidence (axis-binding §2.2). Rank for the E_floor / min.
 _GRADE_RANK = {"sampled": 0, "verified": 1, "exact": 2}
@@ -289,3 +300,57 @@ def scored_walk(score_by_node, default=1.0):
     def scorer(_g, _node, children, _query):
         return {c: score_by_node.get(c, default) for c in children}
     return scorer
+
+
+# --------------------------------------------------------------------------- #
+# WO_FIBER_007 — seal the Episode as a signed StopGate artifact (§6.4).
+# --------------------------------------------------------------------------- #
+def seal_episode(result, *, signer, session_id, workcell_id,
+                 window_start, window_end, evaluated_at=None,
+                 gate_id="fiber-retrieval", lift_authority="michael-only", keyring=None):
+    """Seal a RetrievalResult's Episode as a signed StopGate artifact.
+
+    The HARNESS (not the model) evaluates: our verdict → VerifierIR finding → StopGate
+    PASS/FAIL/INDETERMINATE, ed25519-signed. The page anchors become the artifact's
+    semantic-layer evidence, so a POS is layer-bound (§5.3); the Episode fields + native
+    verdict + grade + witness ride in `extra`. Returns (signed_artifact, disposition).
+    Only a POS carrying anchors seals to PASS (permit) — everything else is no-permit.
+    """
+    finding = _VERDICT_TO_FINDING[result.verdict]
+    evidence = [
+        sg.Evidence(
+            source_event_uuid=str(cite),
+            evidence_hash=sg.sha256_evidence(str(cite)),
+            layer="semantic",
+            mode="presence",
+        )
+        for cite in result.citations
+        if cite
+    ]
+    raw = sg.FINDING_TO_VERDICT[finding]
+    verdict, notes = sg.degrade_verdict(raw, evidence, "semantic", None, keyring)
+    unsigned = sg.build_unsigned(
+        gate_id=gate_id,
+        session_id=session_id,
+        workcell_id=workcell_id,
+        subject=[str(result.answer)] if result.answer is not None else [],
+        predicate="fibered-retrieval:cross-fiber-consistency",
+        verdict=verdict,
+        evidence=evidence,
+        evaluated_by={"component": "fiber_retrieval.seal_episode",
+                      "version": "0.1.0", "kind": sg.HARNESS_KIND},
+        evaluated_at=evaluated_at or sg.utc_now_iso(),
+        window_start=window_start,
+        window_end=window_end,
+        lift_authority=lift_authority,
+        predicate_layer="semantic",
+        extra={
+            "fiber_episode": result.episode,
+            "native_verdict": result.verdict,  # POS/ZERO/NEG/INDETERMINATE (pre-StopGate)
+            "evidence_grade": result.egrade,    # exact / sampled / verified
+            "witness": result.witness,
+            "degrade_notes": notes,
+        },
+    )
+    signed = sg.sign_artifact(unsigned, signer)
+    return signed, sg.DISPOSITION[verdict]

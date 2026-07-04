@@ -35,8 +35,12 @@ def _load(name):
 
 
 cg = _load("conformal_gate")
+sg = _load("stopgate_artifact")
 fp = _load("fiber_projection")
 fr = _load("fiber_retrieval")
+
+_WIN = dict(window_start="2026-07-04T00:00:00Z", window_end="2026-07-04T00:00:01Z",
+            evaluated_at="2026-07-04T00:00:02Z")
 
 T = "t"
 OWNS = "gleif-L2:isDirectParentOf"
@@ -179,6 +183,70 @@ def test_wallguard_hides_restricted_target():
                            query="q", visible=cleared)
     assert res.verdict == fr.ZERO                   # the hop never happened
     assert res.answer is None
+
+
+def _pos_result(g, a):
+    return fr.retrieve_edge(g, a["entity/parentco"], OWNS,
+                            scorer=fr.scored_walk({}, default=0.1), gate=confident_gate(), query="q")
+
+
+def _signer():
+    return sg.Signer.from_seed(b"\x02" * 32, "fiber-test-key")
+
+
+def test_seal_pos_signs_pass_permit_and_independently_verifies():
+    g = fp.project(base_fragment())
+    a = _atoms(g)
+    artifact, disposition = fr.seal_episode(
+        _pos_result(g, a), signer=_signer(), session_id="s1", workcell_id="w1", **_WIN)
+    assert artifact["verdict"] == sg.VERDICT_PASS
+    assert disposition == "permit"
+    assert artifact["evaluated_by"]["kind"] == sg.HARNESS_KIND  # model excluded from sealing (§5.1)
+    assert artifact["native_verdict"] == fr.POS
+    assert artifact["evidence_grade"] == "verified"
+    assert artifact["fiber_episode"]["Claim"][0] == OWNS
+    # both page anchors became semantic-layer evidence (so PASS is layer-bound, §5.3)
+    assert {e["source_event_uuid"] for e in artifact["evidence"]} == {
+        "filing-A#p87§4.2", "filing-B#p14§2.1"}
+    # independently verifiable from the artifact + public key alone
+    keyring = sg.Keyring().add_signer(_signer())
+    assert sg.verify_artifact(artifact, keyring).ok
+
+
+def test_seal_neg_is_fail_deny():
+    g = fp.project(base_fragment(sub_pct=60))
+    a = _atoms(g)
+    artifact, disposition = fr.seal_episode(
+        _pos_result(g, a), signer=_signer(), session_id="s1", workcell_id="w1", **_WIN)
+    assert artifact["verdict"] == sg.VERDICT_FAIL
+    assert disposition == "deny"
+    assert artifact["native_verdict"] == fr.NEG
+    assert artifact["verdict"] not in sg.PERMIT_ELIGIBLE
+
+
+def test_seal_wallguard_zero_is_no_permit():
+    g = fp.project(base_fragment())
+    a = _atoms(g)
+    res = fr.retrieve_edge(g, a["entity/parentco"], OWNS,
+                           scorer=fr.scored_walk({}, default=0.1), gate=confident_gate(),
+                           query="q", visible=fr.label_gate({"firm_approved", "public"}))
+    artifact, disposition = fr.seal_episode(
+        res, signer=_signer(), session_id="s1", workcell_id="w1", **_WIN)
+    assert artifact["verdict"] == sg.VERDICT_INDETERMINATE
+    assert disposition == "deny-require-override"
+    assert artifact["verdict"] not in sg.PERMIT_ELIGIBLE
+
+
+def test_tampered_seal_fails_verification():
+    g = fp.project(base_fragment())
+    a = _atoms(g)
+    artifact, _ = fr.seal_episode(
+        _pos_result(g, a), signer=_signer(), session_id="s1", workcell_id="w1", **_WIN)
+    keyring = sg.Keyring().add_signer(_signer())
+    assert sg.verify_artifact(artifact, keyring).ok
+    # flip the answer after signing → the signature no longer covers the bytes → permit dies
+    tampered = {**artifact, "subject": ["entity/evil"]}
+    assert not sg.verify_artifact(tampered, keyring).ok
 
 
 def test_inv_f2_edge_class_purity():
