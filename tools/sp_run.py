@@ -425,6 +425,38 @@ def outcome_from_findings(findings: list[dict[str, str]]) -> str:
     return "pass"
 
 
+def command_narration_gate(args: argparse.Namespace) -> int:
+    """Gate an agent run's narration fidelity against its sealed control-flow segment.
+
+    Fails closed: exit 0 permits (gate PASS), nonzero denies (an unfaithful claim, a
+    review, or an unparseable segment). The harness key is supplied by the deployment;
+    a deterministic dev default is used otherwise."""
+    import os as _os
+
+    _here = _os.path.dirname(_os.path.abspath(__file__))
+    if _here not in sys.path:
+        sys.path.insert(0, _here)
+    import stopgate_artifact
+    import trace_cfr_runtime
+
+    segment = json.loads(Path(args.segment).read_text(encoding="utf-8"))
+    claims = json.loads(Path(args.claims).read_text(encoding="utf-8")) if args.claims else []
+    seed = bytes.fromhex(args.key_seed) if args.key_seed else b"\x07" * 32
+    signer = stopgate_artifact.Signer.from_seed(seed, key_id=args.key_id)
+
+    report = trace_cfr_runtime.gate_segment(segment, claims, signer)
+    emit({
+        "ok": report.permitted,
+        "gate_verdict": report.gate_verdict,
+        "permitted": report.permitted,
+        "reason": report.reason,
+        "unfaithful_claims": [v.claim_id for v in report.claim_verdicts if v.verdict == "NEG"],
+        "failure_clusters": [t.get("failure_cluster") for t in report.failure_traces],
+        "stepgate_count": len(report.stepgates),
+    })
+    return 0 if report.permitted else 1
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="sp-run")
     subparsers = parser.add_subparsers(dest="command", required=True)
@@ -488,6 +520,15 @@ def build_parser() -> argparse.ArgumentParser:
     validate_bundle = subparsers.add_parser("validate-bundle", help="Validate a SourceOS image-production bundle against blocking conditions.")
     validate_bundle.add_argument("--bundle", required=True, help="Path to bundle.json")
     validate_bundle.set_defaults(func=command_validate_bundle)
+
+    narration_gate = subparsers.add_parser(
+        "narration-gate", help="Gate an agent run's narration fidelity against its sealed control-flow segment."
+    )
+    narration_gate.add_argument("--segment", required=True, help="Path to a sealed trace-cfr segment JSON.")
+    narration_gate.add_argument("--claims", help="Path to a JSON list of ClaimIR narration claims.")
+    narration_gate.add_argument("--key-id", default="dev-harness", help="Harness signing key id.")
+    narration_gate.add_argument("--key-seed", help="32-byte hex ed25519 seed (deployment supplies; dev default otherwise).")
+    narration_gate.set_defaults(func=command_narration_gate)
 
     return parser
 

@@ -78,21 +78,26 @@ class RunRecorder:
 
     # ---- end of run: seal, verify, gate ----
     def finish(self) -> RunFidelityReport:
-        seg = self.em.seal()
-        r = ing.ingest_sealed_segment(seg)
-        if not r.ok:
-            return RunFidelityReport("INDETERMINATE", reason=f"ingest: {r.reasons}", segment=seg)
-        g = cfg.build_cfg(r.events)
-        n = norm.normalize(g)
-        rh_rec = rh.recover_hammock(g, n)
-        ri_rec = ri.recover_interval(g, n)
-        verdicts, gates, traces = nfv.verify_all(
-            self.claims, r.events, rh_rec, self.signer, session_id=self.session_id, ri_recovery=ri_rec
-        )
-        mapped = [_CLAIM_TO_GATE[v.verdict] for v in verdicts]
-        gate = rf.fold(mapped, rf.verdict_monoid) if mapped else "PASS"
-        return RunFidelityReport(
-            gate_verdict=gate, claim_verdicts=verdicts, stepgates=gates,
-            failure_traces=traces, segment=seg,
-            reason="ok" if gate == "PASS" else f"{sum(1 for v in verdicts if v.verdict == nfv.NEG)} unfaithful claim(s)",
-        )
+        return gate_segment(self.em.seal(), self.claims, self.signer, self.session_id)
+
+
+def gate_segment(segment: dict, claims: list[dict], signer: "sg.Signer", session_id: str = "") -> RunFidelityReport:
+    """Gate an already-sealed segment + its narration claims. The reusable core the
+    RunRecorder and the `sp-run narration-gate` CLI both call."""
+    r = ing.ingest_sealed_segment(segment)
+    if not r.ok:
+        return RunFidelityReport("INDETERMINATE", reason=f"ingest: {r.reasons}", segment=segment)
+    g = cfg.build_cfg(r.events)
+    n = norm.normalize(g)
+    rh_rec = rh.recover_hammock(g, n)
+    ri_rec = ri.recover_interval(g, n)
+    verdicts, gates, traces = nfv.verify_all(
+        claims, r.events, rh_rec, signer, session_id=session_id, ri_recovery=ri_rec
+    )
+    mapped = [_CLAIM_TO_GATE[v.verdict] for v in verdicts]
+    gate = rf.fold(mapped, rf.verdict_monoid) if mapped else "PASS"
+    return RunFidelityReport(
+        gate_verdict=gate, claim_verdicts=verdicts, stepgates=gates,
+        failure_traces=traces, segment=segment,
+        reason="ok" if gate == "PASS" else f"{sum(1 for v in verdicts if v.verdict == nfv.NEG)} unfaithful claim(s)",
+    )
