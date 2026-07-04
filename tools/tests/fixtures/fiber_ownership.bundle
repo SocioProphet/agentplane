@@ -1,0 +1,11 @@
+N	entity/parentco	organization
+N	entity/subco	organization
+N	filing-A/root	document
+N	filing-A/s4.2	clause
+N	filing-B/root	document
+N	filing-B/s2.1	clause
+C	filing-A/root	filing-A/s4.2
+C	filing-A/s4.2	entity/parentco
+C	filing-B/root	filing-B/s2.1
+C	filing-B/s2.1	entity/subco
+R	gleif-L2:isDirectParentOf	entity/parentco	entity/subco

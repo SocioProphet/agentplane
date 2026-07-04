@@ -138,3 +138,13 @@ def test_edge_referencing_unknown_node_rejected():
                        "src": "ghost/a", "dst": "ghost/b"}]}
     with pytest.raises(fp.ProjectionError, match="unknown node_id"):
         fp.project(frag)
+
+
+def test_to_bundle_matches_golden_parity_vector():
+    # The bundle is the contract the Rust hg_fiber ingest must reproduce byte-for-byte.
+    g = fp.project(_load())
+    with open(os.path.join(_HERE, "fixtures", "fiber_ownership.bundle"), encoding="utf-8") as fh:
+        assert fp.to_bundle(g) == fh.read()
+    # keyed by node_id (not the internal u128 atom id) so a different engine can rebuild H.
+    assert "N\tentity/parentco\torganization" in fp.to_bundle(g)
+    assert "R\tgleif-L2:isDirectParentOf\tentity/parentco\tentity/subco" in fp.to_bundle(g)
