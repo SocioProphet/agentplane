@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.srcos.ai/agentplane/obligation-ir.schema.v0.2.json",
+  "title": "ObligationIR v2 (composition §13.1 delta)",
+  "description": "Logical id 'obligation.ir/v2'. Extends obligation.ir/v1 with §1 task 'graph' and §11 resource 'taint'. Layers via allOf because the v1 base is additionalProperties:true.",
+  "$defs": {
+    "op_node": {
+      "type": "object",
+      "description": "a node in the COG-style task DAG over Σ_op (forward-referenced by §13.1 as #/$defs/op_node)",
+      "properties": {
+        "op_id": { "type": "string" },
+        "op": { "type": "string", "description": "the Σ_op operator" },
+        "attrs": { "type": "object" }
+      },
+      "required": ["op_id", "op"],
+      "additionalProperties": true
+    }
+  },
+  "allOf": [
+    { "$ref": "https://schemas.srcos.ai/agentplane/obligation-ir.schema.v0.1.json" },
+    {
+      "if": { "properties": { "kind": { "const": "resource" } } },
+      "then": { "required": ["taint"] }
+    }
+  ],
+  "properties": {
+    "graph": {
+      "type": "object",
+      "description": "primitive 1 — task DAG over Σ_op",
+      "properties": {
+        "nodes": { "type": "array", "items": { "$ref": "#/$defs/op_node" } },
+        "edges": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "from": { "type": "string" },
+              "to": { "type": "string" },
+              "edge_type": { "type": "string", "enum": ["decomposition", "dependency", "contribution"] },
+              "sign": { "type": "string", "enum": ["+", "-", "none"] }
+            },
+            "required": ["from", "to", "edge_type"],
+            "additionalProperties": false
+          }
+        },
+        "binding": { "type": "object", "description": "β: operator attribute instantiation" }
+      },
+      "additionalProperties": false
+    },
+    "taint": {
+      "type": "object",
+      "description": "primitive 11 — per-argument Denning taint; present iff kind == resource",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "origin": { "type": "string" },
+          "label": { "type": "string", "description": "position in the Denning IFC lattice" }
+        },
+        "required": ["origin", "label"],
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": true
+}
