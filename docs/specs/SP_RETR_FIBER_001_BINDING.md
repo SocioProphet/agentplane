@@ -101,11 +101,13 @@ Both `ZERO` and `INDETERMINATE` yield a null finding (no permit) — so the spec
 
 ---
 
-## 5. Open decisions for the user (genuine forks, not defaults)
+## 5. Decisions (RESOLVED by Michael 2026-07-04)
 
-1. **Substrate of record for `H`.** Confirm: hellgraph atoms are the runtime graph, Crystal Atlas contracts are the ingestion/evidence schema projected into it? Or should `H` live entirely in Crystal Atlas `graph-node.v0`/`graph-edge.v0` (string ids, JSON) and treat hellgraph as one federated backend? This changes WO_FIBER_002 substantially.
-2. **`EdgeClass` mechanism.** Reserved `type_name` namespace (no migration, my recommendation) vs a first-class atom field (cleaner, but a hellgraph schema change in a repo the other agent is actively hardening).
-3. **Adapter path now or fixtures-first.** Build the Catalog Gateway source-adapter registration (larger), or scope SP-ADAPT-TREE-001's worked example to fixtures until the Gateway lands (faster, keeps this in-lane)?
+1. **Substrate of record for `H`: hellgraph runtime + Crystal Atlas projected in.** hellgraph atoms are the live graph where `descend`/`traverse` execute; Crystal Atlas `asset-catalog-entry.v0`/`evidence.v0` records are ingested and projected via `ι_d`. **Atlas-native substrate (the fork's option 2) is retained as a *second premium (managed/hosted) offering*, not the base** — tracked separately, not built in the WO_FIBER series.
+2. **`EdgeClass` mechanism: first-class atom field.** Add an explicit `edge_class` to the hellgraph `LinkAtom` schema (not a reserved `type_name` convention). This makes INV-F2 (edge-class purity) statically enforceable — but it is a **hellgraph schema change + migration**, in a repo another agent is actively hardening today. ⚠️ **Coordination gate (see WO_FIBER_002 doc):** hold the hellgraph edit until (a) PR #316 merges (spec §0.5.2 one-WO-one-PR) and (b) a clean window / owner coordination on hellgraph. Do not collide.
+3. **Adapter path: fixtures-first.** Scope SP-ADAPT-TREE-001's worked ownership-DAG example to fixtures until the Catalog Gateway lands. Unblocks WO_ADAPT_003/004 without building prophet-platform Gateway infra.
+
+Design for the resolved path is in **`SP_RETR_FIBER_001_WO2.md`**.
 
 ---
 
