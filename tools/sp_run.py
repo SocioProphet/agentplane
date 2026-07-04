@@ -462,6 +462,36 @@ def command_narration_gate(args: argparse.Namespace) -> int:
     return 0 if report.permitted else 1
 
 
+def command_attest_run(args: argparse.Namespace) -> int:
+    """Attest a governed run's narration fidelity from its recorded control-flow actions
+    and bind the signed attestation into its evidence folder. Fails closed."""
+    import os as _os
+
+    _here = _os.path.dirname(_os.path.abspath(__file__))
+    if _here not in sys.path:
+        sys.path.insert(0, _here)
+    import attest_governed_run
+    import stopgate_artifact
+
+    events = json.loads(Path(args.events).read_text(encoding="utf-8"))
+    claims = json.loads(Path(args.claims).read_text(encoding="utf-8")) if args.claims else []
+    seed = bytes.fromhex(args.key_seed) if args.key_seed else b"\x07" * 32
+    signer = stopgate_artifact.Signer.from_seed(seed, key_id=args.key_id)
+
+    attestation, report = attest_governed_run.attest_run(events, claims, signer, session_id=args.session_id or "")
+    written = str(attest_governed_run.write_attestation(attestation, args.run_dir)) if args.run_dir else None
+    emit({
+        "ok": report.permitted,
+        "gate_verdict": report.gate_verdict,
+        "permitted": report.permitted,
+        "reason": report.reason,
+        "unfaithful_claims": [v.claim_id for v in report.claim_verdicts if v.verdict == "NEG"],
+        "attestation_written": written,
+        "segment_hash": attestation["segment_ref"]["segment_hash"],
+    })
+    return 0 if report.permitted else 1
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="sp-run")
     subparsers = parser.add_subparsers(dest="command", required=True)
@@ -536,6 +566,18 @@ def build_parser() -> argparse.ArgumentParser:
     narration_gate.add_argument("--session-id", help="Run/session id recorded in the attestation.")
     narration_gate.add_argument("--out", help="Write the signed run attestation JSON to this path.")
     narration_gate.set_defaults(func=command_narration_gate)
+
+    attest = subparsers.add_parser(
+        "attest-run",
+        help="Attest a governed run's narration fidelity from its control-flow actions; bind the signed attestation into its evidence folder.",
+    )
+    attest.add_argument("--events", required=True, help="Path to control-flow ReasoningEvents JSON (the run's recorded actions).")
+    attest.add_argument("--claims", help="Path to a JSON list of ClaimIR narration claims.")
+    attest.add_argument("--run-dir", help="Evidence folder to write narration-fidelity-attestation.json into.")
+    attest.add_argument("--key-id", default="dev-harness", help="Harness signing key id.")
+    attest.add_argument("--key-seed", help="32-byte hex ed25519 seed (deployment supplies; dev default otherwise).")
+    attest.add_argument("--session-id", help="Run/session id recorded in the attestation.")
+    attest.set_defaults(func=command_attest_run)
 
     return parser
 
