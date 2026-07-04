@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.srcos.ai/agentplane/stepgate-artifact.schema.v0.1.json",
+  "title": "StepGateArtifact (composition §13.6, new)",
+  "description": "Logical id 'stepgate.artifact/v1'. Per-node signed gate with StopGateArtifact semantics along the TIME axis (primitive 9). Authored STANDALONE, not allOf StopGateArtifact.schema.v0.1.json, for two reasons (STATUS §1.2a): that base is additionalProperties:false (would reject the step fields) and pins verdict to PASS/FAIL/REVIEW/INDETERMINATE. Verdict here uses the spec taxonomy with mapping OK↔PASS, VIOLATION↔FAIL. promise/progress are advisory scores; the verdict remains harness-owned (v = g_H(e)).",
+  "type": "object",
+  "properties": {
+    "spec_version": { "type": "string" },
+    "node_id": { "type": "string", "description": "the obligation-graph node this gate covers" },
+    "gate_id": { "type": "string" },
+    "session_id": { "type": "string" },
+    "subject": {},
+    "predicate": { "type": "string" },
+    "tier": { "type": "integer", "enum": [0, 1], "description": "0=cheap trajectory-level short-circuit; 1=turn-level consistency" },
+    "verdict": { "type": "string", "enum": ["OK", "REVIEW", "VIOLATION", "INDETERMINATE"] },
+    "promise": { "type": "number", "minimum": 0, "maximum": 1, "description": "advisory: P(step achieves its obligation)" },
+    "progress": { "type": "number", "minimum": 0, "maximum": 1, "description": "advisory: interdependence with predecessors" },
+    "short_circuit": { "type": "boolean" },
+    "evidence": { "type": "array", "items": { "$ref": "https://schemas.srcos.ai/agentplane/evidence-ir.schema.v0.1.json" } },
+    "evaluated_by": { "type": "object", "description": "StopGate §5.1 model-exclusion: kind ∈ {deterministic-harness, human-authority}" },
+    "evaluated_at": { "type": "string", "format": "date-time" },
+    "signature": { "type": "object", "description": "ed25519 over canonical serialization, per StopGateArtifact" }
+  },
+  "required": ["node_id", "tier", "verdict", "evaluated_by", "evaluated_at"],
+  "additionalProperties": true
+}

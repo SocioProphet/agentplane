@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.srcos.ai/agentplane/verifier-ir.schema.v0.2.json",
+  "title": "VerifierIR v2 (composition §13.2 delta)",
+  "description": "Logical id 'verifier.ir/v2'. Extends verifier.ir/v1 with §7 shape constraints and §8 conformal abstention. Layers via allOf because the v1 base is additionalProperties:true.",
+  "allOf": [
+    { "$ref": "https://schemas.srcos.ai/agentplane/verifier-ir.schema.v0.1.json" }
+  ],
+  "properties": {
+    "properties_constraints": {
+      "type": "array",
+      "description": "primitive 7 — metamorphic shape constraints",
+      "items": {
+        "type": "object",
+        "properties": {
+          "feature_slice": { "type": "string" },
+          "constraint": {
+            "type": "string",
+            "enum": ["monotone", "joint_monotone", "dominance", "edgeworth", "trapezoid", "unimodal", "range_dominance"]
+          },
+          "enforcement": {
+            "type": "string",
+            "enum": ["architectural", "certified", "property_tested"]
+          },
+          "certificate_id": { "type": ["string", "null"] }
+        },
+        "required": ["feature_slice", "constraint", "enforcement"],
+        "allOf": [
+          {
+            "if": { "properties": { "enforcement": { "const": "certified" } } },
+            "then": { "required": ["certificate_id"], "properties": { "certificate_id": { "type": "string" } } }
+          }
+        ],
+        "additionalProperties": false
+      }
+    },
+    "conformal": {
+      "type": "object",
+      "description": "primitive 8 — conformal abstention consulted on the INDETERMINATE branch",
+      "properties": {
+        "alpha": { "type": "number", "minimum": 0, "maximum": 1 },
+        "calibration_set_id": { "type": "string" },
+        "score_fn_id": { "type": "string" },
+        "anytime_valid": { "type": "boolean" },
+        "composition_rule": { "type": "string", "enum": ["independent", "pasc_joint", "bonferroni"] }
+      },
+      "required": ["alpha", "calibration_set_id", "score_fn_id", "anytime_valid"],
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": true
+}

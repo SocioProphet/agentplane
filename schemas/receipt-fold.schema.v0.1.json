@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.srcos.ai/agentplane/receipt-fold.schema.v0.1.json",
+  "title": "ReceiptIR.fold (composition §13.4)",
+  "description": "The §13.4 ReceiptIR aggregation-algebra object. Authored STANDALONE because the existing ReceiptIR base (receipt.schema.v0.1.json) is additionalProperties:false and cannot be allOf-extended; landing this on ReceiptIR requires adding an optional 'fold' property to that base (see STATUS §1.2b). monoid = success verdicts (permutation-invariant, §14.1); abelian_group = blame (signed, credit-conserving, §10).",
+  "type": "object",
+  "properties": {
+    "op_id": { "type": "string" },
+    "identity": { "description": "the monoid/group identity element e" },
+    "algebra": { "type": "string", "enum": ["monoid", "abelian_group"] }
+  },
+  "required": ["op_id", "identity", "algebra"],
+  "additionalProperties": false
+}

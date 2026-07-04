@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.srcos.ai/agentplane/attribution-ir.schema.v0.1.json",
+  "title": "AttributionIR (composition §13.5, new)",
+  "description": "Logical id 'attribution.ir/v1'. Replay-derived counterfactual attribution (primitive 10). Emitted by a harness replay job over the append-only JSONL log, NEVER by the model. crs = Causal Responsibility Score via same-policy do-resample.",
+  "type": "object",
+  "properties": {
+    "node_id": { "type": "string" },
+    "crs": { "type": "number", "minimum": 0, "maximum": 1 },
+    "ci_low": { "type": "number" },
+    "ci_high": { "type": "number" },
+    "shapley_share": { "type": "number" },
+    "locus": {
+      "type": "string",
+      "enum": ["point_of_commitment"],
+      "description": "run-forward confound control"
+    },
+    "emitter": {
+      "type": "string",
+      "const": "harness_replay_job",
+      "description": "§14.3 gate-factorization: MUST NOT be model-emitted"
+    }
+  },
+  "required": ["node_id", "crs", "emitter"],
+  "additionalProperties": false
+}

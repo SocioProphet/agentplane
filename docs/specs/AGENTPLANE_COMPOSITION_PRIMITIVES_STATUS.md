@@ -25,9 +25,19 @@ primitives with `SP_TRACE_CFR_001_SPEC.md` so we build each mechanism once.
 | **CBES** axioms (A1–A7) | ❌ NOT LOCATABLE | 0 files; §6 `prohibition` claims "CBES axioms already express prohibitions" |
 
 ### Consequences
-1. **Base v1 schemas — DONE for 4 of 5** (Obligation/Verifier/Evidence/Claim authored 2026-07-03,
-   Draft-2020 valid). ReceiptIR already existed; LedgerIR deferred (off critical path). The §13 v2
-   deltas now apply additively on top of these bases.
+1. **Base v1 schemas + §13 deltas — LANDED** (2026-07-03, all Draft-2020 valid; base+delta composition
+   instance-tested). Bases: Obligation/Verifier/Evidence/Claim (ReceiptIR pre-existed; LedgerIR
+   deferred). Deltas/new: `verifier-ir.v0.2` (§13.2), `obligation-ir.v0.2` (§13.1), `receipt-fold.v0.1`
+   (§13.4), `attribution-ir.v0.1` (§13.5), `cinorm-ir.v0.1` (§13.7), `stepgate-artifact.v0.1` (§13.6).
+1a. **§13.6 defect — StepGate cannot `allOf` the base.** The canonical `StopGateArtifact.schema.v0.1.json`
+   is `additionalProperties:false` (rejects StepGate's node_id/tier/… fields) AND pins `verdict` to
+   `PASS/FAIL/REVIEW/INDETERMINATE`, which intersects StepGate's `OK/REVIEW/VIOLATION/INDETERMINATE`
+   down to just `{REVIEW,INDETERMINATE}`. ⇒ StepGateArtifact authored **standalone** with the mapping
+   **OK↔PASS, VIOLATION↔FAIL** (documented in-schema), not `allOf`.
+1b. **§13.4 defect — ReceiptIR fold cannot layer.** `receipt.schema.v0.1.json` is also
+   `additionalProperties:false`, so `fold` can't be added by `allOf`. ⇒ `fold` authored as a standalone
+   object schema (`receipt-fold.v0.1`); **landing it on ReceiptIR requires adding an optional `fold`
+   property to the base** (a one-line additive edit, backward-compatible) — deferred as a base-schema change.
 2. **id-scheme mismatch (corrected finding).** The canonical StopGate schema
    `StopGateArtifact.schema.v0.1.json` **does have an `$id`**:
    `https://schemas.srcos.ai/agentplane/StopGateArtifact.schema.v0.1.json` (my earlier "no `$id`"

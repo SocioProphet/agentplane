@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.srcos.ai/agentplane/cinorm-ir.schema.v0.1.json",
+  "title": "CINormIR (composition §13.7, new)",
+  "description": "Logical id 'cinorm.ir/v1'. A contextual-integrity transmission norm (primitive 12), evaluated by the Policy Fabric / Constitutional Policy Engine. §11 taint says where data came from; §12 CI says whether this flow, in this role, is licit.",
+  "type": "object",
+  "properties": {
+    "sender": { "type": "string" },
+    "receiver": { "type": "string" },
+    "subject": { "type": "string" },
+    "information_type": { "type": "string" },
+    "transmission_principle": {
+      "type": "string",
+      "description": "OPA/Rego predicate gating the flow under the current role context"
+    }
+  },
+  "required": ["sender", "receiver", "subject", "information_type", "transmission_principle"],
+  "additionalProperties": false
+}
