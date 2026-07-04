@@ -117,8 +117,14 @@ def classify_edges(nodes, edges, entry):
     return dom, backedges, retreat
 
 
-def compress_seq(nodes, edges, backedges) -> list[list[str]]:
-    """T2: maximal seq chains (interior in1/out1) -> SEQ regions. Excludes backedges."""
+def compress_seq(nodes, edges, backedges, linear: set | None = None) -> list[list[str]]:
+    """T2: maximal seq chains (interior in1/out1) -> SEQ regions. Excludes backedges.
+
+    `linear` restricts compression to straight-line nodes (tool_call/terminal); a
+    control-flow node (decision/spawn/join) is never absorbed into a SEQ region,
+    so e.g. a latent decision stays visible to the latent-branch rule in R_H."""
+    if linear is None:
+        linear = set(nodes)
     out_all, in_all = {}, {}
     for u, v, l in edges:
         if (u, v, l) in backedges:
@@ -127,7 +133,7 @@ def compress_seq(nodes, edges, backedges) -> list[list[str]]:
         in_all.setdefault(v, []).append((u, l))
     nxt: dict[str, str] = {}
     for u, v, l in edges:
-        if (u, v, l) in backedges or l != "seq":
+        if (u, v, l) in backedges or l != "seq" or u not in linear or v not in linear:
             continue
         if out_all.get(u) == [(v, "seq")] and in_all.get(v) == [(u, "seq")]:
             nxt[u] = v
@@ -152,8 +158,9 @@ def normalize(cfg) -> NormalizedCFG:
     # no non-effectful pass-throughs are emitted). Mechanism reserved.
     # T5 first computes backedges so T2 does not compress across a loop header.
     dom, backedges, retreat = classify_edges(nodes, edges, entry)
-    # T2 chain compression.
-    seq_regions = compress_seq(nodes, edges, backedges)
+    # T2 chain compression — only straight-line nodes are absorbable.
+    linear = {nid for nid, n in cfg.nodes.items() if n.kind in ("tool_call", "terminal")}
+    seq_regions = compress_seq(nodes, edges, backedges, linear)
     # T3 short-circuit fold: detect-only in v0.1 (no canonical a&&b/a||b shape is
     # synthesized here); T4 jump-thread: flag-only, none flagged on well-formed traces.
     threaded: set[str] = set()
