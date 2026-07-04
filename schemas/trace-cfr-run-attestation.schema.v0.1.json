@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.srcos.ai/agentplane/trace-cfr-run-attestation.schema.v0.1.json",
+  "title": "Trace CFR Run Attestation (SP-TRACE-CFR §5)",
+  "description": "A signed, run-level narration-fidelity attestation. Binds the sealed segment, the folded gate verdict, per-claim verdict counts, anomalies, and the per-claim StepGate hashes, then signs the whole with an ed25519 harness key. Emitted by deterministic harness code (model-excluded). This is the first-class evidence object a gated agent run produces on the AgentPlane evidence surface.",
+  "type": "object",
+  "properties": {
+    "artifact_kind": { "const": "trace_cfr_run_attestation" },
+    "spec_version": { "type": "string" },
+    "session_id": { "type": "string" },
+    "segment_ref": {
+      "type": "object",
+      "properties": {
+        "first_event_id": { "type": "string" },
+        "last_event_id": { "type": "string" },
+        "segment_hash": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" }
+      },
+      "required": ["segment_hash"],
+      "additionalProperties": true
+    },
+    "normalization_version": { "type": "string" },
+    "engine_versions": {
+      "type": "object",
+      "properties": { "hammock": { "type": "string" }, "interval": { "type": "string" } },
+      "additionalProperties": true
+    },
+    "gate_verdict": { "type": "string", "enum": ["PASS", "FAIL", "REVIEW", "INDETERMINATE"] },
+    "claims_evaluated": { "type": "integer", "minimum": 0 },
+    "verdicts": {
+      "type": "object",
+      "properties": {
+        "POS": { "type": "integer" }, "ZERO": { "type": "integer" },
+        "NEG": { "type": "integer" }, "INDETERMINATE": { "type": "integer" }
+      },
+      "additionalProperties": false
+    },
+    "anomalies": { "type": "array", "items": { "type": "string" } },
+    "stepgate_refs": { "type": "array", "items": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" } },
+    "evidence_hashes": { "type": "array", "items": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" } },
+    "evaluated_by": {
+      "type": "object",
+      "properties": { "kind": { "enum": ["deterministic-harness", "human-authority"] } },
+      "required": ["kind"]
+    },
+    "evaluated_at": { "type": "string" },
+    "signature": {
+      "type": "object",
+      "properties": { "alg": { "const": "ed25519" }, "key_id": { "type": "string" }, "value": { "type": "string" } },
+      "required": ["alg", "key_id", "value"]
+    }
+  },
+  "required": ["artifact_kind", "session_id", "segment_ref", "gate_verdict", "claims_evaluated",
+               "verdicts", "evaluated_by", "evaluated_at", "signature"],
+  "additionalProperties": false
+}

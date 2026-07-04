@@ -386,3 +386,12 @@ validate-prometheus-sr:
 
 validate-reasoning-failure-traces:
 	python3 tools/validate_reasoning_failure_traces.py
+
+# --- SP-TRACE-CFR (narration fidelity verifier) ---
+validate: validate-trace-cfr
+.PHONY: validate-trace-cfr
+validate-trace-cfr:
+	python3 -m json.tool schemas/trace-cfr-segment.schema.v0.1.json >/dev/null
+	python3 -m json.tool schemas/stepgate-artifact.schema.v0.1.json >/dev/null
+	python3 -m json.tool schemas/trace-cfr-run-attestation.schema.v0.1.json >/dev/null
+	python3 tools/validate_trace_cfr.py
