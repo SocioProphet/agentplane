@@ -30,10 +30,23 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import step_gate  # noqa: E402
 import stopgate_artifact as sg  # noqa: E402
 
-POS, ZERO, NEG = "POS", "ZERO", "NEG"
+POS, ZERO, NEG, INDETERMINATE = "POS", "ZERO", "NEG", "INDETERMINATE"
 
 # per-claim verdict -> VerifierIR finding (step_gate then maps finding -> StepGate verdict)
-_VERDICT_TO_FINDING = {POS: "OK", NEG: "VIOLATION", ZERO: None}
+_VERDICT_TO_FINDING = {POS: "OK", NEG: "VIOLATION", ZERO: None, INDETERMINATE: None}
+
+
+def compose_two(h: str, i: str) -> str:
+    """P5 two-engine composition (§4.5). A sign disagreement (POS vs NEG) between the
+    two semantic engines is impossible if both are correct -> VERIFIER-FAULT-001
+    (INDETERMINATE), NEVER charged as a VIOLATION. Otherwise NEG dominates, then POS."""
+    if {h, i} == {POS, NEG}:
+        return INDETERMINATE
+    if NEG in (h, i):
+        return NEG
+    if POS in (h, i):
+        return POS
+    return ZERO
 
 
 @dataclass
@@ -43,6 +56,7 @@ class ClaimVerdict:
     reason: str
     claimed_primitive: str | None = None
     recovered_primitive: str | None = None
+    verifier_fault: bool = False
 
 
 def alpha(claim_ir: dict):
@@ -76,7 +90,20 @@ def _region_over(node_ids, recovery):
     return best
 
 
-def verify_claim(claim_ir: dict, events: list[dict], recovery) -> ClaimVerdict:
+def _engine_verdict(claimed: str, node_ids: set, recovery):
+    """One engine's per-claim verdict over the span."""
+    region = _region_over(node_ids, recovery)
+    if region is None:
+        return ZERO, "SPAN_UNRECOVERED", None
+    if region.verdict == ZERO:
+        return ZERO, "RECOVERED_ZERO", region.primitive
+    if claimed == region.primitive:
+        return POS, "MATCH", region.primitive
+    return NEG, "STRUCTURE_MISMATCH", region.primitive
+
+
+def verify_claim(claim_ir: dict, events: list[dict], recovery, ri_recovery=None) -> ClaimVerdict:
+    """Compare a claim against R_H (and, if given, R_I) and compose the P5 verdict."""
     cid = claim_ir.get("claim_id", "?")
     ast = alpha(claim_ir)
     if ast is None:
@@ -85,15 +112,17 @@ def verify_claim(claim_ir: dict, events: list[dict], recovery) -> ClaimVerdict:
     if node_ids is None:
         return ClaimVerdict(cid, ZERO, "CLAIM_UNANCHORED", claimed_primitive=ast["primitive"])
 
-    region = _region_over(node_ids, recovery)
     claimed = ast["primitive"]
-    if region is None:
-        return ClaimVerdict(cid, ZERO, "SPAN_UNRECOVERED", claimed_primitive=claimed)
-    if region.verdict == ZERO:
-        return ClaimVerdict(cid, ZERO, "RECOVERED_ZERO", claimed, region.primitive)
-    if claimed == region.primitive:
-        return ClaimVerdict(cid, POS, "MATCH", claimed, region.primitive)
-    return ClaimVerdict(cid, NEG, "STRUCTURE_MISMATCH", claimed, region.primitive)
+    h_v, h_reason, h_prim = _engine_verdict(claimed, node_ids, recovery)
+    if ri_recovery is None:
+        return ClaimVerdict(cid, h_v, h_reason, claimed, h_prim)
+
+    i_v, i_reason, i_prim = _engine_verdict(claimed, node_ids, ri_recovery)
+    comp = compose_two(h_v, i_v)
+    if comp == INDETERMINATE:
+        return ClaimVerdict(cid, INDETERMINATE, "VERIFIER_FAULT", claimed, h_prim or i_prim, verifier_fault=True)
+    reason = h_reason if comp == h_v else i_reason
+    return ClaimVerdict(cid, comp, reason, claimed, h_prim or i_prim)
 
 
 def emit_stepgate(cv: ClaimVerdict, signer, session_id: str = "", gate_relevant: bool = False):
@@ -122,9 +151,9 @@ def reasoning_failure_trace(cv: ClaimVerdict, session_id: str = "") -> dict:
     }
 
 
-def verify_all(claims: list[dict], events: list[dict], recovery, signer, session_id: str = ""):
+def verify_all(claims: list[dict], events: list[dict], recovery, signer, session_id: str = "", ri_recovery=None):
     """Verify every claim; return (claim_verdicts, stepgate_artifacts, failure_traces)."""
-    verdicts = [verify_claim(c, events, recovery) for c in claims]
+    verdicts = [verify_claim(c, events, recovery, ri_recovery) for c in claims]
     gates = [emit_stepgate(v, signer, session_id) for v in verdicts]
     traces = [reasoning_failure_trace(v, session_id) for v in verdicts if v.verdict == NEG]
     return verdicts, gates, traces
