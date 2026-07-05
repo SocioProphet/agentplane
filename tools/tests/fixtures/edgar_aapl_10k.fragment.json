@@ -1,0 +1,278 @@
+{
+  "tenant_id": "edgar",
+  "_source": "https://www.sec.gov/Archives/edgar/data/320193/000032019325000079/aapl-20250927.htm",
+  "nodes": [
+    {
+      "graph_node": {
+        "node_id": "320193/10-K",
+        "tenant_id": "edgar",
+        "node_kind": "document",
+        "display_name": "Apple Inc. — Form 10-K (2025-10-31)"
+      },
+      "confidentiality_class": "public"
+    },
+    {
+      "graph_node": {
+        "node_id": "320193/item-1",
+        "tenant_id": "edgar",
+        "node_kind": "clause",
+        "display_name": "Item 1 — Business"
+      },
+      "confidentiality_class": "public"
+    },
+    {
+      "graph_node": {
+        "node_id": "320193/item-1A",
+        "tenant_id": "edgar",
+        "node_kind": "clause",
+        "display_name": "Item 1A — Risk Factors"
+      },
+      "confidentiality_class": "public"
+    },
+    {
+      "graph_node": {
+        "node_id": "320193/item-1B",
+        "tenant_id": "edgar",
+        "node_kind": "clause",
+        "display_name": "Item 1B — Unresolved Staff Comments"
+      },
+      "confidentiality_class": "public"
+    },
+    {
+      "graph_node": {
+        "node_id": "320193/item-1C",
+        "tenant_id": "edgar",
+        "node_kind": "clause",
+        "display_name": "Item 1C — Cybersecurity"
+      },
+      "confidentiality_class": "public"
+    },
+    {
+      "graph_node": {
+        "node_id": "320193/item-2",
+        "tenant_id": "edgar",
+        "node_kind": "clause",
+        "display_name": "Item 2 — Properties"
+      },
+      "confidentiality_class": "public"
+    },
+    {
+      "graph_node": {
+        "node_id": "320193/item-3",
+        "tenant_id": "edgar",
+        "node_kind": "clause",
+        "display_name": "Item 3 — Legal Proceedings"
+      },
+      "confidentiality_class": "public"
+    },
+    {
+      "graph_node": {
+        "node_id": "320193/item-4",
+        "tenant_id": "edgar",
+        "node_kind": "clause",
+        "display_name": "Item 4 — Mine Safety Disclosures"
+      },
+      "confidentiality_class": "public"
+    },
+    {
+      "graph_node": {
+        "node_id": "320193/item-7A",
+        "tenant_id": "edgar",
+        "node_kind": "clause",
+        "display_name": "Item 7A — Quantitative and Qualitative Disclosures About Market Risk"
+      },
+      "confidentiality_class": "public"
+    },
+    {
+      "graph_node": {
+        "node_id": "320193/item-8",
+        "tenant_id": "edgar",
+        "node_kind": "clause",
+        "display_name": "Item 8 — Financial Statements and Supplementary Data"
+      },
+      "confidentiality_class": "public"
+    },
+    {
+      "graph_node": {
+        "node_id": "320193/item-9A",
+        "tenant_id": "edgar",
+        "node_kind": "clause",
+        "display_name": "Item 9A — Controls and Procedures"
+      },
+      "confidentiality_class": "public"
+    },
+    {
+      "graph_node": {
+        "node_id": "320193/item-9B",
+        "tenant_id": "edgar",
+        "node_kind": "clause",
+        "display_name": "Item 9B — Other Information"
+      },
+      "confidentiality_class": "public"
+    },
+    {
+      "graph_node": {
+        "node_id": "320193/item-9C",
+        "tenant_id": "edgar",
+        "node_kind": "clause",
+        "display_name": "Item 9C — Disclosure Regarding Foreign Jurisdictions that Prevent Inspections"
+      },
+      "confidentiality_class": "public"
+    },
+    {
+      "graph_node": {
+        "node_id": "320193/item-10",
+        "tenant_id": "edgar",
+        "node_kind": "clause",
+        "display_name": "Item 10 — Directors, Executive Officers and Corporate Governance"
+      },
+      "confidentiality_class": "public"
+    },
+    {
+      "graph_node": {
+        "node_id": "320193/item-11",
+        "tenant_id": "edgar",
+        "node_kind": "clause",
+        "display_name": "Item 11 — Executive Compensation"
+      },
+      "confidentiality_class": "public"
+    },
+    {
+      "graph_node": {
+        "node_id": "320193/item-14",
+        "tenant_id": "edgar",
+        "node_kind": "clause",
+        "display_name": "Item 14 — Principal Accountant Fees and Services"
+      },
+      "confidentiality_class": "public"
+    },
+    {
+      "graph_node": {
+        "node_id": "320193/item-15",
+        "tenant_id": "edgar",
+        "node_kind": "clause",
+        "display_name": "Item 15 — Exhibit and Financial Statement Schedules"
+      },
+      "confidentiality_class": "public"
+    },
+    {
+      "graph_node": {
+        "node_id": "320193/item-16",
+        "tenant_id": "edgar",
+        "node_kind": "clause",
+        "display_name": "Item 16 — Form"
+      },
+      "confidentiality_class": "public"
+    },
+    {
+      "graph_node": {
+        "node_id": "entity/320193",
+        "tenant_id": "edgar",
+        "node_kind": "organization",
+        "display_name": "Apple Inc.",
+        "attributes": {
+          "cik": "320193"
+        }
+      },
+      "confidentiality_class": "public",
+      "evidence": {
+        "evidence_id": "ev-entity/320193",
+        "tenant_id": "edgar",
+        "source_ref": "0000320193-25-000079",
+        "anchor_ref": "https://www.sec.gov/Archives/edgar/data/320193/000032019325000079/aapl-20250927.htm#item-1"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "class": "containment",
+      "parent": "320193/10-K",
+      "child": "320193/item-1"
+    },
+    {
+      "class": "containment",
+      "parent": "320193/10-K",
+      "child": "320193/item-1A"
+    },
+    {
+      "class": "containment",
+      "parent": "320193/10-K",
+      "child": "320193/item-1B"
+    },
+    {
+      "class": "containment",
+      "parent": "320193/10-K",
+      "child": "320193/item-1C"
+    },
+    {
+      "class": "containment",
+      "parent": "320193/10-K",
+      "child": "320193/item-2"
+    },
+    {
+      "class": "containment",
+      "parent": "320193/10-K",
+      "child": "320193/item-3"
+    },
+    {
+      "class": "containment",
+      "parent": "320193/10-K",
+      "child": "320193/item-4"
+    },
+    {
+      "class": "containment",
+      "parent": "320193/10-K",
+      "child": "320193/item-7A"
+    },
+    {
+      "class": "containment",
+      "parent": "320193/10-K",
+      "child": "320193/item-8"
+    },
+    {
+      "class": "containment",
+      "parent": "320193/10-K",
+      "child": "320193/item-9A"
+    },
+    {
+      "class": "containment",
+      "parent": "320193/10-K",
+      "child": "320193/item-9B"
+    },
+    {
+      "class": "containment",
+      "parent": "320193/10-K",
+      "child": "320193/item-9C"
+    },
+    {
+      "class": "containment",
+      "parent": "320193/10-K",
+      "child": "320193/item-10"
+    },
+    {
+      "class": "containment",
+      "parent": "320193/10-K",
+      "child": "320193/item-11"
+    },
+    {
+      "class": "containment",
+      "parent": "320193/10-K",
+      "child": "320193/item-14"
+    },
+    {
+      "class": "containment",
+      "parent": "320193/10-K",
+      "child": "320193/item-15"
+    },
+    {
+      "class": "containment",
+      "parent": "320193/10-K",
+      "child": "320193/item-16"
+    },
+    {
+      "class": "containment",
+      "parent": "320193/item-1",
+      "child": "entity/320193"
+    }
+  ]
+}
