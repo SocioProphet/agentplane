@@ -40,6 +40,10 @@ EDGE_RELATIONAL = "Relational"     # E_R — typed many-to-many
 # --- evidence / provenance axis (SP_RETR_FIBER_001_axis_binding §2.3) --------- #
 EPISTEMIC_DERIVED = "derived"      # recovered via projection, not observed as source authorship
 
+# Claim atoms are stored as value-envelope keys `attr:claim:<var>` (§3.4.1); to_bundle emits
+# them as K lines. Mirrors fiber_retrieval.CLAIM_PREFIX.
+CLAIM_PREFIX = "attr:claim:"
+
 # Crystal Atlas required fields (verified against the real schemas, BINDING.md §1).
 _GRAPH_NODE_REQUIRED = ("node_id", "tenant_id", "node_kind", "display_name")
 _EVIDENCE_REQUIRED = ("evidence_id", "tenant_id", "source_ref", "anchor_ref")
@@ -299,20 +303,27 @@ def unanchored_relational_endpoints(g: ProjectedGraph) -> list:
 def to_bundle(g: ProjectedGraph) -> str:
     """Serialize the composite graph H to a tab-delimited, node_id-keyed bundle:
 
-        N<TAB>node_id<TAB>node_kind
+        N<TAB>node_id<TAB>node_kind                        (atom)
         C<TAB>parent_node_id<TAB>child_node_id            (E^⊑, containment)
         R<TAB>rel_type<TAB>src_node_id<TAB>dst_node_id     (E_R, relational)
+        A<TAB>node_id<TAB>anchor_ref                       (page anchor — provenance-of-location)
+        K<TAB>node_id<TAB>claim_var<TAB>value<TAB>egrade    (claim atom — for the fiber-product verdict)
 
-    It is keyed by the stable string node_id (NOT the Python-internal u128 atom id), so a
-    Rust ingest adapter (`hg_fiber::ingest_bundle`) rebuilds the SAME two-edge-class graph on
-    the hellgraph substrate, minting its own atom ids. This is the parity contract:
-    fiber_projection is the reference oracle, hg_fiber is the real engine, this bundle is what
-    they must agree on. Deterministic (sorted) so it is a stable golden vector. Structural
-    only in v0 — anchors/labels/claims layer in once the Rust value-write path is bound.
+    Keyed by the stable string node_id (NOT the Python-internal u128 atom id), so the Rust
+    ingest adapter (`hg_fiber::ingest_bundle`) rebuilds the SAME graph on the hellgraph
+    substrate, minting its own atom ids. The parity contract: fiber_projection is the reference
+    oracle, hg_fiber is the real engine, this bundle is what they must agree on. Deterministic
+    (sorted) so it is a stable golden vector.
+
+    N/C/R are structure and live in the real hellgraph graph. A/K are fiber-retrieval DOMAIN
+    data (page anchors, ownership claims) — hellgraph's ValuePayload models only Field/Proof,
+    not arbitrary strings/scalars, so on the Rust side these ride an `hg_fiber` sidecar next to
+    the store (they are not core graph facts). That sidecar is what lets the fiber-product
+    verdict + double grounding run on the substrate, not just in Python.
     """
     rev = {atom_id: node_id for (_tenant, node_id), atom_id in g.id_map.items()}
     nodes = [f"N\t{rev[a]}\t{g.nodes[a].type_name}" for a in sorted(g.nodes, key=lambda a: rev[a])]
-    cont, rel = [], []
+    cont, rel, anchors, claims = [], [], [], []
     for l in g.containment_links():
         p = next(t for (r, t, _o) in l.members if r == "parent")
         c = next(t for (r, t, _o) in l.members if r == "child")
@@ -321,4 +332,11 @@ def to_bundle(g: ProjectedGraph) -> str:
         s = next(t for (r, t, _o) in l.members if r == "src")
         d = next(t for (r, t, _o) in l.members if r == "dst")
         rel.append(f"R\t{l.type_name}\t{rev[s]}\t{rev[d]}")
-    return "\n".join(nodes + sorted(cont) + sorted(rel)) + "\n"
+    for v in g.values:
+        node_id = rev[v.subject_atom]
+        if v.key == "anchor":
+            anchors.append(f"A\t{node_id}\t{v.payload}")
+        elif v.key.startswith(CLAIM_PREFIX):
+            var = v.key[len(CLAIM_PREFIX):]
+            claims.append(f"K\t{node_id}\t{var}\t{v.payload['value']}\t{v.payload['egrade']}")
+    return "\n".join(nodes + sorted(cont) + sorted(rel) + sorted(anchors) + sorted(claims)) + "\n"

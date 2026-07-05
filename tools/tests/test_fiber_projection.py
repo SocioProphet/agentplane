@@ -143,8 +143,13 @@ def test_edge_referencing_unknown_node_rejected():
 def test_to_bundle_matches_golden_parity_vector():
     # The bundle is the contract the Rust hg_fiber ingest must reproduce byte-for-byte.
     g = fp.project(_load())
+    b = fp.to_bundle(g)
     with open(os.path.join(_HERE, "fixtures", "fiber_ownership.bundle"), encoding="utf-8") as fh:
-        assert fp.to_bundle(g) == fh.read()
-    # keyed by node_id (not the internal u128 atom id) so a different engine can rebuild H.
-    assert "N\tentity/parentco\torganization" in fp.to_bundle(g)
-    assert "R\tgleif-L2:isDirectParentOf\tentity/parentco\tentity/subco" in fp.to_bundle(g)
+        assert b == fh.read()
+    # structure — keyed by node_id (not the internal u128 atom id) so a different engine rebuilds H.
+    assert "N\tentity/parentco\torganization" in b
+    assert "R\tgleif-L2:isDirectParentOf\tentity/parentco\tentity/subco" in b
+    # domain data for double-grounding on the substrate: anchors (A) + claims (K).
+    assert "A\tentity/parentco\tfiling-A#p87§4.2" in b
+    assert "K\tentity/parentco\towns_pct:parentco|subco\t100\tverified" in b
+    assert "K\tentity/subco\towns_pct:parentco|subco\t100\tverified" in b

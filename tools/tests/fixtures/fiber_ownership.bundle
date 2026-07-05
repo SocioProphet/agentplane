@@ -9,3 +9,7 @@ C	filing-A/s4.2	entity/parentco
 C	filing-B/root	filing-B/s2.1
 C	filing-B/s2.1	entity/subco
 R	gleif-L2:isDirectParentOf	entity/parentco	entity/subco
+A	entity/parentco	filing-A#p87§4.2
+A	entity/subco	filing-B#p14§2.1
+K	entity/parentco	owns_pct:parentco|subco	100	verified
+K	entity/subco	owns_pct:parentco|subco	100	verified
