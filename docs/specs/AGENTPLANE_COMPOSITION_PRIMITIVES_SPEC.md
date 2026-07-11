@@ -1,5 +1,5 @@
 # AGENTPLANE_COMPOSITION_PRIMITIVES_SPEC
-**Status:** DRAFT v0.1.0
+**Status:** DRAFT v0.2.0 (v0.1.0 + CO-7 promotion gating + typed exception classes)
 **Scope:** AgentPlane orchestration — task construction, execution/gating, diagnostics
 **Depends on:** `STOPGATE_ARTIFACT_SPEC.md`, IR vocabulary (ClaimIR, EvidenceIR, VerifierIR, ReceiptIR, ObligationIR, LedgerIR), Mellumwork falsification framework (T1/T2, POS/ZERO/NEG), CBES axioms (A1–A7), SCOPE-D
 **Verdict taxonomy (inherited):** `OK | REVIEW | VIOLATION | INDETERMINATE`
@@ -411,8 +411,64 @@ Deltas only. Existing fields elided as `...`.
 }
 ```
 
+### 13.8 PromotionReceipt  (new — CO-7 binding)
+A tier promotion (`trace → candidate`, `candidate → durable`) is a governed action and emits a
+receipt with the same shape as any other governed action (§14.7 CO-7.1). `prior_state`/`post_state`
+are memory tiers; quarantine (CO-7.4) is a *serving status*, not a tier — a quarantined item keeps
+its tier but MUST NOT be served.
+```json
+{
+  "$id": "promotion.receipt/v1",
+  "type": "object",
+  "description": "CO-7 (§14.7) — receipt for a tier-promotion action; harness-emitted",
+  "properties": {
+    "verdict": { "type": "string", "enum": ["POS", "ZERO", "NEG"] },
+    "policy_id": { "type": "string" },
+    "evidence_digest": { "type": "string" },
+    "actor_id": { "type": "string" },
+    "prior_state": { "type": "string", "enum": ["trace", "candidate", "durable"] },
+    "post_state": { "type": "string", "enum": ["trace", "candidate", "durable"] },
+    "tombstone": {
+      "type": "boolean",
+      "description": "true iff verdict == NEG (CO-7.3 retraction marker; item retained in trace)"
+    }
+  },
+  "required": ["verdict", "policy_id", "evidence_digest",
+               "actor_id", "prior_state", "post_state"]
+}
+```
+
+### 13.9 Typed exception classes  (new — closed enum)
+Every exception/error field in the IR vocabulary MUST take its value from this closed enum.
+Untyped exception/error buckets are prohibited. The enum is **closed**: any runtime condition
+not matching one of these members is a spec bug to be fixed by amendment, not an "other" case.
+No catch-all member exists or may be added.
+```json
+{
+  "$id": "exception.class/v1",
+  "type": "string",
+  "enum": [
+    "EXC_OUT_OF_GRANT",
+    "EXC_RECEIPT_DIVERGENCE",
+    "EXC_UNGATED_PROMOTION",
+    "EXC_STALE_EVIDENCE",
+    "EXC_REVOKED_GRANT",
+    "EXC_QUARANTINE_TAINT"
+  ]
+}
+```
+| Member | Condition |
+|---|---|
+| `EXC_OUT_OF_GRANT` | effect executed outside the authority closure (§11 grants) |
+| `EXC_RECEIPT_DIVERGENCE` | attested effect ≠ observed effect |
+| `EXC_UNGATED_PROMOTION` | tier change with no POS promotion receipt (CO-7) |
+| `EXC_STALE_EVIDENCE` | `evidence_digest` resolves to an expired/revoked artifact |
+| `EXC_REVOKED_GRANT` | grant revoked after issue, before/during effect |
+| `EXC_QUARANTINE_TAINT` | CO-7.5 transitive provenance violation |
+
 ---
 ## 14. Conformance obligations
+Obligations are numbered CO-1…CO-7 in section order (§14.1 = CO-1, …, §14.7 = CO-7).
 
 ### 14.1 Permutation invariance of the receipt fold (primitive 4)
 ```
@@ -466,6 +522,37 @@ DO      compare against random-direction baseline of matched dimensionality
 ASSERT  taxonomy separation score > random baseline at declared significance
 FAIL    → taxonomy MUST NOT be used; set random_baseline_cleared = false
 ```
+
+### 14.7 Promotion gating (CO-7)
+Promotion of an item from trace → candidate, or candidate → durable, is itself a governed
+ACTION and MUST NOT occur except under a POS verdict.
+
+- **CO-7.1** Every promotion emits a receipt with the same schema as any other governed action:
+  `{verdict, policy_id, evidence_digest, actor_id, prior_state, post_state}` (§13.8).
+- **CO-7.2** A ZERO verdict on a promotion request holds the item at its current tier. ZERO is
+  NOT a soft-allow. No timeout-to-promote.
+- **CO-7.3** A NEG verdict emits a tombstone receipt; the item is retained in trace with a
+  retraction marker. No deletion (chain integrity).
+- **CO-7.4** Durable-tier items whose promotion receipt cannot be resolved to a POS verdict are
+  QUARANTINED, not served. This is the migration path for any pre-CO-7 durable state.
+- **CO-7.5** Provenance is transitive: an item MUST NOT be promoted to durable if any item in
+  its evidence closure is quarantined or retracted.
+
+```
+GIVEN   a promotion request for item i, tier t_from → t_to, with receipt R
+ASSERT  R exists, is well-formed per §13.8, and R.{prior_state,post_state} == (t_from,t_to)
+ASSERT  R.verdict == POS for any effected tier change      (else EXC_UNGATED_PROMOTION)
+ASSERT  R.policy_id resolves to a live policy              (else quarantine per CO-7.4)
+IF      t_to == durable:
+ASSERT  ∀ e ∈ evidence_closure(i): e is neither quarantined nor retracted
+                                                           (else EXC_QUARANTINE_TAINT)
+FAIL    → item held at current tier (ZERO) or tombstoned-in-trace (NEG); never silently promoted
+```
+Negative fixtures: `tests/fixtures/composition-primitives/neg-08…neg-11` (each MUST fail this
+check and pass the correctly-rejected assertion in `tools/validate_composition_promotion_gate.py`).
+
+**Rationale.** Without CO-7 an ungoverned belief becomes durable system state and every
+downstream decision inherits laundered provenance. The governance plane is then decorative.
 
 ---
 ## 15. Rollout order (leverage-to-diff)

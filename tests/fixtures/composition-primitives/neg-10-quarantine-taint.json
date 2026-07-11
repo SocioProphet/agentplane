@@ -1,0 +1,21 @@
+{
+  "kind": "composition.promotion.v0",
+  "item_id": "claim/supplier-solvency-composite",
+  "from_tier": "candidate",
+  "to_tier": "durable",
+  "promotion_receipt": {
+    "verdict": "POS",
+    "policy_id": "policy/promotion-gate.v0",
+    "evidence_digest": "sha256:9d2c5b8e1f4a7d0c3b6e9f2a5d8c1b4e7f0a3d6c9b2e5f8a1d4c7b0e3f6a9d2c",
+    "actor_id": "harness/promotion-gate",
+    "prior_state": "candidate",
+    "post_state": "durable"
+  },
+  "policy_registry": ["policy/promotion-gate.v0"],
+  "evidence_closure": [
+    { "item_id": "evidence/filings-parse-2026q1", "status": "active" },
+    { "item_id": "evidence/legacy-import-batch-7", "status": "quarantined" }
+  ],
+  "expected_exception": "EXC_QUARANTINE_TAINT",
+  "why_invalid": "promotion to durable whose evidence closure contains a quarantined item; provenance is transitive (CO-7.5)"
+}

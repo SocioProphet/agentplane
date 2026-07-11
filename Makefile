@@ -395,3 +395,9 @@ validate-trace-cfr:
 	python3 -m json.tool schemas/stepgate-artifact.schema.v0.1.json >/dev/null
 	python3 -m json.tool schemas/trace-cfr-run-attestation.schema.v0.1.json >/dev/null
 	python3 tools/validate_trace_cfr.py
+
+# --- Composition primitives CO-7 (promotion gating, §14.7) ---
+validate: validate-composition-promotion-gate
+.PHONY: validate-composition-promotion-gate
+validate-composition-promotion-gate:
+	python3 tools/validate_composition_promotion_gate.py

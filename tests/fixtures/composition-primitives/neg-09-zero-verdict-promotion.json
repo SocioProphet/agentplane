@@ -1,0 +1,20 @@
+{
+  "kind": "composition.promotion.v0",
+  "item_id": "claim/vendor-risk-score-drift",
+  "from_tier": "candidate",
+  "to_tier": "durable",
+  "promotion_receipt": {
+    "verdict": "ZERO",
+    "policy_id": "policy/promotion-gate.v0",
+    "evidence_digest": "sha256:1f4e7a2b9c6d3e0f5a8b1c4d7e0f3a6b9c2d5e8f1a4b7c0d3e6f9a2b5c8d1e4f",
+    "actor_id": "harness/promotion-gate",
+    "prior_state": "candidate",
+    "post_state": "durable"
+  },
+  "policy_registry": ["policy/promotion-gate.v0"],
+  "evidence_closure": [
+    { "item_id": "evidence/drift-window-14d", "status": "active" }
+  ],
+  "expected_exception": "EXC_UNGATED_PROMOTION",
+  "why_invalid": "ZERO verdict but promotion attempted anyway; ZERO holds the item at its current tier, it is not a soft-allow and there is no timeout-to-promote (CO-7.2)"
+}
