@@ -1,0 +1,19 @@
+{
+  "kind": "composition.promotion.v0",
+  "item_id": "claim/market-abstention-rate-q2",
+  "from_tier": "trace",
+  "to_tier": "candidate",
+  "promotion_receipt": {
+    "verdict": "POS",
+    "policy_id": "policy/promotion-gate.v0",
+    "evidence_digest": "sha256:5b0c8f8f2b1e4f6a9d3c7e1a8b2d4f6c0e9a7b5d3f1c8e6a4b2d0f9e7c5a3b1d",
+    "actor_id": "harness/promotion-gate",
+    "prior_state": "trace",
+    "post_state": "candidate"
+  },
+  "policy_registry": ["policy/promotion-gate.v0"],
+  "evidence_closure": [
+    { "item_id": "evidence/run-2026-07-09-abstention", "status": "active" },
+    { "item_id": "evidence/calibration-set-q2", "status": "active" }
+  ]
+}

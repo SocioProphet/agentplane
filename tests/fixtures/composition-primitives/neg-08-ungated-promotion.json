@@ -1,0 +1,13 @@
+{
+  "kind": "composition.promotion.v0",
+  "item_id": "claim/latency-improvement-belief",
+  "from_tier": "candidate",
+  "to_tier": "durable",
+  "promotion_receipt": null,
+  "policy_registry": ["policy/promotion-gate.v0"],
+  "evidence_closure": [
+    { "item_id": "evidence/bench-run-0031", "status": "active" }
+  ],
+  "expected_exception": "EXC_UNGATED_PROMOTION",
+  "why_invalid": "candidate -> durable tier change with no promotion receipt at all (CO-7 / CO-7.1)"
+}
