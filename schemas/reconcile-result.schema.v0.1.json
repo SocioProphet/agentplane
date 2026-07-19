@@ -1,0 +1,124 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "AgentPlane Reconcile Result v0.1",
+  "description": "Read-only explanation and safe-action plan for one task-state reconciliation pass.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "kind",
+    "bundle",
+    "capturedAt",
+    "taskId",
+    "workflowMode",
+    "acceptedEvidenceRefs",
+    "rejectedEvidenceRefs",
+    "contradictions",
+    "safeActions"
+  ],
+  "properties": {
+    "kind": {
+      "const": "ReconcileResult"
+    },
+    "bundle": {
+      "type": "string"
+    },
+    "capturedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "taskId": {
+      "type": "string"
+    },
+    "workflowMode": {
+      "enum": [
+        "direct",
+        "branch_pr",
+        "unknown"
+      ]
+    },
+    "canonicalRef": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "acceptedEvidenceRefs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "rejectedEvidenceRefs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "contradictions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "class",
+          "fingerprint",
+          "severity"
+        ],
+        "properties": {
+          "class": {
+            "enum": [
+              "projection_drift",
+              "observation_gap",
+              "authority_conflict",
+              "canonical_corruption",
+              "unknown"
+            ]
+          },
+          "fingerprint": {
+            "type": "string"
+          },
+          "summary": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "severity": {
+            "enum": [
+              "info",
+              "warn",
+              "error",
+              "fatal"
+            ]
+          }
+        }
+      }
+    },
+    "confidence": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "minimum": 0,
+      "maximum": 1
+    },
+    "safeActions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "unsafeActions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "notes": {
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  }
+}
