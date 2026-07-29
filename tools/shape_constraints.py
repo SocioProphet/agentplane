@@ -45,6 +45,10 @@ _EPS = 1e-9
 #: cannot be certified by property testing and must report UNVERIFIED.
 PROPERTY_TESTABLE = frozenset({"monotone", "joint_monotone", "dominance", "unimodal"})
 
+#: Enforcement modes this module understands. An unrecognised mode is a
+#: declaration error, not a licence to fall through to the weakest check.
+ENFORCEMENT_MODES = frozenset({"architectural", "certified", "property_tested"})
+
 
 @dataclass(frozen=True)
 class ShapeConstraint:
@@ -169,10 +173,20 @@ def check(
     """Evaluate one shape constraint.
 
     `certificate_verifier` is an optional callable taking the certificate id and
-    returning True/False. Without it, a `certified` constraint is UNVERIFIED: the
-    presence of an id string is not evidence that anything was certified.
+    returning True/False. Without it a `certified` constraint is UNVERIFIED unless
+    the property test refutes it outright — the presence of an id string is not
+    evidence that anything was certified, but a counterexample is evidence that
+    nothing valid could have been.
     """
     rng = rng or random.Random(0)
+
+    # An unrecognised enforcement mode must not fall through to property_tested,
+    # the weakest branch: a typo would then quietly return OK for a constraint
+    # nobody declared how to verify.
+    if c.enforcement not in ENFORCEMENT_MODES:
+        return Finding(c, FINDING_VIOLATION,
+                       f"unknown enforcement mode {c.enforcement!r}; "
+                       f"expected one of {sorted(ENFORCEMENT_MODES)}")
 
     if c.enforcement == "certified":
         if not c.certificate_id:
@@ -205,7 +219,7 @@ def check(
             return Finding(c, FINDING_VIOLATION, f"architectural claim refuted: {probe.detail}")
         return Finding(c, FINDING_OK, f"architectural claim held under property test ({c.constraint})")
 
-    # property_tested
+    # property_tested (the only remaining mode, guarded above)
     result = _property_test(fn, c, sampler, rng, n)
     if result is None:
         return Finding(c, FINDING_UNVERIFIED,

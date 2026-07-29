@@ -184,3 +184,20 @@ def test_property_testable_constant_matches_dispatch():
                                dominates_over="unverified" if kind == "dominance" else None)
         f = sc.check(fn, c, _sampler, random.Random(10))
         assert f.finding != sc.FINDING_UNVERIFIED, f"{kind} is listed testable but reported UNVERIFIED"
+
+
+def test_unknown_enforcement_mode_is_a_violation_not_a_fallthrough():
+    """A typo'd mode must not quietly land in the weakest branch and pass."""
+    fn = lambda x: 2 * x["severity"]           # would PASS a property test
+    c = sc.ShapeConstraint("severity", "monotone", "architecturaal")   # typo
+    f = sc.check(fn, c, _sampler, random.Random(11))
+    assert f.finding == sc.FINDING_VIOLATION
+    assert "unknown enforcement mode" in f.detail
+
+
+def test_every_declared_enforcement_mode_is_handled():
+    fn = lambda x: 2 * x["severity"]
+    for mode in sc.ENFORCEMENT_MODES:
+        c = sc.ShapeConstraint("severity", "monotone", mode, certificate_id="cert-1")
+        f = sc.check(fn, c, _sampler, random.Random(12))
+        assert "unknown enforcement mode" not in f.detail, mode
