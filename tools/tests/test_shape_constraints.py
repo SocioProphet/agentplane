@@ -81,7 +81,7 @@ def test_certificate_is_contradicted_by_a_failing_property_test():
 
 
 def test_architectural_claim_is_refuted_by_counterexample():
-    """"By construction" is a claim about the function; a counterexample refutes it."""
+    """A "by construction" label is a claim about the function; a counterexample refutes it."""
     fn = lambda x: -x["severity"]   # non-monotone despite the architectural label
     c = sc.ShapeConstraint("severity", "monotone", "architectural")
     f = sc.check(fn, c, _sampler, random.Random(6))
@@ -143,3 +143,44 @@ def test_enforce_aggregates_and_flags_any_violation():
     findings = sc.enforce(fn, constraints, _sampler, random.Random(4))
     assert sc.any_violation(findings)
     assert [f.finding for f in findings] == [sc.FINDING_OK, sc.FINDING_VIOLATION]
+
+
+def test_accepted_certificate_cannot_launder_a_refuted_constraint():
+    """Evidence of breakage outranks attestation that it holds."""
+    fn = lambda x: -3 * x["severity"]          # demonstrably non-monotone
+    c = sc.ShapeConstraint("severity", "monotone", "certified", certificate_id="lipvor-abc123")
+    f = sc.check(fn, c, _sampler, random.Random(9), certificate_verifier=lambda _cid: True)
+    assert f.finding == sc.FINDING_VIOLATION
+    assert "contradicted" in f.detail
+
+
+def test_certificate_still_ok_when_property_test_holds_and_verifier_accepts():
+    fn = lambda x: 2 * x["severity"]
+    c = sc.ShapeConstraint("severity", "monotone", "certified", certificate_id="lipvor-abc123")
+    f = sc.check(fn, c, _sampler, random.Random(9), certificate_verifier=lambda _cid: True)
+    assert f.finding == sc.FINDING_OK
+
+
+def test_untestable_certified_kind_relies_on_the_verifier():
+    """No property test exists for trapezoid, so the verifier is the only evidence."""
+    fn = lambda x: x["severity"]
+    c = sc.ShapeConstraint("severity", "trapezoid", "certified", certificate_id="cert-1")
+    assert sc.check(fn, c, _sampler, certificate_verifier=lambda _cid: True).finding == sc.FINDING_OK
+    assert sc.check(fn, c, _sampler, certificate_verifier=lambda _cid: False).finding == sc.FINDING_VIOLATION
+
+
+def test_all_verified_is_false_on_an_empty_finding_set():
+    """Deliberate fail-closed: "nothing evaluated" must not read as success."""
+    assert sc.all_verified([]) is False
+    assert sc.any_violation([]) is False
+    assert sc.any_unverified([]) is False
+
+
+def test_property_testable_constant_matches_dispatch():
+    """The constant is authoritative: every listed kind must actually dispatch."""
+    fn = lambda x: x["severity"]
+    for kind in sc.PROPERTY_TESTABLE:
+        c = sc.ShapeConstraint("severity", kind, "property_tested",
+                               dominates_over="unverified" if kind == "dominance" else None)
+        f = sc.check(fn, c, _sampler, random.Random(10))
+        assert f.finding != sc.FINDING_UNVERIFIED, f"{kind} is listed testable but reported UNVERIFIED"

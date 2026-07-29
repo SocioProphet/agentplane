@@ -33,6 +33,7 @@ Stdlib-only.
 from __future__ import annotations
 
 import random
+from collections.abc import Callable
 from dataclasses import dataclass
 
 FINDING_OK = "OK"
@@ -121,7 +122,15 @@ def _unimodal_counterexample(fn, feature, sampler, rng, n, steps=25):
 
 
 def _property_test(fn, c: ShapeConstraint, sampler, rng, n) -> Finding | None:
-    """Run the property test for `c` if its kind supports one; else None."""
+    """Run the property test for `c` if its kind supports one; else None.
+
+    PROPERTY_TESTABLE gates dispatch so the constant cannot drift away from the
+    implementation: a kind listed there but unhandled below raises rather than
+    silently returning None (which would read as "untestable" and produce a
+    false UNVERIFIED).
+    """
+    if c.constraint not in PROPERTY_TESTABLE:
+        return None
     if c.constraint == "monotone":
         cx = _monotone_counterexample(fn, c.feature_slice, sampler, rng, n)
         return (Finding(c, FINDING_VIOLATION, f"monotonicity violated: {cx[0]:.3f} -> {cx[1]:.3f} on {cx[2]}")
@@ -144,7 +153,9 @@ def _property_test(fn, c: ShapeConstraint, sampler, rng, n) -> Finding | None:
                         f"unimodality violated on {cx[0]}: {cx[5]} "
                         f"({cx[1]:.3f}->{cx[3]:.3f} gave {cx[2]:.3f}->{cx[4]:.3f})")
                 if cx else Finding(c, FINDING_OK, "unimodal verified"))
-    return None
+    raise AssertionError(
+        f"{c.constraint!r} is listed in PROPERTY_TESTABLE but has no dispatch branch"
+    )
 
 
 def check(
@@ -153,7 +164,7 @@ def check(
     sampler,
     rng: random.Random | None = None,
     n: int = 300,
-    certificate_verifier=None,
+    certificate_verifier: Callable[[str], bool] | None = None,
 ) -> Finding:
     """Evaluate one shape constraint.
 
@@ -166,12 +177,18 @@ def check(
     if c.enforcement == "certified":
         if not c.certificate_id:
             return Finding(c, FINDING_VIOLATION, "certified constraint missing certificate_id")
+
+        # Refutation runs FIRST and unconditionally. Evidence that the constraint
+        # is broken outranks any attestation that it holds — otherwise an accepted
+        # certificate would launder a function this module can demonstrably refute,
+        # which is the exact "asserted but never checked" failure this file exists
+        # to remove.
+        probe = _property_test(fn, c, sampler, rng, n)
+        if probe is not None and probe.finding == FINDING_VIOLATION:
+            return Finding(c, FINDING_VIOLATION,
+                           f"certificate {c.certificate_id} contradicted by property test: {probe.detail}")
+
         if certificate_verifier is None:
-            # Still try to refute it directly — a failing property test beats an unchecked certificate.
-            probe = _property_test(fn, c, sampler, rng, n)
-            if probe is not None and probe.finding == FINDING_VIOLATION:
-                return Finding(c, FINDING_VIOLATION,
-                               f"certificate {c.certificate_id} contradicted by property test: {probe.detail}")
             return Finding(c, FINDING_UNVERIFIED,
                            f"certificate {c.certificate_id} not validated (no certificate_verifier supplied)")
         if not certificate_verifier(c.certificate_id):
@@ -196,7 +213,13 @@ def check(
     return result
 
 
-def enforce(fn, constraints, sampler, rng: random.Random | None = None, certificate_verifier=None) -> list[Finding]:
+def enforce(
+    fn,
+    constraints,
+    sampler,
+    rng: random.Random | None = None,
+    certificate_verifier: Callable[[str], bool] | None = None,
+) -> list[Finding]:
     rng = rng or random.Random(0)
     return [check(fn, c, sampler, rng, certificate_verifier=certificate_verifier) for c in constraints]
 
@@ -212,8 +235,13 @@ def any_unverified(findings: list[Finding]) -> bool:
 
 
 def all_verified(findings: list[Finding]) -> bool:
-    """Every constraint was checked AND held — the condition a gate should require.
+    """Non-empty AND every constraint checked and held — what a gate should require.
 
     Prefer this over `not any_violation(...)`, which treats never-checked as fine.
+
+    An EMPTY findings list returns False, deliberately, and not by the usual
+    vacuous-truth convention: "nothing was evaluated" is the state this module
+    exists to stop reporting as success. A caller that legitimately has no
+    constraints should branch on that explicitly rather than read it as verified.
     """
     return bool(findings) and all(f.finding == FINDING_OK for f in findings)
