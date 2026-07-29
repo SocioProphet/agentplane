@@ -2,9 +2,23 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# qemu-local backend (v0): contract-first.
-# Today: validate bundle, run smoke, emit artifacts, manage pointers.
-# Next: build+boot NixOS VM and execute smoke inside guest (same interface).
+# qemu-local backend.
+#
+# What this actually does today — read before running:
+#   - validates bundle.json, runs smoke, emits artifacts;
+#   - BUILDS AND BOOTS a NixOS VM via `nix build .#packages.<system>.vm-example-agent`
+#     and executes the resolved run-*-vm script;
+#   - on darwin hosts, DELEGATES build+run to a remote Linux host over ssh: it
+#     rsyncs this repo to ${REMOTE}:${REMOTE_ROOT}, runs QEMU there under a
+#     ${REMOTE_TIMEOUT} deadline, streams guest serial output, and rsyncs
+#     artifacts back (note the `rsync -a --delete` into the remote repo path);
+#   - swaps state/pointers/{current-staging,current-prod,previous-good} on
+#     promote/rollback.
+#
+# Not implemented: `stop` is a no-op.
+#
+# The blast radius is a booted VM and, on the darwin path, writes to a remote
+# host — not merely local files.
 
 usage() {
   cat <<USAGE
@@ -18,7 +32,9 @@ Usage:
 
 Notes:
   - <bundle-dir> is a directory containing bundle.json
-  - v0 does not boot a VM yet; it is contract+artifacts+pointers.
+  - run boots a NixOS VM; on darwin it delegates build+run to \${REMOTE} over
+    ssh, rsyncing this repo there and syncing artifacts back.
+  - stop is currently a no-op.
 USAGE
 }
 
