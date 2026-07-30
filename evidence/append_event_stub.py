@@ -19,6 +19,7 @@ rolling root (`root = sha256(previous_root || entry_hash)`).
 from __future__ import annotations
 
 import argparse
+import fcntl
 import hashlib
 import json
 import os
@@ -39,6 +40,16 @@ def canonical_bytes(value: Any) -> bytes:
 
 
 def _strip_prefix(digest: str) -> str:
+    """Strip a scheme prefix ('sha256:') from a digest string.
+
+    Silently accepting a bare hex string is deliberate for BACKWARDS-COMPATIBILITY
+    with a small number of legacy records — but new writers must always emit the
+    `sha256:` form, and `append_event` below constructs its writes that way. If a
+    future writer starts emitting bare hex, `verify_journal` will still succeed on
+    the chain check but the reader loses the scheme labelling used elsewhere; that
+    is a separate constraint tightening (fail-closed on bare-hex on read) and NOT
+    what this file's durability fix set out to change.
+    """
     return digest.split(":", 1)[1] if ":" in digest else digest
 
 
@@ -57,28 +68,69 @@ def tip_digest(journal_path: Path) -> str:
 
 
 def append_event(payload: dict[str, Any], journal_path: Path = DEFAULT_JOURNAL) -> dict[str, Any]:
-    """Append one evidence record and return its real offset and digests."""
+    """Append one evidence record and return its real offset and digests.
+
+    CONCURRENCY. The read-tip → compute-chain → write → publish-offset window
+    is guarded by fcntl.flock(LOCK_EX) on the journal file descriptor for the
+    duration of the append. Without it, two concurrent writers observe the SAME
+    `previous`, compute two records whose `previousDigest` both link to the same
+    point, and both write — the chain silently branches and `verify_journal`
+    fails at the second record. Same class as the ledger.py fix in
+    SocioProphet/evidence-intake-kernel: durability is not asserted, it is held
+    by the lock.
+
+    Offset is derived from the file descriptor INSIDE the lock via `tell()`
+    after `seek(0, io.SEEK_END)`, NOT via a separate `Path.stat()` before the
+    write. A pre-write stat + a separate open leaves a TOCTOU window: another
+    writer can extend the file between the two syscalls, and the returned offset
+    points into the middle of another record — every downstream reader
+    (`cairn://<task>/<offset>` handles) dereferences garbage.
+    """
     event = payload.get("event", payload)
     digest = hashlib.sha256(canonical_bytes(event)).hexdigest()
 
     journal_path.parent.mkdir(parents=True, exist_ok=True)
-    previous = tip_digest(journal_path)
-    chain = hashlib.sha256(f"{previous}{digest}".encode("utf-8")).hexdigest()
 
-    record = {
-        "appendedAt": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
-        "chainDigest": f"sha256:{chain}",
-        "evidenceDigest": f"sha256:{digest}",
-        "event": event,
-        "previousDigest": f"sha256:{previous}",
-    }
+    line = ""  # populated inside the lock; hoisted for post-lock return
+    journal_offset = 0
+    chain = ""
+    # Open once in "a+" so we can read the tip and write, both under the same
+    # advisory lock. `O_APPEND` semantics still guarantee the write goes to the
+    # end even if some other writer sneaks past a broken flock; the lock is the
+    # primary guarantee, and O_APPEND is the belt.
+    with journal_path.open("a+", encoding="utf-8") as handle:
+        try:
+            fcntl.flock(handle.fileno(), fcntl.LOCK_EX)
+            # Read the tip UNDER THE LOCK. tip_digest() opens its own file
+            # handle and would race — read directly from the locked fd.
+            handle.seek(0)
+            last = None
+            for read_line in handle:
+                if read_line.strip():
+                    last = read_line
+            previous = _strip_prefix(json.loads(last)["chainDigest"]) if last else GENESIS
 
-    # Offset is taken before the write so it marks where this record starts.
-    journal_offset = journal_path.stat().st_size if journal_path.exists() else 0
-    with journal_path.open("a", encoding="utf-8") as handle:
-        handle.write(json.dumps(record, sort_keys=True, separators=(",", ":")) + "\n")
-        handle.flush()
-        os.fsync(handle.fileno())
+            chain = hashlib.sha256(f"{previous}{digest}".encode("utf-8")).hexdigest()
+            record = {
+                "appendedAt": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
+                "chainDigest": f"sha256:{chain}",
+                "evidenceDigest": f"sha256:{digest}",
+                "event": event,
+                "previousDigest": f"sha256:{previous}",
+            }
+            line = json.dumps(record, sort_keys=True, separators=(",", ":")) + "\n"
+
+            # Offset derived from the fd (not stat) so nothing can extend the
+            # file between measurement and write.
+            handle.seek(0, os.SEEK_END)
+            journal_offset = handle.tell()
+            handle.write(line)
+            handle.flush()
+            os.fsync(handle.fileno())
+        finally:
+            # Release the lock explicitly; the close would release too, but
+            # being explicit keeps the intent legible next to the acquire.
+            fcntl.flock(handle.fileno(), fcntl.LOCK_UN)
 
     return {
         "appended": True,
