@@ -47,6 +47,11 @@
         "sourceosImageProduction": {
           "type": "object",
           "additionalProperties": true
+        },
+        "chronosCarrier": {
+          "description": "CHRONOS neuro-symbolic carrier passthrough fields projected from Bundle.spec.chronosCarrier when present (additive bridge extension; see docs/sociosphere-bridge.md).",
+          "type": "object",
+          "additionalProperties": true
         }
       }
     }

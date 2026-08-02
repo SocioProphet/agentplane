@@ -251,6 +251,33 @@
           },
           "type": "object"
         },
+        "chronosCarrier": {
+          "description": "Optional CHRONOS neuro-symbolic carrier passthrough (additive bridge extension; agentplane does not own this taxonomy -- see docs/sociosphere-bridge.md).",
+          "properties": {
+            "sourceEvidenceRef": {
+              "type": "string"
+            },
+            "methodFamily": {
+              "type": "string"
+            },
+            "claimStatus": {
+              "type": "string"
+            },
+            "validationStatus": {
+              "type": "string"
+            },
+            "nonAuthorityDeclaration": {
+              "type": "boolean"
+            },
+            "owningPlane": {
+              "type": "string"
+            },
+            "replayRef": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
         "agentMachine": {
           "description": "Optional SourceOS Agent Machine binding for local Mac/Windows/Linux Podman workspaces and cluster-local TopoLVM placement.",
           "properties": {

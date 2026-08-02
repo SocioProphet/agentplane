@@ -1,0 +1,43 @@
+{
+  "apiVersion": "agentplane.socioprophet.org/v0.1",
+  "kind": "Bundle",
+  "metadata": {
+    "createdAt": "2026-08-02T00:00:00-05:00",
+    "licensePolicy": {
+      "allowAGPL": false
+    },
+    "name": "chronos-carrier-bridge-fixture",
+    "version": "0.1.0"
+  },
+  "spec": {
+    "artifacts": {
+      "outDir": "/tmp/agentplane-chronos-carrier-bridge-fixture"
+    },
+    "chronosCarrier": {
+      "sourceEvidenceRef": "urn:chronos:evidence:neurasp-adjudication-0007",
+      "methodFamily": "neurasp-adjudication",
+      "claimStatus": "proposed",
+      "validationStatus": "unvalidated",
+      "nonAuthorityDeclaration": true,
+      "owningPlane": "ontogenesis"
+    },
+    "policy": {
+      "failOnTimeout": true,
+      "humanGateRequired": false,
+      "lane": "staging",
+      "maxRunSeconds": 20,
+      "policyPackHash": "UNSET",
+      "policyPackRef": "policy-packs/dev/default"
+    },
+    "secrets": {
+      "required": []
+    },
+    "smoke": {
+      "script": "bundles/example-agent/smoke.sh"
+    },
+    "vm": {
+      "backendIntent": "lima-process",
+      "modulePath": "bundles/example-agent/vm.nix"
+    }
+  }
+}

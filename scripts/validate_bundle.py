@@ -15,6 +15,19 @@ SOURCEOS_BINDING_KEYS = {
     "remoteExecutionProtocolRef",
 }
 
+# CHRONOS neuro-symbolic carrier passthrough (additive to this bridge; see
+# docs/sociosphere-bridge.md "CHRONOS carrier passthrough"). agentplane does not
+# own this taxonomy -- these keys are structural only.
+CHRONOS_CARRIER_REQUIRED_KEYS = (
+    "sourceEvidenceRef",
+    "methodFamily",
+    "claimStatus",
+    "validationStatus",
+    "nonAuthorityDeclaration",
+    "owningPlane",
+    "replayRef",
+)
+
 
 def die(msg: str, code: int = 2) -> None:
     print(f"[validate] ERROR: {msg}", file=sys.stderr)
@@ -27,11 +40,13 @@ def _require_mapping(obj, path: str):
     return obj
 
 
-def _require_non_empty(obj: dict, path: str, keys: tuple[str, ...]) -> None:
+def _require_non_empty(
+    obj: dict, path: str, keys: tuple[str, ...], reason: str = "for SourceOS image-production bundles"
+) -> None:
     for key in keys:
         value = obj.get(key)
         if value is None or value == "" or value == []:
-            die(f"{path}.{key} is required for SourceOS image-production bundles", 2)
+            die(f"{path}.{key} is required {reason}", 2)
 
 
 def extract_sourceos_bindings(spec: dict) -> dict:
@@ -143,6 +158,61 @@ def validate_sourceos_image_production(spec: dict) -> dict:
     }
 
 
+def validate_chronos_carrier(spec: dict) -> dict:
+    """Validate the optional CHRONOS neuro-symbolic carrier passthrough lane.
+
+    The lane is intentionally optional so existing bundles (and the existing
+    SourceOS / sociosphere-workspace bridge lanes) continue to pass unchanged.
+    When a bundle declares `spec.chronosCarrier`, we fail closed unless the
+    structural fields the evidence/replay surface needs are present, and unless
+    the carrier is explicitly self-declared as not under agentplane's authority.
+    This does not validate or enumerate CHRONOS's own method-family / claim /
+    validation taxonomy -- those values are opaque passthrough here.
+    """
+    if "chronosCarrier" not in spec:
+        return {"enabled": False, "result": "not_applicable"}
+
+    carrier = _require_mapping(spec.get("chronosCarrier") or {}, "spec.chronosCarrier")
+    _require_non_empty(
+        carrier,
+        "spec.chronosCarrier",
+        CHRONOS_CARRIER_REQUIRED_KEYS,
+        reason="when spec.chronosCarrier is declared (CHRONOS carrier passthrough)",
+    )
+
+    if carrier.get("nonAuthorityDeclaration") is not True:
+        die(
+            "spec.chronosCarrier.nonAuthorityDeclaration must be true: agentplane must "
+            "explicitly disclaim canonical authority over any CHRONOS carrier it carries",
+            2,
+        )
+
+    owning_plane = carrier.get("owningPlane")
+    if not isinstance(owning_plane, str) or owning_plane.strip().lower() == "agentplane":
+        die(
+            "spec.chronosCarrier.owningPlane must name a plane other than agentplane "
+            "(agentplane is a carrier surface, not the carrier's owning authority)",
+            2,
+        )
+
+    for key in ("sourceEvidenceRef", "methodFamily", "claimStatus", "validationStatus", "replayRef"):
+        value = carrier.get(key)
+        if not isinstance(value, str) or not value.strip():
+            die(f"spec.chronosCarrier.{key} must be a non-empty string", 2)
+
+    return {
+        "enabled": True,
+        "result": "pass",
+        "sourceEvidenceRef": carrier.get("sourceEvidenceRef"),
+        "methodFamily": carrier.get("methodFamily"),
+        "claimStatus": carrier.get("claimStatus"),
+        "validationStatus": carrier.get("validationStatus"),
+        "nonAuthorityDeclaration": carrier.get("nonAuthorityDeclaration"),
+        "owningPlane": owning_plane,
+        "replayRef": carrier.get("replayRef"),
+    }
+
+
 def main() -> int:
     if len(sys.argv) != 2:
         die("usage: scripts/validate_bundle.py <path/to/bundle.json>", 2)
@@ -181,6 +251,7 @@ def main() -> int:
 
     sourceos_bindings = extract_sourceos_bindings(spec)
     sourceos_image_production_gate = validate_sourceos_image_production(spec)
+    chronos_carrier_gate = validate_chronos_carrier(spec)
 
     pol = spec.get("policy") or {}
     mrs = pol.get("maxRunSeconds")
@@ -256,6 +327,7 @@ def main() -> int:
         "result": "pass",
         "sourceosBindings": sourceos_bindings,
         "sourceosImageProductionGate": sourceos_image_production_gate,
+        "chronosCarrierGate": chronos_carrier_gate,
         "controlGate": {
             "result": gate_artifact["result"],
             "reason": gate_artifact["reason"],
