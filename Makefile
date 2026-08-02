@@ -294,6 +294,7 @@ validate-wallguard-collaboration-admission:
 
 test:
 	python3 -m pytest -q tools/tests
+
 .PHONY: validate-workspace-prophet-control-receipt validate-prophet-mesh-agentplane-adapter
 validate-workspace-prophet-control-receipt:
 	python3 tools/validate_workspace_prophet_control_receipt.py
@@ -401,3 +402,12 @@ validate: validate-composition-promotion-gate
 .PHONY: validate-composition-promotion-gate
 validate-composition-promotion-gate:
 	python3 tools/validate_composition_promotion_gate.py
+
+# --- CHRONOS carrier passthrough (sociosphere-bridge additive extension, issue #329) ---
+validate: validate-chronos-carrier-bridge
+.PHONY: validate-chronos-carrier-bridge
+validate-chronos-carrier-bridge:
+	python3 -m json.tool schemas/run-artifact.schema.v0.1.json >/dev/null
+	python3 -m json.tool schemas/replay-artifact.schema.v0.1.json >/dev/null
+	python3 -m json.tool schemas/bundle.schema.v0.1.json >/dev/null
+	python3 -m unittest tests.test_sourceos_binding_projection tests.test_chronos_carrier_bridge -v

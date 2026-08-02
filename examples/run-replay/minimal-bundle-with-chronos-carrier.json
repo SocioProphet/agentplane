@@ -1,0 +1,35 @@
+{
+  "metadata": {
+    "name": "minimal-run-replay-fixture-chronos-carrier",
+    "version": "0.1.0"
+  },
+  "spec": {
+    "artifacts": {
+      "outDir": "/tmp/agentplane-run-replay-fixture-chronos-carrier"
+    },
+    "policy": {
+      "lane": "staging",
+      "policyPackRef": "policy-pack:synthetic-run-replay",
+      "policyPackHash": "sha256:1111111111111111111111111111111111111111111111111111111111111111"
+    },
+    "vm": {
+      "backendIntent": "qemu"
+    },
+    "secrets": {
+      "required": []
+    },
+    "chronosCarrier": {
+      "sourceEvidenceRef": "urn:chronos:evidence:neurasp-adjudication-0007",
+      "methodFamily": "neurasp-adjudication",
+      "claimStatus": "proposed",
+      "validationStatus": "unvalidated",
+      "nonAuthorityDeclaration": true,
+      "owningPlane": "ontogenesis",
+      "replayRef": "urn:chronos:replay:neurasp-adjudication-0007"
+    },
+    "governanceContext": {
+      "fixture": "run-replay-artifact-validation-chronos-carrier",
+      "nonProductionOnly": true
+    }
+  }
+}

@@ -49,6 +49,20 @@ SOURCEOS_ENV_KEYS = {
     "smokeReceiptRef": "AGENTPLANE_SOURCEOS_SMOKE_RECEIPT_REF",
 }
 
+# CHRONOS neuro-symbolic carrier passthrough (additive to this bridge; see
+# docs/sociosphere-bridge.md "CHRONOS carrier passthrough"). This is a
+# permissive projection -- the fail-closed structural gate lives in
+# scripts/validate_bundle.py, which runs upstream of this script.
+CHRONOS_CARRIER_KEYS = (
+    "sourceEvidenceRef",
+    "methodFamily",
+    "claimStatus",
+    "validationStatus",
+    "nonAuthorityDeclaration",
+    "owningPlane",
+    "replayRef",
+)
+
 
 def die(msg: str, code: int = 2) -> None:
     print(f"[run-artifact] ERROR: {msg}", file=sys.stderr)
@@ -183,6 +197,21 @@ def extract_sourceos_image_production(spec: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+def extract_chronos_carrier(spec: dict[str, Any]) -> dict[str, Any]:
+    """Project a declared CHRONOS carrier's fields, if present.
+
+    Permissive by design: the fail-closed structural gate (required fields,
+    non-authority declaration, owning-plane check) lives in
+    scripts/validate_bundle.py and runs before this script does. This function
+    only records whatever was declared, the same way extract_sourceos_bindings
+    records whatever SourceOS binding was declared.
+    """
+    carrier = spec.get("chronosCarrier") if isinstance(spec.get("chronosCarrier"), dict) else {}
+    if not carrier:
+        return {}
+    return _copy_non_empty(carrier, CHRONOS_CARRIER_KEYS)
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(prog="emit_run_artifact")
     ap.add_argument("bundle", help="path to bundle.json")
@@ -241,6 +270,7 @@ def main() -> int:
         "upstreamArtifacts": upstream,
         "sourceosBindings": extract_sourceos_bindings(spec),
         "sourceosImageProduction": extract_sourceos_image_production(spec),
+        "chronosCarrier": extract_chronos_carrier(spec),
     }
 
     if governance_context is not None:

@@ -6,8 +6,12 @@ on:
       - "docs/sociosphere-bridge.md"
       - "schemas/run-artifact.schema.v0.1.json"
       - "schemas/replay-artifact.schema.v0.1.json"
+      - "schemas/bundle.schema.v0.1.json"
       - "scripts/emit_run_artifact.py"
       - "scripts/emit_replay_artifact.py"
+      - "scripts/validate_bundle.py"
+      - "tests/test_sourceos_binding_projection.py"
+      - "tests/test_chronos_carrier_bridge.py"
       - "examples/run-replay/**"
       - ".github/workflows/run-replay-artifacts.yml"
   push:
@@ -17,8 +21,12 @@ on:
       - "docs/sociosphere-bridge.md"
       - "schemas/run-artifact.schema.v0.1.json"
       - "schemas/replay-artifact.schema.v0.1.json"
+      - "schemas/bundle.schema.v0.1.json"
       - "scripts/emit_run_artifact.py"
       - "scripts/emit_replay_artifact.py"
+      - "scripts/validate_bundle.py"
+      - "tests/test_sourceos_binding_projection.py"
+      - "tests/test_chronos_carrier_bridge.py"
       - "examples/run-replay/**"
       - ".github/workflows/run-replay-artifacts.yml"
   workflow_dispatch:
@@ -38,7 +46,10 @@ jobs:
         run: |
           python3 -m json.tool schemas/run-artifact.schema.v0.1.json >/dev/null
           python3 -m json.tool schemas/replay-artifact.schema.v0.1.json >/dev/null
-          python3 -m py_compile scripts/emit_run_artifact.py scripts/emit_replay_artifact.py
+          python3 -m py_compile scripts/emit_run_artifact.py scripts/emit_replay_artifact.py scripts/validate_bundle.py
+      - name: Bridge binding/carrier projection unit tests
+        run: |
+          python3 -m unittest tests.test_sourceos_binding_projection tests.test_chronos_carrier_bridge -v
       - name: Emit synthetic run and replay artifacts
         run: |
           rm -rf /tmp/agentplane-run-replay-fixture
@@ -46,3 +57,18 @@ jobs:
           python3 scripts/emit_replay_artifact.py examples/run-replay/minimal-bundle.json qemu --bundle-rev synthetic-rev --bundle-path examples/run-replay/minimal-bundle.json
           python3 -m json.tool /tmp/agentplane-run-replay-fixture/run-artifact.json >/dev/null
           python3 -m json.tool /tmp/agentplane-run-replay-fixture/replay-artifact.json >/dev/null
+      - name: Emit synthetic run and replay artifacts carrying a CHRONOS carrier
+        run: |
+          rm -rf /tmp/agentplane-run-replay-fixture-chronos-carrier
+          python3 scripts/emit_run_artifact.py examples/run-replay/minimal-bundle-with-chronos-carrier.json qemu 0 --stdout artifact:stdout --stderr artifact:stderr
+          python3 scripts/emit_replay_artifact.py examples/run-replay/minimal-bundle-with-chronos-carrier.json qemu --bundle-rev synthetic-rev --bundle-path examples/run-replay/minimal-bundle-with-chronos-carrier.json
+          python3 -m json.tool /tmp/agentplane-run-replay-fixture-chronos-carrier/run-artifact.json >/dev/null
+          python3 -m json.tool /tmp/agentplane-run-replay-fixture-chronos-carrier/replay-artifact.json >/dev/null
+          python3 -c "
+          import json
+          run = json.load(open('/tmp/agentplane-run-replay-fixture-chronos-carrier/run-artifact.json'))
+          replay = json.load(open('/tmp/agentplane-run-replay-fixture-chronos-carrier/replay-artifact.json'))
+          assert run['chronosCarrier']['methodFamily'] == 'neurasp-adjudication', run
+          assert replay['inputs']['chronosCarrier']['methodFamily'] == 'neurasp-adjudication', replay
+          print('chronosCarrier passthrough OK')
+          "
