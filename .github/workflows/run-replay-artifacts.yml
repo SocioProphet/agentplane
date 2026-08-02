@@ -46,6 +46,7 @@ jobs:
         run: |
           python3 -m json.tool schemas/run-artifact.schema.v0.1.json >/dev/null
           python3 -m json.tool schemas/replay-artifact.schema.v0.1.json >/dev/null
+          python3 -m json.tool schemas/bundle.schema.v0.1.json >/dev/null
           python3 -m py_compile scripts/emit_run_artifact.py scripts/emit_replay_artifact.py scripts/validate_bundle.py
       - name: Bridge binding/carrier projection unit tests
         run: |
@@ -64,11 +65,11 @@ jobs:
           python3 scripts/emit_replay_artifact.py examples/run-replay/minimal-bundle-with-chronos-carrier.json qemu --bundle-rev synthetic-rev --bundle-path examples/run-replay/minimal-bundle-with-chronos-carrier.json
           python3 -m json.tool /tmp/agentplane-run-replay-fixture-chronos-carrier/run-artifact.json >/dev/null
           python3 -m json.tool /tmp/agentplane-run-replay-fixture-chronos-carrier/replay-artifact.json >/dev/null
-          python3 -c "
+          python3 - <<'PY'
           import json
           run = json.load(open('/tmp/agentplane-run-replay-fixture-chronos-carrier/run-artifact.json'))
           replay = json.load(open('/tmp/agentplane-run-replay-fixture-chronos-carrier/replay-artifact.json'))
           assert run['chronosCarrier']['methodFamily'] == 'neurasp-adjudication', run
           assert replay['inputs']['chronosCarrier']['methodFamily'] == 'neurasp-adjudication', replay
           print('chronosCarrier passthrough OK')
-          "
+          PY
