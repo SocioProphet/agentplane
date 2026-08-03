@@ -1,0 +1,37 @@
+{
+  "kind": "CountertestRunArtifact",
+  "artifact_id": "demo_countertest_run",
+  "run_ref": "agentplane://run/epigov-hygiene-runtime/demo",
+  "countertest_id": "CTEST.DEVIL-S.LIST.V1",
+  "hygiene_run_ref": "agentplane://run/epigov-hygiene-runtime/demo",
+  "input_hash": "sha256:d7430b052227c990c0a87c7bc36cc5005b16546093ffc50eb5c2974f2d2956d6",
+  "ruleset_hash": "sha256:5546c7c8c1ee47c86e670c10b53ec78feec26bb2582c8a5a0360672aaa45c2e4",
+  "findings_addressed": 3,
+  "countertest_outcomes": [
+    {
+      "outcome_id": "demo_ctest_000",
+      "finding_ref": "demo_bias_000",
+      "verdict": "refuted_finding",
+      "steelman_claim": "The claim's inference is formally valid and withstands the strongest counter-claim; the hygiene finding is overturned and the claim is admitted.",
+      "counter_evidence_refs": []
+    },
+    {
+      "outcome_id": "demo_ctest_001",
+      "finding_ref": "demo_bias_001",
+      "verdict": "epistemically_void",
+      "steelman_claim": "No observation could refute this claim (no declared falsifier / no counter-test obligation); withheld from the testable set \u2014 Crown T1 / SILENT Phase-0 gate."
+    },
+    {
+      "outcome_id": "demo_ctest_002",
+      "finding_ref": "demo_afc_000",
+      "verdict": "confirmed_finding",
+      "rejection_code": "REJECTED_AFFIRMING_THE_CONSEQUENT",
+      "steelman_claim": "Even under the most charitable reading, inferring the antecedent from the consequent is formally invalid; a verdict manufactured this way is void (Crown D1 = SILENT firewall affirming-the-consequent guard, eik#3)."
+    }
+  ],
+  "validation_artifact_ref": "agentplane://validation/epigov-hygiene-runtime/demo",
+  "replay_artifact_ref": "agentplane://replay/epigov-hygiene-runtime/demo",
+  "sociosphere_protocol_ref": "protocol/epistemic-governance/v1",
+  "replay_verified": true,
+  "issued_at": "2026-08-03T00:00:00Z"
+}

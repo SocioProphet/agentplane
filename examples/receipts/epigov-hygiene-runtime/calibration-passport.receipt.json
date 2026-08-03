@@ -1,0 +1,10 @@
+{
+  "recordType": "HygieneRunArtifactReceipt",
+  "ledgerSeq": 0,
+  "ledgerPrevHash": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+  "artifactId": "demo_calibration_passport",
+  "inputHash": "sha256:35be3518f2e820598cd153e83367e721658e3709ef4154e1fe49f91c1697c3d8",
+  "outputHash": "sha256:24b8c1221c80ed40fb2afd3ceebd76776976b66a9da2b6ac4aac51418afef795",
+  "emittedAt": "2026-08-03T00:00:00Z",
+  "entryHash": "sha256:bd0b99efcb19518ddcc222ce7352c0bc1f8db5b5e45674509aa3f100fcc43444"
+}

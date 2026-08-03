@@ -1,0 +1,10 @@
+{
+  "recordType": "HygieneRunArtifactReceipt",
+  "ledgerSeq": 0,
+  "ledgerPrevHash": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+  "artifactId": "demo_bias_passport",
+  "inputHash": "sha256:04105d822b9a9ef129b6bf85357ea8f925c4aed80e5b8537eb7f50417ce71846",
+  "outputHash": "sha256:376eab62e259908f9e0354bd20eab20c69bc525bf72cb250ae28e5411a8431bc",
+  "emittedAt": "2026-08-03T00:00:00Z",
+  "entryHash": "sha256:022029b77f0def462aa59630081f0c673f36eefb8fe2c32dcdeab2273eca0b0f"
+}
