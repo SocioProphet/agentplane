@@ -1,0 +1,10 @@
+{
+  "recordType": "CountertestRunArtifactReceipt",
+  "ledgerSeq": 0,
+  "ledgerPrevHash": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+  "artifactId": "demo_countertest_run",
+  "inputHash": "sha256:d7430b052227c990c0a87c7bc36cc5005b16546093ffc50eb5c2974f2d2956d6",
+  "outputHash": "sha256:6383de2994435fb60e48162657735c2138c204bbb4d40579c96fb2e14dec52f9",
+  "emittedAt": "2026-08-03T00:00:00Z",
+  "entryHash": "sha256:8595bd56aeef5bfb9efbe342519bd7a45d9eb3f74cb4341abb6e75bf024d1283"
+}

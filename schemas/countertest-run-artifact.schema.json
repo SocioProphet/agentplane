@@ -64,11 +64,17 @@
         "finding_ref": { "type": "string", "minLength": 1 },
         "verdict": {
           "type": "string",
-          "enum": ["confirmed_finding", "refuted_finding", "inconclusive", "escalate_review"]
+          "enum": ["confirmed_finding", "refuted_finding", "inconclusive", "escalate_review", "epistemically_void"],
+          "description": "epistemically_void: the claim declares no counter-test / falsifier and is withheld from the testable set — the Crown T1 / SILENT Phase-0 gate (evidence-intake-kernel#2)."
         },
         "steelman_claim": {
           "type": "string",
           "description": "Strongest plausible counter-claim against the hygiene finding"
+        },
+        "rejection_code": {
+          "type": "string",
+          "description": "Set when the counter-test rejects the claim's inference form, e.g. REJECTED_AFFIRMING_THE_CONSEQUENT (Crown invariant D1 / SILENT firewall eik#3).",
+          "enum": ["REJECTED_AFFIRMING_THE_CONSEQUENT"]
         },
         "counter_evidence_refs": {
           "type": "array",

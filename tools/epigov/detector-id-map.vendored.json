@@ -1,0 +1,291 @@
+{
+  "_provenance": {
+    "note": "VENDORED, do not edit by hand. Byte-copy projection of the canonical sociosphere standard. Regenerate from source; teeth live in sociosphere CI.",
+    "source_repo": "SocioProphet/sociosphere",
+    "id_map_path": "standards/epistemic-governance/detector-id-map.yaml",
+    "id_map_sha256": "sha256:60c560121725b64f3ef3ebc637f119a9a7dd63a50ff0e957dc7373c36ba844a9",
+    "bias_catalog_path": "standards/epistemic-governance/bias-catalog.yaml",
+    "bias_catalog_sha256": "sha256:ce5b0b528fdf6620d7b89c8d4e522039379f691f459975657313e95acb07af0c",
+    "ruleset_path": "standards/epistemic-governance/detector-countertest-map.yaml",
+    "ruleset_sha256": "sha256:5546c7c8c1ee47c86e670c10b53ec78feec26bb2582c8a5a0360672aaa45c2e4",
+    "ruleset_semver": "1.5.0"
+  },
+  "detector_id_map": [
+    {
+      "emitted_id": "LOGFALL.STRAWMAN.V1",
+      "standard_id": "LOGFALL.STRAWMAN.V1",
+      "family": "LOGFALL",
+      "succeeds_into": "LOGFALL.STRAWMAN.V2"
+    },
+    {
+      "emitted_id": "LOGFALL.ADHOMINEM.V1",
+      "standard_id": "LOGFALL.ADHOMINEM.V1",
+      "family": "LOGFALL",
+      "succeeds_into": "LOGFALL.ADHOM.V2"
+    },
+    {
+      "emitted_id": "LOGFALL.SLIPPERYSLOPE.V1",
+      "standard_id": "LOGFALL.SLIPPERYSLOPE.V1",
+      "family": "LOGFALL",
+      "succeeds_into": null
+    },
+    {
+      "emitted_id": "LOGFALL.FALSEDICHOTOMY.V1",
+      "standard_id": "LOGFALL.FALSEDICHOTOMY.V1",
+      "family": "LOGFALL",
+      "succeeds_into": null
+    },
+    {
+      "emitted_id": "LOGFALL.HASTYGEN.V1",
+      "standard_id": "LOGFALL.HASTYGEN.V1",
+      "family": "LOGFALL",
+      "succeeds_into": null
+    },
+    {
+      "emitted_id": "LOGFALL.APPEALAUTHORITY.V1",
+      "standard_id": "LOGFALL.APPEALAUTHORITY.V1",
+      "family": "LOGFALL",
+      "succeeds_into": null
+    },
+    {
+      "emitted_id": "LOGFALL.TUQUOQUE.V1",
+      "standard_id": "LOGFALL.TUQUOQUE.V1",
+      "family": "LOGFALL",
+      "succeeds_into": null
+    },
+    {
+      "emitted_id": "LOGFALL.BANDWAGON.V1",
+      "standard_id": "LOGFALL.BANDWAGON.V1",
+      "family": "LOGFALL",
+      "succeeds_into": null
+    },
+    {
+      "emitted_id": "LOGFALL.APPEALEMOTION.V1",
+      "standard_id": "LOGFALL.APPEALEMOTION.V1",
+      "family": "LOGFALL",
+      "succeeds_into": "LOGFALL.EMOTION.V2"
+    },
+    {
+      "emitted_id": "LOGFALL.CIRCULAR.V1",
+      "standard_id": "LOGFALL.CIRCULAR.V1",
+      "family": "LOGFALL",
+      "succeeds_into": null
+    },
+    {
+      "emitted_id": "LOGFALL.SUNKCOST.V1",
+      "standard_id": "LOGFALL.SUNKCOST.V1",
+      "family": "LOGFALL",
+      "succeeds_into": null
+    },
+    {
+      "emitted_id": "LOGFALL.FALSECAUSE.V1",
+      "standard_id": "LOGFALL.FALSECAUSE.V1",
+      "family": "LOGFALL",
+      "succeeds_into": "LOGFALL.FALSECAUSE.V2"
+    },
+    {
+      "emitted_id": "COGBIAS.CONFIRM.V1",
+      "standard_id": "COGBIAS.CONFIRM.V1",
+      "family": "COGBIAS",
+      "succeeds_into": null
+    },
+    {
+      "emitted_id": "COGBIAS.ANCHOR.V1",
+      "standard_id": "COGBIAS.ANCHOR.V1",
+      "family": "COGBIAS",
+      "succeeds_into": "COGBIAS.ANCHORING.V2"
+    },
+    {
+      "emitted_id": "COGBIAS.ABSOLUTECERTAINTY.V1",
+      "standard_id": "COGBIAS.ABSOLUTECERTAINTY.V1",
+      "family": "COGBIAS",
+      "succeeds_into": null
+    },
+    {
+      "emitted_id": "COGBIAS.AVAILABILITY.V1",
+      "standard_id": "COGBIAS.AVAILABILITY.V1",
+      "family": "COGBIAS",
+      "succeeds_into": null
+    }
+  ],
+  "bias_catalog": {
+    "biases": [
+      {
+        "key": "confirmation",
+        "detector_id": "COGBIAS.CONFIRM.V1",
+        "required_counter_test": "CTEST.DEVIL-S.LIST.V1",
+        "maturity": "shipped"
+      },
+      {
+        "key": "fundamental_attribution_error",
+        "detector_id": "COGBIAS.FAE.V1",
+        "required_counter_test": "CTEST.ATTRIBUTION-BLIND.A/B.V1",
+        "maturity": "proposed"
+      },
+      {
+        "key": "hindsight",
+        "detector_id": "COGBIAS.HINDSIGHT.V1",
+        "required_counter_test": "CTEST.FORESIGHT-BLIND.V1",
+        "maturity": "proposed"
+      },
+      {
+        "key": "framing",
+        "detector_id": "COGBIAS.FRAMING.V1",
+        "required_counter_test": "CTEST.REFRAME-INVARIANCE.V1",
+        "maturity": "proposed"
+      },
+      {
+        "key": "belief_bias",
+        "detector_id": "COGBIAS.BELIEFBIAS.V1",
+        "required_counter_test": "CTEST.FORMAL-VALIDITY.V1",
+        "maturity": "proposed"
+      }
+    ],
+    "formal_validity_tooth": {
+      "detector_id": "LOGFALL.AFFIRMCONSEQ.V1",
+      "required_counter_test": "CTEST.FORMAL-VALIDITY.V1",
+      "crown_invariant": "D1"
+    }
+  },
+  "counter_test_map": {
+    "required_counter_tests": {
+      "LOGFALL.STRAWMAN.V2": [
+        "CTEST.STEELMAN.CONFIRM.V2"
+      ],
+      "LOGFALL.ADHOM.V2": [
+        "CTEST.REFOCUS.PROPOSITION.V1"
+      ],
+      "LOGFALL.EMOTION.V2": [
+        "CTEST.BASELINE.DATA.V1"
+      ],
+      "LOGFALL.FALSECAUSE.V2": [
+        "CTEST.CAUSAL.DO/COUNTERFACTUAL.V1"
+      ],
+      "LOGFALL.GISH.V1": [
+        "CTEST.ACYCLIC.PROOF.V1"
+      ],
+      "LOGFALL.SHARPSHOOT.V2": [
+        "CTEST.PREREG/MTP.V2"
+      ],
+      "LOGFALL.LOADED.V1": [
+        "CTEST.PRESUP.EXPOSE.V1"
+      ],
+      "LOGFALL.BURDEN.V1": [
+        "CTEST.BURDEN.REASSIGN.V1"
+      ],
+      "LOGFALL.EQUIV.V1": [
+        "CTEST.TERMS.LOCK.V1"
+      ],
+      "LOGFALL.MOTTEBAILEY.V1": [
+        "CTEST.CRITERIA.PRE-REGISTER.V1"
+      ],
+      "COGBIAS.ANCHORING.V2": [
+        "CTEST.COUNTER-ANCHOR.V1"
+      ],
+      "COGBIAS.CONFIRM.V1": [
+        "CTEST.DEVIL-S.LIST.V1"
+      ],
+      "COGBIAS.OVERCONF.V1": [
+        "CTEST.CALIBRATION-20Q.V1"
+      ],
+      "COGBIAS.REACTDEV.V1": [
+        "CTEST.ATTRIBUTION-BLIND.A/B.V1"
+      ],
+      "COGBIAS.FAE.V1": [
+        "CTEST.ATTRIBUTION-BLIND.A/B.V1"
+      ],
+      "COGBIAS.HINDSIGHT.V1": [
+        "CTEST.FORESIGHT-BLIND.V1"
+      ],
+      "COGBIAS.FRAMING.V1": [
+        "CTEST.REFRAME-INVARIANCE.V1"
+      ],
+      "COGBIAS.BELIEFBIAS.V1": [
+        "CTEST.FORMAL-VALIDITY.V1"
+      ],
+      "LOGFALL.AFFIRMCONSEQ.V1": [
+        "CTEST.FORMAL-VALIDITY.V1"
+      ],
+      "LOGFALL.STRAWMAN.V1": [
+        "CTEST.STEELMAN.CONFIRM.V2"
+      ],
+      "LOGFALL.ADHOMINEM.V1": [
+        "CTEST.REFOCUS.PROPOSITION.V1"
+      ],
+      "LOGFALL.APPEALAUTHORITY.V1": [
+        "CTEST.EVIDENCE-LR.V1"
+      ],
+      "LOGFALL.APPEALEMOTION.V1": [
+        "CTEST.BASELINE.DATA.V1"
+      ],
+      "LOGFALL.BANDWAGON.V1": [
+        "CTEST.EVIDENCE-LR.V1"
+      ],
+      "LOGFALL.CIRCULAR.V1": [
+        "CTEST.ACYCLIC.PROOF.V1"
+      ],
+      "LOGFALL.FALSECAUSE.V1": [
+        "CTEST.CAUSAL.DO/COUNTERFACTUAL.V1"
+      ],
+      "LOGFALL.FALSEDICHOTOMY.V1": [
+        "CTEST.PRESUP.EXPOSE.V1"
+      ],
+      "LOGFALL.HASTYGEN.V1": [
+        "CTEST.CHAIN.PROB.V1"
+      ],
+      "LOGFALL.SLIPPERYSLOPE.V1": [
+        "CTEST.CHAIN.PROB.V1"
+      ],
+      "LOGFALL.SUNKCOST.V1": [
+        "CTEST.EVIDENCE-LR.V1"
+      ],
+      "LOGFALL.TUQUOQUE.V1": [
+        "CTEST.REFOCUS.PROPOSITION.V1"
+      ],
+      "COGBIAS.ABSOLUTECERTAINTY.V1": [
+        "CTEST.EVIDENCE-LR.V1"
+      ],
+      "COGBIAS.ANCHOR.V1": [
+        "CTEST.COUNTER-ANCHOR.V1"
+      ],
+      "COGBIAS.AVAILABILITY.V1": [
+        "CTEST.EVIDENCE-LR.V1"
+      ],
+      "TECHCLAIM.UNREPRODUCIBLE.V1": [
+        "TTEST.REPRODUCE.RUN.V1"
+      ],
+      "TECHCLAIM.BENCH_CHERRYPICK.V1": [
+        "TTEST.BENCH.BASELINE.V1"
+      ],
+      "TECHCLAIM.NO_FAILING_TEST.V1": [
+        "TTEST.FAILING.TEST.REQUIRED.V1"
+      ],
+      "TECHCLAIM.NO_THREAT_MODEL.V1": [
+        "TTEST.THREAT.MODEL.MINIMUM.V1"
+      ]
+    },
+    "runnable": [
+      "CTEST.TERMS.LOCK.V1",
+      "CTEST.ACYCLIC.PROOF.V1",
+      "CTEST.CHAIN.PROB.V1",
+      "CTEST.EVIDENCE-LR.V1",
+      "CTEST.CAUSAL.DO/COUNTERFACTUAL.V1",
+      "CTEST.PRESUP.EXPOSE.V1"
+    ],
+    "proposed": [
+      "CTEST.STEELMAN.CONFIRM.V2",
+      "CTEST.REFOCUS.PROPOSITION.V1",
+      "CTEST.BASELINE.DATA.V1",
+      "CTEST.PREREG/MTP.V2",
+      "CTEST.BURDEN.REASSIGN.V1",
+      "CTEST.CRITERIA.PRE-REGISTER.V1",
+      "CTEST.COUNTER-ANCHOR.V1",
+      "CTEST.DEVIL-S.LIST.V1",
+      "CTEST.CALIBRATION-20Q.V1",
+      "CTEST.ATTRIBUTION-BLIND.A/B.V1",
+      "CTEST.FORESIGHT-BLIND.V1",
+      "CTEST.REFRAME-INVARIANCE.V1",
+      "CTEST.FORMAL-VALIDITY.V1"
+    ]
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "kind": "HygieneRunArtifact",
+  "artifact_id": "demo_calibration_passport",
+  "run_ref": "agentplane://run/epigov-hygiene-runtime/demo",
+  "detector_id": "COGBIAS.OVERCONF.V1",
+  "hygiene_profile": "calibration-passport",
+  "calibration_state": {
+    "metric": "reasoning_calibration",
+    "brier_score": 0.12,
+    "drift": "within_tolerance",
+    "n": 42
+  },
+  "ruleset_hash": "sha256:5546c7c8c1ee47c86e670c10b53ec78feec26bb2582c8a5a0360672aaa45c2e4",
+  "input_hash": "sha256:35be3518f2e820598cd153e83367e721658e3709ef4154e1fe49f91c1697c3d8",
+  "claims_evaluated": 0,
+  "hygiene_findings": [],
+  "validation_artifact_ref": "agentplane://validation/epigov-hygiene-runtime/demo",
+  "replay_artifact_ref": "agentplane://replay/epigov-hygiene-runtime/demo",
+  "sociosphere_protocol_ref": "protocol/epistemic-governance/v1",
+  "replay_verified": true,
+  "issued_at": "2026-08-03T00:00:00Z"
+}

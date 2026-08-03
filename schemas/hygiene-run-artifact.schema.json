@@ -51,7 +51,17 @@
       "const": "protocol/epistemic-governance/v1"
     },
     "replay_verified": { "type": "boolean" },
-    "issued_at": { "type": "string", "format": "date-time" }
+    "issued_at": { "type": "string", "format": "date-time" },
+    "hygiene_profile": {
+      "type": "string",
+      "description": "Which hygiene profile this run projects. Additive (v0.1); default 'hygiene'.",
+      "enum": ["hygiene", "bias-passport", "calibration-passport"]
+    },
+    "calibration_state": {
+      "type": "object",
+      "description": "Calibration/drift state for a calibration-passport run. Additive (v0.1).",
+      "additionalProperties": true
+    }
   },
   "$defs": {
     "HygieneFinding": {
@@ -69,8 +79,15 @@
             "attribution_without_evidence",
             "load_bearing_metaphor",
             "missing_non_claim",
-            "circular_evidence"
+            "circular_evidence",
+            "logical_fallacy",
+            "cognitive_bias"
           ]
+        },
+        "finding_detector_id": {
+          "type": "string",
+          "description": "Governed detector id (reconciled namespace) this finding was raised under, e.g. COGBIAS.CONFIRM.V1. Required by the Bias/Calibration Passport producers; a bias detection lacking it is rejected before emission.",
+          "pattern": "^(LOGFALL|COGBIAS|TECHCLAIM)\\.[A-Z0-9]+(\\.[A-Z0-9/-]+)*\\.V[0-9]+$"
         },
         "severity": {
           "type": "string",

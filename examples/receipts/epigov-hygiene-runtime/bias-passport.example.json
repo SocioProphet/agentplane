@@ -1,0 +1,33 @@
+{
+  "kind": "HygieneRunArtifact",
+  "artifact_id": "demo_bias_passport",
+  "run_ref": "agentplane://run/epigov-hygiene-runtime/demo",
+  "detector_id": "COGBIAS.CONFIRM.V1",
+  "hygiene_profile": "bias-passport",
+  "ruleset_hash": "sha256:5546c7c8c1ee47c86e670c10b53ec78feec26bb2582c8a5a0360672aaa45c2e4",
+  "input_hash": "sha256:04105d822b9a9ef129b6bf85357ea8f925c4aed80e5b8537eb7f50417ce71846",
+  "claims_evaluated": 2,
+  "hygiene_findings": [
+    {
+      "finding_id": "demo_bias_000",
+      "claim_ref": "claim://epigov/demo/claim_001",
+      "finding_type": "cognitive_bias",
+      "finding_detector_id": "COGBIAS.CONFIRM.V1",
+      "severity": "warning",
+      "description": "Only supporting sources cited; disconfirming evidence not sought."
+    },
+    {
+      "finding_id": "demo_bias_001",
+      "claim_ref": "claim://epigov/demo/claim_002",
+      "finding_type": "cognitive_bias",
+      "finding_detector_id": "COGBIAS.FRAMING.V1",
+      "severity": "info",
+      "description": "Gain-framed and loss-framed statements reach opposite conclusions."
+    }
+  ],
+  "validation_artifact_ref": "agentplane://validation/epigov-hygiene-runtime/demo",
+  "replay_artifact_ref": "agentplane://replay/epigov-hygiene-runtime/demo",
+  "sociosphere_protocol_ref": "protocol/epistemic-governance/v1",
+  "replay_verified": true,
+  "issued_at": "2026-08-03T00:00:00Z"
+}
